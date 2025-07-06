@@ -75,7 +75,7 @@ Tüm oyun ve iletişim ayarlarını yönetebileceğiniz, çocuğunuzun gelişimi
 <summary><h2>🏃‍♂️ Sprint 1</h2></summary>
 
 <details>
-<summary><h3>📈 Sprint Board Görselleri</h3></summary>
+<summary><h4>📈 Sprint Board Görselleri</h4></summary>
 
 ![Sprint 1 - To Do](./assets/Sprint1-ToDo.png)
 
@@ -84,7 +84,7 @@ Tüm oyun ve iletişim ayarlarını yönetebileceğiniz, çocuğunuzun gelişimi
 </details>
 
 <details>
-<summary><h3>💻 Uygulama Ekran Görüntüleri</h3></summary>
+<summary><h4>💻 Uygulama Ekran Görüntüleri</h4></summary>
 
 | Ana Sayfa | Giriş | Kayıt | İletişim |
 |-----------|-------|-------|----------|
