@@ -1,3 +1,5 @@
+<div align="center">
+
 # **SaySay**
 
 ![Proje Logosu](./assets/logo.png)
@@ -7,12 +9,19 @@
 ![Platform](https://img.shields.io/badge/Platform-Web-blue.svg)
 ![Technology](https://img.shields.io/badge/Technology-React-green.svg)
 ![Status](https://img.shields.io/badge/Status-Sprint2_Ongoing-orange.svg)
+![Status](https://img.shields.io/badge/Status-Sprint1_Completed-success.svg)
+
+</div>
 
 ---
 
 ## **🏆 Takım Bilgileri**
 
+<div align="center">
+
 ### **`Grup 206`**
+
+</div>
 
 ### **👥 Takım Elemanları**
 
@@ -58,34 +67,34 @@ Tüm oyun ve iletişim ayarlarını yönetebileceğiniz, çocuğunuzun gelişimi
 
 | Frontend | Backend | Veritabanı | AI | Deployment |
 |----------|---------|------------|----|------------|
-| Next.js, React, TypeScript | FastAPI, Python | Supabase PostgreSQL | Gemini API | Vercel |
+| Next.js, React, TypeScript | FastAPI, Python | Supabase PostgreSQL | Gemini | Vercel |
 
 ---
 
-## 🏃‍♂️ Sprint 1
+<details>
+<summary><h2>🏃‍♂️ Sprint 1</h2></summary>
 
-### **📊 Sprint Bilgileri**
-- **Sprint Notları**: Sprint 1'in ana hedefi, projenin temel altyapısını kurmak, teknoloji yığınını hayata geçirmek ve kullanıcıların sistemle etkileşime girebileceği en temel yapıları oluşturmaktı. Vite ile React + TypeScript projesi kuruldu, temel sayfa yapısı oluşturuldu ve responsive tasarım tamamlandı. Veritabanı için Supabase test edildi ve başarılı sonuçlar alındı. Bir sonraki sprint için Next.js'e geçiş kararı alındı.
-- **Sprint içinde tamamlanması tahmin edilen puan**: 21 Puan
-- **Puan tamamlama mantığı**: Fibonacci serisi (1, 2, 3, 5, 8) kullanılarak story point'ler belirlenmiştir. Puanlama, işin karmaşıklığı, gerektirdiği efor ve barındırdığı belirsizlik üçgenine göre yapılmıştır. Basit görevler 1-3, orta karmaşıklık 5-8 puan olarak değerlendirilmiştir.
-- **Backlog düzeni ve Story seçimleri**: Product Backlog Trello'da yönetilmekte olup, Sprint 1 için temel UI/UX tasarımları ve proje altyapısı önceliklendirilmiştir.
-- **Daily Scrum**: WhatsApp üzerinden günlük 20 dakikalık toplantılar yapılmıştır. Takım üyeleri günlük ilerlemelerini paylaşmış, engelleri belirtmiş ve bir sonraki günün planlarını yapmıştır.
-
-### **📈 Sprint Board**
+<details>
+<summary><h3>📈 Sprint Board Görselleri</h3></summary>
 
 ![Sprint 1 - To Do](./assets/Sprint1-ToDo.png)
 
 ![Sprint 1 - Done](./assets/Sprint1-Done.png)
 
-### **💻 Uygulama Ekran Görüntüleri**
+</details>
+
+<details>
+<summary><h3>💻 Uygulama Ekran Görüntüleri</h3></summary>
 
 | Ana Sayfa | Giriş | Kayıt | İletişim |
 |-----------|-------|-------|----------|
 | ![Ana Sayfa](./assets/app-hompage.png) | ![Giriş](./assets/app-login.png) | ![Kayıt](./assets/app-register.png) | ![İletişim](./assets/app-contact.png) |
 
-### **📝 Sprint Review & Retrospective**
+</details>
 
-#### **Sprint Review**
+**📝 Sprint Review & Retrospective**
+
+**Sprint Review**
 **Neler Başarıldı ve Gösterildi?**
 ✅ Proje Kurulumu (Vite + React + TS) - 3 puan
 ✅ Ana Sayfa ve İletişim Sayfası UI Kodlaması - 5 puan  
@@ -99,7 +108,7 @@ Tüm oyun ve iletişim ayarlarını yönetebileceğiniz, çocuğunuzun gelişimi
 
 **Sprint Review katılımcıları**: Muhammed Yuşa Güler, Halil Kıyak, Sevde Altunköse, Eray İnan, Muhammet Yusuf Aydın
 
-#### **Sprint Retrospective**
+**Sprint Retrospective**
 **Neler İyi Gitti?**
 - Takım içi iletişim ve iş birliği çok güçlüydü.
 - Vite kullanma kararımız, geliştirme sürecini hızlandırdı.
@@ -110,7 +119,7 @@ Tüm oyun ve iletişim ayarlarını yönetebileceğiniz, çocuğunuzun gelişimi
 - Bazı görevlerin karmaşıklığını başlangıçta tam olarak kestiremedik.
 - Bir sonraki sprint için kavram oyunları ve kullanıcı yönetimi özellikleri önceliklendirilmiştir.
 
----
+</details>
 
 [![Scrum](https://img.shields.io/badge/Methodology-Scrum-orange?style=for-the-badge&logo=scrum)](https://scrum.org/)
 [![GitHub](https://img.shields.io/badge/GitHub-Repository-black?style=for-the-badge&logo=github)](https://github.com/vamos99/SaySay)
