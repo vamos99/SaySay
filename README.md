@@ -121,5 +121,9 @@ Tüm oyun ve iletişim ayarlarını yönetebileceğiniz, çocuğunuzun gelişimi
 
 </details>
 
+<div align="center">
+
 [![Scrum](https://img.shields.io/badge/Methodology-Scrum-orange?style=for-the-badge&logo=scrum)](https://scrum.org/)
 [![GitHub](https://img.shields.io/badge/GitHub-Repository-black?style=for-the-badge&logo=github)](https://github.com/vamos99/SaySay)
+
+</div>
