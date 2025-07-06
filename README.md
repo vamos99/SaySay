@@ -6,9 +6,9 @@
 
 *Çocuğunuzun sesini duyun, gelişimini destekleyin!*
 
-[![Platform](https://img.shields.io/badge/Platform-Web-blue.svg)](https://example.com)
-[![Technology](https://img.shields.io/badge/Technology-React-green.svg)](https://example.com)
-[![Status](https://img.shields.io/badge/Status-Sprint1_Completed-success.svg)](https://example.com)
+![Platform](https://img.shields.io/badge/Platform-Web-blue.svg)
+![Technology](https://img.shields.io/badge/Technology-React-green.svg)
+![Status](https://img.shields.io/badge/Status-Sprint2_Ongoing-orange.svg)
 
 </div>
 
@@ -33,7 +33,7 @@
   </tr>
   <tr>
     <td><b>Muhammed Yuşa Güler</b></td>
-    <td><span style="background-color: #ff6b6b; color: white; padding: 4px 8px; border-radius: 12px; font-size: 12px;">Product Owner</span></td>
+    <td><kbd style="background-color: #ff6b6b; color: white; padding: 4px 8px; border-radius: 12px; font-size: 12px;">Product Owner</kbd></td>
     <td>
       <a href="https://github.com/yusaglr" target="_blank"><img src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" width="20" height="20"/></a>
       <a href="placeholder_linkedin_url" target="_blank"><img src="https://content.linkedin.com/content/dam/me/business/en-us/amp/brand-site/v2/bg/LI-Bug.svg.original.svg" width="20" height="20"/></a>
@@ -41,7 +41,7 @@
   </tr>
   <tr>
     <td><b>Halil Kıyak</b></td>
-    <td><span style="background-color: #4ecdc4; color: white; padding: 4px 8px; border-radius: 12px; font-size: 12px;">Scrum Master</span></td>
+    <td><kbd style="background-color: #4ecdc4; color: white; padding: 4px 8px; border-radius: 12px; font-size: 12px;">Scrum Master</kbd></td>
     <td>
       <a href="https://github.com/vamos99" target="_blank"><img src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" width="20" height="20"/></a>
       <a href="https://tr.linkedin.com/in/halilkiyak" target="_blank"><img src="https://content.linkedin.com/content/dam/me/business/en-us/amp/brand-site/v2/bg/LI-Bug.svg.original.svg" width="20" height="20"/></a>
@@ -49,7 +49,7 @@
   </tr>
   <tr>
     <td><b>Sevde Altunköse</b></td>
-    <td><span style="background-color: #45b7d1; color: white; padding: 4px 8px; border-radius: 12px; font-size: 12px;">Developer</span></td>
+    <td><kbd style="background-color: #45b7d1; color: white; padding: 4px 8px; border-radius: 12px; font-size: 12px;">Developer</kbd></td>
     <td>
       <a href="https://github.com/SevdeAltunkose" target="_blank"><img src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" width="20" height="20"/></a>
       <a href="https://tr.linkedin.com/in/sevde-altunk%C3%B6se-608450312" target="_blank"><img src="https://content.linkedin.com/content/dam/me/business/en-us/amp/brand-site/v2/bg/LI-Bug.svg.original.svg" width="20" height="20"/></a>
@@ -57,7 +57,7 @@
   </tr>
   <tr>
     <td><b>Eray İnan</b></td>
-    <td><span style="background-color: #96ceb4; color: white; padding: 4px 8px; border-radius: 12px; font-size: 12px;">Developer</span></td>
+    <td><kbd style="background-color: #96ceb4; color: white; padding: 4px 8px; border-radius: 12px; font-size: 12px;">Developer</kbd></td>
     <td>
       <a href="https://github.com/erayinn" target="_blank"><img src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" width="20" height="20"/></a>
       <a href="https://www.linkedin.com/in/eray-inan-b022392a9/" target="_blank"><img src="https://content.linkedin.com/content/dam/me/business/en-us/amp/brand-site/v2/bg/LI-Bug.svg.original.svg" width="20" height="20"/></a>
@@ -65,7 +65,7 @@
   </tr>
   <tr>
     <td><b>Muhammet Yusuf Aydın</b></td>
-    <td><span style="background-color: #feca57; color: white; padding: 4px 8px; border-radius: 12px; font-size: 12px;">Developer</span></td>
+    <td><kbd style="background-color: #feca57; color: white; padding: 4px 8px; border-radius: 12px; font-size: 12px;">Developer</kbd></td>
     <td>
       <a href="https://github.com/yayd1n" target="_blank"><img src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" width="20" height="20"/></a>
       <a href="https://www.linkedin.com/in/muhammet-yusuf-ayd%C4%B1n/" target="_blank"><img src="https://content.linkedin.com/content/dam/me/business/en-us/amp/brand-site/v2/bg/LI-Bug.svg.original.svg" width="20" height="20"/></a>
@@ -147,7 +147,7 @@
 
 ### **📊 Sprint Bilgileri**
 - **Sprint Notları**: Sprint 1'in ana hedefi, projenin temel altyapısını kurmak, teknoloji yığınını hayata geçirmek ve kullanıcıların sistemle etkileşime girebileceği en temel yapıları oluşturmaktı. Vite ile React + TypeScript projesi kuruldu, temel sayfa yapısı oluşturuldu ve responsive tasarım tamamlandı. Veritabanı için Supabase test edildi ve başarılı sonuçlar alındı. Bir sonraki sprint için Next.js'e geçiş kararı alındı.
-- **Sprint içinde tamamlanması tahmin edilen puan**: <span style="background-color: #28a745; color: white; padding: 4px 8px; border-radius: 12px;">21 Puan</span>
+- **Sprint içinde tamamlanması tahmin edilen puan**: <kbd style="background-color: #28a745; color: white; padding: 4px 8px; border-radius: 12px;">21 Puan</kbd>
 - **Puan tamamlama mantığı**: Fibonacci serisi (1, 2, 3, 5, 8) kullanılarak story point'ler belirlenmiştir. Puanlama, işin karmaşıklığı, gerektirdiği efor ve barındırdığı belirsizlik üçgenine göre yapılmıştır. Basit görevler 1-3, orta karmaşıklık 5-8 puan olarak değerlendirilmiştir.
 - **Backlog düzeni ve Story seçimleri**: Product Backlog Trello'da yönetilmekte olup, Sprint 1 için temel UI/UX tasarımları ve proje altyapısı önceliklendirilmiştir.
 - **Daily Scrum**: WhatsApp üzerinden günlük 20 dakikalık toplantılar yapılmıştır. Takım üyeleri günlük ilerlemelerini paylaşmış, engelleri belirtmiş ve bir sonraki günün planlarını yapmıştır.
@@ -216,7 +216,7 @@
 
 <div align="center">
 
-**Not**: Bu README dosyası Scrum metodolojisi kullanılarak geliştirilmiştir. Sprint 1 süreçleri detaylı olarak dokümante edilmiştir.
+
 
 [![Scrum](https://img.shields.io/badge/Methodology-Scrum-orange?style=for-the-badge&logo=scrum)](https://scrum.org/)
 [![GitHub](https://img.shields.io/badge/GitHub-Repository-black?style=for-the-badge&logo=github)](https://github.com/vamos99/SaySay)
