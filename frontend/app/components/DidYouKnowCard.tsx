@@ -1,7 +1,8 @@
+'use client';
+
 import React, { useState, useEffect } from 'react';
-import { FACTS } from '../utils/constants';
-import dogImg from '../assets/dog.png';
-import kidImg from '../assets/kid.png';
+import { FACTS } from '@/constants';
+import Image from 'next/image';
 
 export const DidYouKnowCard: React.FC = () => {
   const [factIndex, setFactIndex] = useState(0);
@@ -31,14 +32,16 @@ export const DidYouKnowCard: React.FC = () => {
         <h3>{currentFact.title}</h3>
         <p>{currentFact.text}</p>
       </div>
-                  <img
-              key={factIndex}
-              src={currentFact.image.includes('kid') ? kidImg : dogImg}
-              alt="Bilgi görseli"
-              className={`fact-image ${currentFact.image.includes('kid') ? 'fact-image-kid' : 'fact-image-dog'} ${isTransitioning ? 'fade-out' : 'fade-in'}`}
-            />
+      <Image
+        key={factIndex}
+        src={`/${currentFact.image}`}
+        alt="Bilgi görseli"
+        width={150}
+        height={150}
+        className={`fact-image ${currentFact.image.includes('kid') ? 'fact-image-kid' : 'fact-image-dog'} ${isTransitioning ? 'fade-out' : 'fade-in'}`}
+      />
       <div className="card-footer">&lt;ooo&gt;</div>
       <div className="sparkle bottom-right">✨</div>
     </div>
   );
-}; 
+};

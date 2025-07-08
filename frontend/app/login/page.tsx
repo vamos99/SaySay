@@ -1,10 +1,20 @@
-import React, { FormEvent } from 'react';
-import { DidYouKnowCard } from '../components/DidYouKnowCard';
+'use client';
 
-export const LoginPage: React.FC = () => {
-  const handleSubmit = (e: FormEvent) => {
+import React, { FormEvent } from 'react';
+import { DidYouKnowCard } from '@/components/DidYouKnowCard';
+import { supabase } from '../utils/supabaseClient';
+
+export default function LoginPage() {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    // Handle login logic
+    const email = (document.getElementById('email') as HTMLInputElement).value;
+    const password = (document.getElementById('password') as HTMLInputElement).value;
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error) {
+      alert('Giriş başarısız: ' + error.message);
+    } else {
+      window.location.href = '/portal';
+    }
   };
 
   return (
@@ -20,10 +30,10 @@ export const LoginPage: React.FC = () => {
               <input type="password" id="password" required placeholder="Şifre" />
             </div>
             <button type="submit" className="btn-submit">Giriş</button>
-            <a href="#/forgot-password" className="form-link">Şifreni mi Unuttun?</a>
+            <a href="/forgot-password" className="form-link">Şifreni mi Unuttun?</a>
           </form>
         </div>
       </div>
     </div>
   );
-}; 
+};

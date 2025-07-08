@@ -1,9 +1,20 @@
-import React, { FormEvent } from 'react';
+'use client';
 
-export const RegisterPage: React.FC = () => {
-  const handleSubmit = (e: FormEvent) => {
+import React, { FormEvent } from 'react';
+import { supabase } from '../utils/supabaseClient';
+
+export default function RegisterPage() {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    // Handle registration logic
+    const email = (document.getElementById('reg-email') as HTMLInputElement).value;
+    const password = (document.getElementById('reg-password') as HTMLInputElement).value;
+    const { error } = await supabase.auth.signUp({ email, password });
+    if (error) {
+      alert('Kayıt başarısız: ' + error.message);
+    } else {
+      alert('Kayıt başarılı! Lütfen e-postanızı kontrol edin.');
+      window.location.href = '/login';
+    }
   };
 
   return (
@@ -41,16 +52,9 @@ export const RegisterPage: React.FC = () => {
             <div className="checkbox-item"><input type="checkbox" id="gender-f"/> <label htmlFor="gender-f">Kadın</label></div>
             <div className="checkbox-item"><input type="checkbox" id="gender-m"/> <label htmlFor="gender-m">Erkek</label></div>
           </div>
-          <div className="checkbox-group">
-            <div className="checkbox-item"><input type="checkbox" id="literate"/> <label htmlFor="literate">Okuma Yazma Biliyor</label></div>
-            <div className="checkbox-item"><input type="checkbox" id="not-literate"/> <label htmlFor="not-literate">Okuma Yazma Bilmiyor</label></div>
-          </div>
-          <div className="checkbox-group">
-            <div className="checkbox-item"><input type="checkbox" id="special-needs"/> <label htmlFor="special-needs">Özel Gereksinimli?</label></div>
-          </div>
           <button type="submit" className="btn-submit">Kayıt Ol</button>
         </form>
       </div>
     </div>
   );
-}; 
+};

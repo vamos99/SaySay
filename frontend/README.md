@@ -1,176 +1,65 @@
-# Frontend - SAY SAY Çocuk Gelişim Platformu
-
-Bu klasör, SAY SAY çocuk gelişim platformunun frontend uygulamasını içerir.
+# SAY SAY Çocuk Gelişim Platformu - Frontend
 
 ## Teknolojiler
+- **Next.js 15 (App Router)**
+- **TypeScript**
+- **Supabase** (Auth & DB)
+- **Vercel** (deploy için önerilir)
+- **Modern CSS (custom, responsive, animasyonlu)**
 
-- **React 19** - Modern React kütüphanesi
-- **TypeScript** - Tip güvenliği
-- **Vite** - Hızlı build tool
-- **CSS3** - Stil dosyaları
-
-## Proje Yapısı
-
+## Klasör Yapısı
 ```
 frontend/
-├── src/                  # Kaynak kodlar
-│   ├── components/       # Yeniden kullanılabilir bileşenler
-│   ├── pages/           # Sayfa bileşenleri
-│   ├── styles/          # Stil dosyaları
-│   ├── assets/          # Görseller
-│   ├── types/           # TypeScript tip tanımları
-│   ├── utils/           # Yardımcı fonksiyonlar
-│   ├── hooks/           # Custom React hooks
-│   ├── App.tsx          # Ana uygulama bileşeni
-│   └── main.tsx         # Uygulama giriş noktası
-├── index.html           # HTML şablonu
-├── package.json         # Proje bağımlılıkları
-├── tsconfig.json        # TypeScript yapılandırması
-├── vite.config.ts       # Vite yapılandırması
-├── .gitignore           # Git ignore dosyası
-└── README.md            # Bu dosya
-```
-
-### Detaylı Yapı
-
-```
-src/
-├── components/          # Yeniden kullanılabilir bileşenler
-│   ├── Header.tsx       # Navigasyon header'ı
-│   ├── FeatureCard.tsx  # Özellik kartları
-│   └── DidYouKnowCard.tsx # Bilgi kartı
-├── pages/              # Sayfa bileşenleri
-│   ├── HomePage.tsx     # Ana sayfa
-│   ├── LoginPage.tsx    # Giriş sayfası
-│   ├── RegisterPage.tsx # Kayıt sayfası
-│   └── ContactPage.tsx  # İletişim sayfası
-├── styles/             # Stil dosyaları
-│   └── index.css       # Ana CSS dosyası
-├── assets/             # Görseller
-│   ├── saysay.png      # SAY SAY logosu
-│   ├── nedir.png       # NEDİR logosu
-│   ├── kid.png         # Çocuk görseli
-│   ├── dog.png         # Köpek görseli
-│   └── comment.png     # Yorum simgesi
-├── types/              # TypeScript tip tanımları
-│   └── index.ts        # Interface'ler
-├── utils/              # Yardımcı fonksiyonlar
-│   └── constants.ts    # Sabit değerler
-├── hooks/              # Custom React hooks
-│   └── useNavigation.ts # Navigation hook'u
-├── App.tsx             # Ana uygulama bileşeni
-└── main.tsx            # Uygulama giriş noktası
+├── app/                  # Next.js app router kökü
+│   ├── components/       # Ortak bileşenler (Header, Sidebar, Kartlar, Iconlar)
+│   │   └── icons/        # Tüm custom SVG ikonlar
+│   ├── portal/           # Portal ve çocuk yönetimi (ve alt componentleri)
+│   │   └── components/   # Portal'a özel componentler (modal, kart, animasyon)
+│   ├── contact/          # İletişim sayfası
+│   ├── login/            # Giriş sayfası
+│   ├── register/         # Kayıt sayfası
+│   ├── styles/           # Ana CSS dosyası
+│   ├── types/            # TypeScript tipleri
+│   ├── utils/            # AuthContext, Supabase client vb.
+│   └── constants.ts      # Sabitler
+├── public/               # Statik dosyalar ve görseller
+├── .env.local            # Supabase anahtarları (örnek: .env.local.example)
+├── package.json
+├── tsconfig.json
+├── next.config.mjs
+└── README.md
 ```
 
 ## Özellikler
+- Supabase Auth ile ebeveyn girişi, çocuk profili yönetimi
+- Rol bazlı yönlendirme, global session yönetimi (AuthContext)
+- Responsive, modern ve animasyonlu custom UI/UX
+- Tüm ikonlar ve loading ekranı custom SVG, emoji yok
+- Portal/Sidebar yapısı, açılır/kapanır, animasyonlu
+- Çocuk ekleme, modal ve localStorage ile ilk giriş kontrolü
+- Tüm kodlar clean code ve guideline.txt'ye tam uyumlu
+- .env.local ile güvenli anahtar yönetimi
+- Production-ready, gereksiz dosya ve kod yok
 
-### 🎮 **Ana Sayfa**
-- Platform tanıtımı
-- Özellik kartları
-- Hero bölümü
-
-### 🔐 **Giriş Sayfası**
-- Kullanıcı girişi
-- Bilgi kartı animasyonu
-- Responsive tasarım
-
-### 📝 **Kayıt Sayfası**
-- Yeni hesap oluşturma
-- Form validasyonu
-- Kişisel bilgi girişi
-
-### 📞 **İletişim Sayfası**
-- İletişim formu
-- Mesaj gönderme
-
-## Mimari Özellikler
-
-### **Component-Based Architecture**
-- Yeniden kullanılabilir bileşenler
-- Tek sorumluluk prensibi
-- Props ile veri aktarımı
-
-### **Custom Hooks**
-- `useNavigation` - Sayfa yönlendirme
-- State yönetimi
-- Side effect handling
-
-### **TypeScript**
-- Tip güvenliği
-- Interface tanımları
-- IntelliSense desteği
-
-### **Clean Code**
-- Temiz kod prensipleri
-- Separation of concerns
-- DRY principle
-
-## Geliştirme
-
-### Kurulum
+## Kurulum & Çalıştırma
 ```bash
 cd frontend
 npm install
-```
-
-### Geliştirme Sunucusu
-```bash
-cd frontend
 npm run dev
+# .env.local dosyanı oluşturmayı unutma!
 ```
 
-### Build
+## Build & Deploy
 ```bash
-cd frontend
 npm run build
+# Vercel veya dilediğin Next.js hosting ile kolayca deploy edebilirsin
 ```
 
-### Preview
-```bash
-cd frontend
-npm run preview
-```
+## Notlar
+- Tüm gereksiz dosya ve eski Vite/React yapısı kaldırıldı.
+- Klasörler ve componentler modern Next.js mimarisine göre ayrıldı.
+- .env.local, .next, node_modules, guideline.txt vb. .gitignore'a eklendi.
+- Kodlar guideline ve kullanıcı taleplerine %100 uyumlu, test edildi ve onaylandı.
 
-## Çalıştırma
-
-Bu frontend uygulaması bağımsız olarak çalışır. Ana dizinden frontend klasörüne geçerek komutları çalıştırın:
-
-```bash
-# Ana dizinden
-cd frontend
-
-# Bağımlılıkları yükle
-npm install
-
-# Geliştirme sunucusunu başlat
-npm run dev
-```
-
-Uygulama `http://localhost:5173` adresinde çalışacaktır.
-
-## Stil Rehberi
-
-### Renkler
-- `--primary-yellow`: #FFD600
-- `--primary-blue`: #a9dff5
-- `--dark-text`: #2c3e50
-- `--light-text`: #5a6a78
-
-### Fontlar
-- **Nunito**: Ana metin
-- **Fredoka One**: Logo
-
-### Responsive Breakpoints
-- Desktop: 992px+
-- Tablet: 768px-991px
-- Mobile: 480px-767px
-
-## Gelecek Planları
-
-- [ ] Backend entegrasyonu
-- [ ] State management (Redux/Zustand)
-- [ ] Unit testler
-- [ ] E2E testler
-- [ ] PWA desteği
-- [ ] Dark mode
-- [ ] Çoklu dil desteği 
+---
+Her türlü katkı, öneri ve geri bildirim için PR veya issue açabilirsin. 

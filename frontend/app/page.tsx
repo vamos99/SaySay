@@ -1,24 +1,33 @@
-import React from 'react';
-import { FeatureCard } from '../components/FeatureCard';
-import saysayImg from '../assets/saysay.png';
-import nedirImg from '../assets/nedir.png';
-import commentImg from '../assets/comment.png';
-import kidImg from '../assets/kid.png';
+'use client';
 
-export const HomePage: React.FC = () => {
+import React, { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { useAuth } from './utils/AuthContext';
+import { FeatureCard } from '@/components/FeatureCard';
+import Image from 'next/image';
+
+export default function HomePage() {
+  const { session, loading } = useAuth();
+  const router = useRouter();
+  useEffect(() => {
+    if (!loading && session) {
+      router.replace('/portal');
+    }
+  }, [session, loading, router]);
+  if (loading) return null;
+  if (session) return null;
   return (
     <div className="page-container container">
       <div className="home-layout">
         <div className="home-left-column">
           <section className="hero-section">
             <div className="hero-say-say">
-              <img src={saysayImg} alt="SAY SAY" className="hero-image" />
+              <Image src="/saysay.png" alt="SAY SAY" width={500} height={200} className="hero-image" />
             </div>
             <div className="hero-nedir">
-              <img src={nedirImg} alt="NEDİR" className="hero-image" />
+              <Image src="/nedir.png" alt="NEDİR" width={500} height={200} className="hero-image" />
             </div>
           </section>
-
           <section className="about-section">
             <h2 className="about-title">Çocuğunuzun sesini duyun, gelişimini destekleyin!</h2>
             <p>
@@ -35,12 +44,12 @@ export const HomePage: React.FC = () => {
               <FeatureCard icon="📚" title="Eğitim Kaynakları" color="#f8e4c9" description="Gelişimini destekleyecek zengin ve çeşitli eğitim materyalleri kütüphanesi."/>
               <FeatureCard icon="⏱️" title="Zaman Yönetimi" color="#fef9e7" description="Ekran süresini sağlıklı bir şekilde yönetmek için zamanlayıcılar ve sınırlar belirleyin."/>
               <FeatureCard icon="📊" title="Gelişim Takibi" color="#bde6d3" description="Çocuğunuzun ilerlemesini ve gelişimsel kilometre taşlarını kolayca takip edin."/>
-              <FeatureCard icon={<img src={commentImg} alt="İletişim" className="feature-icon" />} title="İletişim Panosu" color="#fef9e7" description="Çocuğunuzla, öğretmenlerle ve uzmanlarla güvenli bir şekilde iletişim kurun."/>
-              <FeatureCard icon={<img src={kidImg} alt="Kişisel Profil" className="feature-icon" />} title="Kişisel Profil" color="#f8c9d3" description="Her çocuk için ilgi alanlarına ve ihtiyaçlarına göre kişiselleştirilmiş profiller oluşturun."/>
+              <FeatureCard icon={<Image src="/comment.png" alt="İletişim" width={40} height={40} className="feature-icon" />} title="İletişim Panosu" color="#fef9e7" description="Çocuğunuzla, öğretmenlerle ve uzmanlarla güvenli bir şekilde iletişim kurun."/>
+              <FeatureCard icon={<Image src="/kid.png" alt="Kişisel Profil" width={40} height={40} className="feature-icon" />} title="Kişisel Profil" color="#f8c9d3" description="Her çocuk için ilgi alanlarına ve ihtiyaçlarına göre kişiselleştirilmiş profiller oluşturun."/>
             </div>
           </section>
         </div>
       </div>
     </div>
   );
-}; 
+}
