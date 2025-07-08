@@ -1,0 +1,24 @@
+# Proje gereksiz dosya/klasörleri
+.guideline.txt
+guideline.txt
+.cursor/
+
+# Gerekirse ek olarak: VSCode, MacOS, log, temp, build, .env dosyaları
+.vscode/
+.DS_Store
+node_modules/
+.next/
+.env*
+*.log
+dist/
+build/ 
+# Ortam değişkenleri (gizli anahtarlar)
+.env
+.env.*
+.env.local
+.env.development
+.env.production
+
+# Test ve upload çıktıları
+coverage/
+uploads/ 
