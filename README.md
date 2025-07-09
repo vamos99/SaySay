@@ -71,53 +71,85 @@ Tüm oyun ve iletişim ayarlarını yönetebileceğiniz, çocuğunuzun gelişimi
 
 ---
 
-<details>
+<details open>
 <summary><h2>🏃‍♂️ Sprint 1</h2></summary>
 
+### Sprint Notları
+Bu sprint'in ana hedefi, projenin temel frontend arayüzlerini kodlayarak görsel bir prototip oluşturmaktı. Hızlı başlangıç için Vite ile React + TypeScript projesi kuruldu ve statik sayfalar (Ana Sayfa, Giriş/Kayıt, İletişim) hayata geçirildi. Tüm bu sayfaların mobil ve masaüstü cihazlarla uyumlu responsive tasarımı tamamlandı. Sprint sonunda, projenin ölçeklenebilirliği için Next.js'e geçiş yapılmasına stratejik olarak karar verildi.
+
+---
+
+### Sprint İçinde Tamamlanması Tahmin Edilen Puan
+**Hedeflenen Puan:** 21 Puan  
+**Tamamlanan Puan:** 21 Puan
+
+---
+
+### Puan Tamamlama Mantığı
+Proje boyunca tamamlanması gereken toplam backlog puanı 131’dir. İlk Sprint için bitirilmesi istenilen puan sayısı 21 olarak belirlenmiştir ve hedefe ulaşılmıştır.
+
+Puanlama, görevlerin karmaşıklığı, gerektirdiği efor ve barındırdığı belirsizliklere göre Fibonacci serisi (1, 2, 3, 5, 8, ...) kullanılarak belirlenmektedir. Bir görev, tüm gereksinimleri karşılayıp "Done" sütununa taşındığında, o göreve atanan puan tamamlanmış sayılır.
+
+---
+
 <details>
-<summary><h4>📈 Sprint Board Görselleri</h4></summary>
+<summary><h4>Daily Scrum</h4></summary>
 
-![Sprint 1 - To Do](./assets/Sprint1-ToDo.png)
+Daily Scrum toplantılarında ekip, önceki gün yapılanlar, o günün planı ve karşılaşılan engelleri paylaşmıştır.
 
-![Sprint 1 - Done](./assets/Sprint1-Done.png)
+Aşağıdaki görselde UI/UX ve uygulama özellikleri üzerine yapılan tartışmadan bir kesit yer almaktadır.
+
+![alt text](./assets/wp%20konuşma.png)
 
 </details>
 
 <details>
-<summary><h4>💻 Uygulama Ekran Görüntüleri</h4></summary>
+<summary><h4>Sprint Board</h4></summary>
 
-| Ana Sayfa | Giriş | Kayıt | İletişim |
-|-----------|-------|-------|----------|
-| ![Ana Sayfa](./assets/app-hompage.png) | ![Giriş](./assets/app-login.png) | ![Kayıt](./assets/app-register.png) | ![İletişim](./assets/app-contact.png) |
+**Sprint Board Linki:** [https://trello.com/b/gMziIBP7/saysay](https://trello.com/b/gMziIBP7/saysay)
+
+![alt text](./assets/Sprint%201%20To%20Do.png)
+![alt text](./assets/Sprint%201%20Done.png)
 
 </details>
 
-**📝 Sprint Review & Retrospective**
+<details>
+<summary><h4>Uygulama Ekran Görüntüleri</h4></summary>
 
-**Sprint Review**
-**Neler Başarıldı ve Gösterildi?**
-✅ Proje Kurulumu (Vite + React + TS) - 3 puan
-✅ Ana Sayfa ve İletişim Sayfası UI Kodlaması - 5 puan  
-✅ Giriş ve Kayıt Sayfaları UI Kodlaması - 5 puan
-✅ Tüm Sayfalar için Responsive Tasarım - 8 puan
-✅ Proje klasör yapısı organize edildi (components, pages, styles, utils, hooks, types).
-✅ Veritabanı için Supabase test edildi ve başarılı sonuçlar alındı.
+Ana Sayfa  
+![alt text](./assets/app-hompage.png)
 
-**Tespit Edilen Sorunlar:**
-⚠️ Planlanan tasarıma göre ufak tasarım sorunları mevcut.
+Giriş  
+![alt text](./assets/app-login.png)
 
-**Sprint Review katılımcıları**: Muhammed Yuşa Güler, Halil Kıyak, Sevde Altunköse, Eray İnan, Muhammet Yusuf Aydın
+Kayıt  
+![alt text](./assets/app-register.png)
 
-**Sprint Retrospective**
-**Neler İyi Gitti?**
-- Takım içi iletişim ve iş birliği çok güçlüydü.
-- Vite kullanma kararımız, geliştirme sürecini hızlandırdı.
-- Responsive tasarım başarıyla tamamlandı.
-- Teknoloji stack kararlarında esneklik gösterdik (Vite'dan Next.js'e geçiş planı).
+İletişim  
+![alt text](./assets/app-contact.png)
 
-**Neler Geliştirilebilir?**
-- Bazı görevlerin karmaşıklığını başlangıçta tam olarak kestiremedik.
-- Bir sonraki sprint için kavram oyunları ve kullanıcı yönetimi özellikleri önceliklendirilmiştir.
+</details>
+
+<details>
+<summary><h4>Sprint Review & Retrospective</h4></summary>
+
+<strong>Review (Neler Başarıldı?):</strong>
+
+✅ (3 Puan) Vite ile React + TypeScript projesi başarıyla kuruldu.
+
+✅ (5 Puan) Ana Sayfa ve İletişim Sayfası UI kodlaması tamamlandı.
+
+✅ (5 Puan) Giriş ve Kayıt Sayfaları UI kodlaması tamamlandı.
+
+✅ (8 Puan) Tüm sayfalar için responsive tasarım yapıldı.
+
+<strong>Retrospective (Neler Öğrendik?):</strong>
+
+Takım içi iletişim ve Vite kullanarak hızlı başlangıç yapmamız çok iyi gitti.
+
+Bazı UI görevlerinin tahminimizden uzun sürdüğünü fark ettik. Bir sonraki sprint için daha dikkatli planlama yapma kararı aldık.
+
+</details>
 
 </details>
 
