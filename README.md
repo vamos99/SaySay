@@ -116,17 +116,9 @@ Aşağıdaki görselde UI/UX ve uygulama özellikleri üzerine yapılan tartış
 <details>
 <summary><h4>Uygulama Ekran Görüntüleri</h4></summary>
 
-Ana Sayfa  
-![alt text](./assets/app-hompage.png)
-
-Giriş  
-![alt text](./assets/app-login.png)
-
-Kayıt  
-![alt text](./assets/app-register.png)
-
-İletişim  
-![alt text](./assets/app-contact.png)
+| Ana Sayfa | Giriş | Kayıt | İletişim |
+|-----------|-------|-------|----------|
+| ![Ana Sayfa](./assets/app-hompage.png) | ![Giriş](./assets/app-login.png) | ![Kayıt](./assets/app-register.png) | ![İletişim](./assets/app-contact.png) |
 
 </details>
 
