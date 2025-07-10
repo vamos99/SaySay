@@ -9,6 +9,7 @@ import { ExpandSidebarIcon } from '@/components/icons/ExpandSidebarIcon';
 import { AddChildModal } from './components/AddChildModal';
 import { AnimatedBubbles } from './components/AnimatedBubbles';
 import { PortalCard } from './components/PortalCard';
+import LoadingScreen from '@/components/LoadingScreen';
 
 const MOTIVATION = [
   'Her çocuk bir dünyadır! 🌍',
@@ -30,6 +31,7 @@ export default function PortalPage() {
   const [showAddChild, setShowAddChild] = useState(false);
   const [children, setChildren] = useState<any[]>([]);
   const [childrenLoading, setChildrenLoading] = useState(true);
+  const [selectedChildId, setSelectedChildId] = useState<string | null>(null);
   // Hydration hatası için: SSR'da sabit başlat, client'ta güncelle
   const [progress, setProgress] = useState(20); // SSR'da sabit
   const [motivation, setMotivation] = useState(MOTIVATION[0]); // SSR'da sabit
@@ -51,6 +53,11 @@ export default function PortalPage() {
       const anim = `bubble${i+1} ${(4+i)}s infinite alternate`;
       return { size, top, left, color, opacity, anim, i };
     }));
+    // Seçili çocuk localStorage'dan yükle
+    if (typeof window !== 'undefined') {
+      const stored = localStorage.getItem('selected_child_id');
+      if (stored) setSelectedChildId(stored);
+    }
   }, []);
 
   useEffect(() => {
@@ -63,7 +70,7 @@ export default function PortalPage() {
       supabase
         .from('children')
         .select('*')
-        .eq('parent_id', user.id)
+        .eq('user_id', user.id)
         .then(({ data }) => {
           setChildren(data || []);
           setChildrenLoading(false);
@@ -71,6 +78,11 @@ export default function PortalPage() {
             setShowAddChild(true);
           } else {
             setShowAddChild(false);
+            // Eğer seçili çocuk yoksa ilkini seç
+            if ((!selectedChildId || !(data || []).find(c=>c.id===selectedChildId)) && data && data.length > 0) {
+              setSelectedChildId(data[0].id);
+              localStorage.setItem('selected_child_id', data[0].id);
+            }
           }
         });
     }
@@ -91,103 +103,34 @@ export default function PortalPage() {
     return () => { if (progressRef.current) clearInterval(progressRef.current); };
   }, [loading, childrenLoading, isClient]);
 
-  // Çocuk ekleme işlemi sonrası children'ı güncelle
+  // Çocuk ekleme işlemi sonrası children'ı güncelle ve yeni çocuğu seçili yap
   const handleAddChild = async (name: string) => {
     if (!user?.id) return;
-    await supabase.from('children').insert([{ parent_id: user.id, name }]);
+    const { data: inserted, error } = await supabase.from('children').insert([{ user_id: user.id, name }]).select();
     // Yeniden fetch et
     setChildrenLoading(true);
-    const { data } = await supabase.from('children').select('*').eq('parent_id', user.id);
+    const { data } = await supabase.from('children').select('*').eq('user_id', user.id);
     setChildren(data || []);
     setChildrenLoading(false);
     setShowAddChild(false);
-    localStorage.setItem('child_added_once', '1'); // Artık tekrar popup açılmasın
+    localStorage.setItem('child_added_once', '1');
+    // Eklenen çocuğu seçili yap
+    if (inserted && inserted[0]) {
+      setSelectedChildId(inserted[0].id);
+      localStorage.setItem('selected_child_id', inserted[0].id);
+    }
   };
 
-  if (!isClient) return null; // SSR'da hiç render etme, client'ta başlat
+  // Çocuk seçimi değişince localStorage'a yaz
+  useEffect(() => {
+    if (selectedChildId) {
+      localStorage.setItem('selected_child_id', selectedChildId);
+    }
+  }, [selectedChildId]);
+
+  if (!isClient) return null;
   if (loading || childrenLoading) {
-    // Random baloncuklar (artık state'ten)
-    const bubbleEls = bubbles.map(({size, top, left, color, opacity, anim, i}) => (
-      <div key={i} style={{position:'absolute',top:`${top}%`,left:`${left}%`,opacity,animation:anim,zIndex:0}}>
-        <svg width={size} height={size}><circle cx={size/2} cy={size/2} r={size/2-3} fill={color} /></svg>
-      </div>
-    ));
-    // Custom SVG çocuk yüzü
-    const ChildFaceSVG = (
-      <svg width="120" height="120" viewBox="0 0 120 120" style={{display:'block'}}>
-        <circle cx="60" cy="60" r="56" fill="#ffe6b3" stroke="#e0b97d" strokeWidth="4" />
-        <ellipse cx="60" cy="80" rx="32" ry="18" fill="#fff" />
-        <ellipse cx="60" cy="80" rx="18" ry="10" fill="#f9d7a0" />
-        <ellipse cx="42" cy="60" rx="7" ry="9" fill="#fff" />
-        <ellipse cx="78" cy="60" rx="7" ry="9" fill="#fff" />
-        <ellipse cx="42" cy="62" rx="3.5" ry="4.5" fill="#5a6a78" />
-        <ellipse cx="78" cy="62" rx="3.5" ry="4.5" fill="#5a6a78" />
-        <ellipse cx="60" cy="92" rx="7" ry="3.5" fill="#e0b97d" />
-        <path d="M50 50 Q60 40 70 50" stroke="#e0b97d" strokeWidth="3" fill="none" />
-        <path d="M48 90 Q60 100 72 90" stroke="#e0b97d" strokeWidth="2" fill="none" />
-        <ellipse cx="35" cy="48" rx="7" ry="4" fill="#e0b97d" opacity="0.18" />
-        <ellipse cx="85" cy="48" rx="7" ry="4" fill="#e0b97d" opacity="0.18" />
-        <ellipse cx="60" cy="30" rx="18" ry="10" fill="#e0b97d" opacity="0.18" />
-      </svg>
-    );
-    // Custom SVG dönen oyuncak ikonları
-    const OrbitSVG = (
-      <svg width="180" height="180" style={{position:'absolute',top:-30,left:-30,animation:'orbit 3.5s linear infinite',zIndex:2}}>
-        {/* Ayı */}
-        <g transform="rotate(0 90 90)">
-          <circle cx="90" cy="30" r="18" fill="#ffe6b3" stroke="#e0b97d" strokeWidth="2" />
-          <ellipse cx="90" cy="25" rx="5" ry="3" fill="#fff" opacity="0.7" />
-          <circle cx="82" cy="28" r="3" fill="#e0b97d" />
-          <circle cx="98" cy="28" r="3" fill="#e0b97d" />
-        </g>
-        {/* Balon */}
-        <g transform="rotate(120 90 90)">
-          <ellipse cx="90" cy="30" rx="10" ry="16" fill="#e0b97d" stroke="#e0b97d" strokeWidth="2" />
-          <rect x="87" y="46" width="6" height="8" rx="2" fill="#5a6a78" />
-          <path d="M90 54 Q92 58 94 54" stroke="#5a6a78" strokeWidth="2" fill="none" />
-        </g>
-        {/* Puzzle */}
-        <g transform="rotate(240 90 90)">
-          <rect x="80" y="18" width="20" height="20" rx="5" fill="#fff6e0" stroke="#e0b97d" strokeWidth="2" />
-          <circle cx="90" cy="18" r="4" fill="#fff" stroke="#5a6a78" strokeWidth="1" />
-          <circle cx="100" cy="28" r="4" fill="#fff" stroke="#5a6a78" strokeWidth="1" />
-        </g>
-      </svg>
-    );
-    return (
-      <div style={{display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',height:'100vh',background:'linear-gradient(135deg,#fffef7 60%,#ffe6b3 100%)',position:'relative',overflow:'hidden'}}>
-        {bubbleEls}
-        {/* Ortada custom çocuk yüzü ve etrafında dönen SVG oyuncaklar */}
-        <div style={{position:'relative',width:120,height:120,marginBottom:24,zIndex:2}}>
-          {ChildFaceSVG}
-          {OrbitSVG}
-        </div>
-        <div style={{fontWeight:800, fontSize: '1.4rem', color:'#e74c3c', marginBottom:8,letterSpacing:1,zIndex:1}}>SaySay Yükleniyor...</div>
-        <div style={{width:240, height:16, background:'#e0b97d', borderRadius:10, overflow:'hidden', marginBottom:12,boxShadow:'0 2px 8px #ffe6b3',zIndex:1}}>
-          <div style={{width: `${progress}%`, height:'100%', background:'linear-gradient(90deg,#ffe6b3 0%,#e0b97d 100%)', transition:'width 0.7s', borderRadius:10}}></div>
-        </div>
-        <div style={{color:'#2c3e50', fontSize:'1.05rem',fontWeight:700,marginBottom:4,zIndex:1}}>{progress < 100 ? `Veriler hazırlanıyor... %${progress}` : 'Hazır!'}</div>
-        <div style={{color:'#5a6a78', fontSize:'0.95rem',zIndex:1}}>{motivation}</div>
-        <style>{`
-          @keyframes orbit {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-          }
-          @keyframes bubble1 {
-            0% { transform: translateY(0) scale(1); }
-            100% { transform: translateY(-30px) scale(1.08); }
-          }
-          @keyframes bubble2 {
-            0% { transform: translateY(0) scale(1); }
-            100% { transform: translateY(24px) scale(1.12); }
-          }
-          @keyframes bubble3 {
-            0% { transform: translateY(0) scale(1); }
-            100% { transform: translateY(-18px) scale(1.05); }
-          }
-        `}</style>
-      </div>
-    );
+    return <LoadingScreen />;
   }
 
   return (
@@ -206,14 +149,41 @@ export default function PortalPage() {
         <h1 style={{ fontSize: "2rem", fontWeight: 800, color: "#2c3e50", marginBottom: 12, display:'flex', alignItems:'center', gap:8 }}>
           Hoş geldiniz <WelcomeSmileHandIcon />
         </h1>
-        <div style={{ display: "flex", gap: 24, flexWrap: "wrap", position: 'relative', alignItems: 'flex-start', marginTop: 0, minHeight: 'calc(100vh - 64px)', width: '100%' }}>
-          {/* Animasyonlu arka plan baloncukları */}
-          <AnimatedBubbles />
-          <PortalCard type="children" count={children.length} onAddChild={()=>setShowAddChild(true)} />
-          <PortalCard type="game" />
-          <PortalCard type="report" />
+        {/* Çocuklar listesi ve seçimi */}
+        <div style={{marginBottom: 18}}>
+          <div style={{fontWeight:700, color:'#2c3e50', marginBottom:6}}>Çocuklarınız:</div>
+          <div style={{background:'#f8c9d3',borderRadius:16,padding:'12px 10px',boxShadow:'0 2px 8px #f8c9d3',maxWidth:420,minWidth:220,height:70,display:'flex',alignItems:'center',overflowX:'auto',gap:10}}>
+            {children.map(child => (
+              <button key={child.id} onClick={()=>setSelectedChildId(child.id)} style={{
+                padding:'6px 16px',
+                borderRadius:8,
+                border: child.id===selectedChildId ? '2px solid #4CAF50' : '1.5px solid #dcdcdc',
+                background: child.id===selectedChildId ? '#eaffea' : '#fff',
+                color:'#2c3e50',
+                fontWeight:600,
+                cursor:'pointer',
+                outline:'none',
+                boxShadow: child.id===selectedChildId ? '0 2px 8px #bde6d3' : 'none',
+                transition:'all .2s',
+                fontSize:15,
+                minWidth:80
+              }}>{child.name}</button>
+            ))}
+            {/* Çocuk ekleme butonu kaldırıldı, yerine yönlendirme */}
+            <button onClick={()=>router.push('/portal/children')} style={{padding:'6px 16px',borderRadius:8,border:'1.5px dashed #4CAF50',background:'#f8fff8',color:'#4CAF50',fontWeight:600,cursor:'pointer',fontSize:15,minWidth:80}}>Çocukları Yönet</button>
+          </div>
         </div>
-        {showAddChild && <AddChildModal onAdd={handleAddChild} onClose={()=>setShowAddChild(false)} />}
+        {/* Portal özet alanı */}
+        <div style={{marginBottom: 24, background:'#f8f8ff', borderRadius:16, padding:24, boxShadow:'0 2px 8px #f0f0f0'}}>
+          <div style={{fontWeight:700, fontSize:'1.1rem', color:'#2c3e50', marginBottom:8}}>Özet</div>
+          <ul style={{margin:0, paddingLeft:18, color:'#5a6a78', fontSize:'1rem'}}>
+            <li>Toplam çocuk: {children.length}</li>
+            {/* Buraya roadmap, gelişim, son aktivite vb. özetler eklenebilir */}
+            <li>Son aktivite: -</li>
+            <li>Roadmap durumu: -</li>
+          </ul>
+        </div>
+        {/* PortalCard ve tekrar eden kartlar kaldırıldı */}
       </main>
     </div>
   );

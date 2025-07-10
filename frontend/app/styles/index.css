@@ -1,16 +1,16 @@
 :root {
   --primary-yellow: #FFD600; /* More vibrant yellow */
-  --primary-blue: #a9dff5;
-  --light-blue-bg: #f0f8ff; /* slightly lighter blue */
+  --primary-blue: #b3d8e6; /* daha pastel, hafif mavi */
+  --light-blue-bg: #f7f4ed; /* daha sıcak, krem ve beyaz arası ama daha belirgin */
   --dark-text: #2c3e50;
   --light-text: #5a6a78;
-  --green-card-bg: #dce5d9;
-  --green-card-border: #4b5f43;
+  --green-card-bg: #dce5d9; /* biliyor muydunuz için eskiye yakın pastel yeşil */
+  --green-card-border: #4b5f43; /* eski koyu yeşil kenar */
   --white: #ffffff;
-  --border-color: #dcdcdc;
+  --border-color: #e0b97d;
   --error-red: #e74c3c;
-  --light-cream-bg: #fffef7;
-  --sidebar-bg: #fffef7;
+  --light-cream-bg: #fff7e6; /* daha sıcak krem */
+  --sidebar-bg: #fff7e6;
   --sidebar-dark-bg: #23272f;
   --sidebar-dark-link: #bfc9d1;
   --sidebar-dark-active: #FFD600;
@@ -353,12 +353,15 @@ main {
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 8px;
-  border: 3px solid var(--dark-text);
+  border-radius: 12px;
+  border: 2.5px solid var(--dark-text);
   font-size: 1.8rem;
   color: var(--dark-text);
   flex-shrink: 0;
   transition: all 0.3s ease;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+  padding: 7px;
+  background-clip: padding-box;
 }
 
 .feature-icon {
@@ -482,7 +485,7 @@ main {
   padding: 0.7rem;
   border: none;
   border-radius: 8px;
-  background-color: var(--primary-blue);
+  background-color: var(--primary-yellow);
   color: var(--dark-text);
   font-size: 0.95rem;
   font-weight: 700;
@@ -492,7 +495,7 @@ main {
 }
 
 .btn-submit:hover {
-  background-color: #8ecae6;
+  background-color: #FFB300;
 }
 
 .form-link {
@@ -1016,8 +1019,8 @@ main {
   position: fixed;
   top: 12px;
   left: 12px;
-  z-index: 99999;
-  background: rgba(255, 255, 255, 0.85);
+  z-index: 99999 !important;
+  background: rgba(255, 255, 255, 0.95);
   border: none;
   border-radius: 50%;
   box-shadow: 0 2px 12px rgba(0,0,0,0.13);
@@ -1186,5 +1189,11 @@ body.dark .sidebar-expand-btn {
   box-shadow: 0 2px 12px rgba(0,0,0,0.33);
 }
 .portal-sidebar.closed .sidebar-links {
-  padding-top: 32px;
+    margin-top: 120px;
+}
+
+.avatar-container svg {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
 }

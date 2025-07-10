@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { FACTS } from '@/constants';
 import Image from 'next/image';
+import CustomSparkle from './icons/CustomSparkle';
 
 export const DidYouKnowCard: React.FC = () => {
   const [factIndex, setFactIndex] = useState(0);
@@ -23,7 +24,7 @@ export const DidYouKnowCard: React.FC = () => {
 
   return (
     <div className="did-you-know-card">
-      <div className="sparkle top-left">✨</div>
+      <div className="sparkle top-left"><CustomSparkle /></div>
       <div className="card-header">
         <div className="card-dots"><span></span><span></span><span></span></div>
         <span>🔊</span>
@@ -41,7 +42,7 @@ export const DidYouKnowCard: React.FC = () => {
         className={`fact-image ${currentFact.image.includes('kid') ? 'fact-image-kid' : 'fact-image-dog'} ${isTransitioning ? 'fade-out' : 'fade-in'}`}
       />
       <div className="card-footer">&lt;ooo&gt;</div>
-      <div className="sparkle bottom-right">✨</div>
+      <div className="sparkle bottom-right"><CustomSparkle /></div>
     </div>
   );
 };

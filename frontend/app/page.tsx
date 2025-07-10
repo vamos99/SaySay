@@ -5,6 +5,14 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from './utils/AuthContext';
 import { FeatureCard } from '@/components/FeatureCard';
 import Image from 'next/image';
+import CustomGameIcon from '@/components/icons/CustomGameIcon';
+import CustomFamilyIcon from '@/components/icons/CustomFamilyIcon';
+import CustomLockIcon from '@/components/icons/CustomLockIcon';
+import CustomBookIcon from '@/components/icons/CustomBookIcon';
+import CustomClockIcon from '@/components/icons/CustomClockIcon';
+import CustomChartIcon from '@/components/icons/CustomChartIcon';
+import CustomMessageIcon from '@/components/icons/CustomMessageIcon';
+import CustomProfileIcon from '@/components/icons/CustomProfileIcon';
 
 export default function HomePage() {
   const { session, loading } = useAuth();
@@ -38,14 +46,14 @@ export default function HomePage() {
         <div className="home-right-column">
           <section className="features-section">
             <div className="features-grid">
-              <FeatureCard icon="🎮" title="Kavram Oyunları" color="#a9dff5" description="Çocuğunuzun eğlenerek yeni kavramlar öğrenmesini sağlayan etkileşimli oyunlar."/>
-              <FeatureCard icon="👨‍👩‍👧‍👦" title="Uzman Desteği" color="#f8c9d3" description="Çocuk gelişimi uzmanlarından ve pedagoglardan anında profesyonel destek alın."/>
-              <FeatureCard icon="🔒" title="Ebeveyn Kontrolü" color="#d3c9f8" description="Çocuğunuzun uygulama içi deneyimini güvenle yönetin ve zamanı kontrol edin."/>
-              <FeatureCard icon="📚" title="Eğitim Kaynakları" color="#f8e4c9" description="Gelişimini destekleyecek zengin ve çeşitli eğitim materyalleri kütüphanesi."/>
-              <FeatureCard icon="⏱️" title="Zaman Yönetimi" color="#fef9e7" description="Ekran süresini sağlıklı bir şekilde yönetmek için zamanlayıcılar ve sınırlar belirleyin."/>
-              <FeatureCard icon="📊" title="Gelişim Takibi" color="#bde6d3" description="Çocuğunuzun ilerlemesini ve gelişimsel kilometre taşlarını kolayca takip edin."/>
-              <FeatureCard icon={<Image src="/comment.png" alt="İletişim" width={40} height={40} className="feature-icon" />} title="İletişim Panosu" color="#fef9e7" description="Çocuğunuzla, öğretmenlerle ve uzmanlarla güvenli bir şekilde iletişim kurun."/>
-              <FeatureCard icon={<Image src="/kid.png" alt="Kişisel Profil" width={40} height={40} className="feature-icon" />} title="Kişisel Profil" color="#f8c9d3" description="Her çocuk için ilgi alanlarına ve ihtiyaçlarına göre kişiselleştirilmiş profiller oluşturun."/>
+              <FeatureCard icon={<CustomGameIcon />} title="Kavram Oyunları" color="#a9dff5" iconBgColor="#ffe6b3" description="Çocuğunuzun eğlenerek yeni kavramlar öğrenmesini sağlayan etkileşimli oyunlar."/>
+              <FeatureCard icon={<CustomFamilyIcon />} title="Uzman Desteği" color="#f8c9d3" iconBgColor="#b3e6dd" description="Çocuk gelişimi uzmanlarından ve pedagoglardan anında profesyonel destek alın."/>
+              <FeatureCard icon={<CustomLockIcon />} title="Ebeveyn Kontrolü" color="#d3c9f8" iconBgColor="#ffd6a9" description="Çocuğunuzun uygulama içi deneyimini güvenle yönetin ve zamanı kontrol edin."/>
+              <FeatureCard icon={<CustomBookIcon />} title="Eğitim Kaynakları" color="#ffd6a9" iconBgColor="#b3dff5" description="Gelişimini destekleyecek zengin ve çeşitli eğitim materyalleri kütüphanesi."/>
+              <FeatureCard icon={<CustomClockIcon />} title="Zaman Yönetimi" color="#bde6d3" iconBgColor="#f6c6ec" description="Ekran süresini sağlıklı bir şekilde yönetmek için zamanlayıcılar ve sınırlar belirleyin."/>
+              <FeatureCard icon={<CustomChartIcon />} title="Gelişim Takibi" color="#f6c6ec" iconBgColor="#bde6d3" description="Çocuğunuzun ilerlemesini ve gelişimsel kilometre taşlarını kolayca takip edin."/>
+              <FeatureCard icon={<CustomMessageIcon />} title="İletişim Panosu" color="#ffe6b3" iconBgColor="#d3c9f8" description="Çocuğunuzla, öğretmenlerle ve uzmanlarla güvenli bir şekilde iletişim kurun."/>
+              <FeatureCard icon={<CustomProfileIcon />} title="Kişisel Profil" color="#b3e6dd" iconBgColor="#f8c9d3" description="Her çocuk için ilgi alanlarına ve ihtiyaçlarına göre kişiselleştirilmiş profiller oluşturun."/>
             </div>
           </section>
         </div>
