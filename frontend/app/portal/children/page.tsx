@@ -26,9 +26,11 @@ export default function ChildrenPage() {
     });
   }, [user]);
 
-  const handleAddChild = async (child: { name: string; birthYear: number; gender: string; avatar: string; note: string; theme: string }) => {
+  const handleAddChild = async (child: any) => {
     setError("");
     if (!user?.id) return;
+    // Sadece yeni çocuk ekleme için, gerekli alanlar varsa ekle
+    if (!child.name || !child.birthYear || !child.gender || !child.theme) return;
     const { data, error } = await supabase.from('children').insert([
       {
         user_id: user.id,
@@ -37,7 +39,9 @@ export default function ChildrenPage() {
         theme: child.theme,
         birth_year: child.birthYear,
         avatar: child.avatar,
-        note: child.note
+        note: child.note,
+        is_literate: child.is_literate,
+        wants_tts: child.wants_tts,
       }
     ]).select();
     if (error) { setError("Kayıt hatası: " + error.message); return; }

@@ -32,12 +32,17 @@ export default function ChildProfilePage() {
   }, []);
   const [activeTab, setActiveTab] = useState<'profile'|'roadmap'>('profile');
   const [showAvatarModal, setShowAvatarModal] = useState(false);
+  // Yeni state'ler
+  const [isLiterate, setIsLiterate] = useState(child?.is_literate ?? false);
+  const [wantsTTS, setWantsTTS] = useState(child?.wants_tts ?? false);
 
   useEffect(() => {
     if (!user?.id || !id) return;
     setLoading(true);
     supabase.from('children').select('*').eq('id', id).eq('user_id', user.id).single().then(({ data }) => {
       setChild(data);
+      setIsLiterate(data?.is_literate ?? false);
+      setWantsTTS(data?.wants_tts ?? false);
       setLoading(false);
     });
   }, [user, id]);
@@ -102,10 +107,12 @@ export default function ChildProfilePage() {
   );
 
   // Avatar güncelleme fonksiyonu
-  const handleAvatarUpdate = async (newAvatar: string) => {
+  const handleAvatarUpdate = async (newData: { avatar: string; is_literate: boolean; wants_tts: boolean }) => {
     if (!child?.id) return;
-    await supabase.from('children').update({ avatar: newAvatar }).eq('id', child.id);
-    setChild({ ...child, avatar: newAvatar });
+    await supabase.from('children').update({ avatar: newData.avatar, is_literate: newData.is_literate, wants_tts: newData.wants_tts }).eq('id', child.id);
+    setChild({ ...child, avatar: newData.avatar, is_literate: newData.is_literate, wants_tts: newData.wants_tts });
+    setIsLiterate(newData.is_literate);
+    setWantsTTS(newData.wants_tts);
     setShowAvatarModal(false);
   };
   // Silme fonksiyonu
@@ -173,11 +180,11 @@ export default function ChildProfilePage() {
             </div>
             
             {showAvatarModal && (
-                  <AddChildModal
-                    onAdd={(c: { avatar: string }) => handleAvatarUpdate(c.avatar)}
-                    onClose={()=>setShowAvatarModal(false)}
-                  />
-                )}
+              <AddChildModal
+                onAdd={handleAvatarUpdate}
+                onClose={()=>setShowAvatarModal(false)}
+              />
+            )}
             {/* Kavramlar başlığı ve liste */}
             <h3 style={{ margin: 0, fontWeight: 900, color: '#2c3e50',fontSize:'1.18rem',marginBottom:14,letterSpacing:0.1 }}>Tüm Kavramlar</h3>
             <div style={{flex:1,overflowY:'auto',minHeight:120,maxHeight:isMobile?260:260,paddingRight:4}}>
