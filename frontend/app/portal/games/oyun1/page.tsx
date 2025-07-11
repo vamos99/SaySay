@@ -83,21 +83,18 @@ export default function Oyun1Page() {
       const text = await fetchGeminiText(prompt);
       setQuestionText(text);
       setIsLoading(false);
-      // Seslendirme: sadece wants_tts true ise
-      if (child.wants_tts && typeof window !== 'undefined' && 'speechSynthesis' in window) {
-        window.speechSynthesis.cancel(); // Önceki seslendirmeyi kesinlikle durdur
-        setTimeout(() => {
-          const utter = new window.SpeechSynthesisUtterance(text);
-          utter.lang = 'tr-TR';
-          utter.rate = 1;
-          utter.pitch = 1.1;
-          window.speechSynthesis.speak(utter);
-        }, 200);
+      // Seslendirme: window.speechSynthesis ile
+      if (child.wants_tts && text) {
+        const utter = new window.SpeechSynthesisUtterance(text);
+        utter.lang = 'tr-TR';
+        utter.rate = 1;
+        utter.pitch = 1.1;
+        window.speechSynthesis.speak(utter);
       }
     }
     generateQuestion();
     // eslint-disable-next-line
-  }, [child, roadmap, items.length, current]);
+  }, [child, roadmap, items]);
 
   // Cevap seçimi
   const handleSelect = (item: any) => {
@@ -154,13 +151,13 @@ export default function Oyun1Page() {
 }
 
 // Yeni yardımcı fonksiyonlar
-// Gemini 2.5 Flash ile metin üretimi (ör: soru, açıklama)
+// Gemini 2.5 Flash text endpoint ile metin üretimi
 async function fetchGeminiText(prompt: string): Promise<string> {
-  // Anahtarı window'dan oku (Next.js client-side için)
-  const apiKey = typeof window !== 'undefined' ? (window as any).NEXT_PUBLIC_GEMINI_API_KEY || process.env.NEXT_PUBLIC_GEMINI_API_KEY : process.env.NEXT_PUBLIC_GEMINI_API_KEY;
+  const apiKey = process.env.NEXT_PUBLIC_GEMINI_API_KEY;
   const endpoint = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent';
   const body = {
-    contents: [{ role: 'user', parts: [{ text: prompt }] }]
+    contents: [{ role: 'user', parts: [{ text: prompt }] }],
+    generationConfig: { response_mime_type: 'text/plain' }
   };
   try {
     const response = await fetch(endpoint + '?key=' + apiKey, {
@@ -168,11 +165,33 @@ async function fetchGeminiText(prompt: string): Promise<string> {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body)
     });
-    const data = await response.json();
-    return data?.candidates?.[0]?.content?.parts?.[0]?.text || 'Soru üretilemedi.';
+    if (!response.ok) {
+      const err = await response.text();
+      console.log('Gemini Text Hatası:', err);
+      return '';
+    }
+    const result = await response.json();
+    return result.candidates?.[0]?.content?.parts?.[0]?.text || '';
   } catch (e) {
-    return 'Soru üretilemedi.';
+    console.log('Gemini Text Hatası:', e);
+    return '';
   }
+}
+
+// Base64 to Blob yardımcı fonksiyonu
+function b64toBlob(b64Data: string, contentType = '', sliceSize = 512) {
+  const byteCharacters = atob(b64Data);
+  const byteArrays = [];
+  for (let offset = 0; offset < byteCharacters.length; offset += sliceSize) {
+    const slice = byteCharacters.slice(offset, offset + sliceSize);
+    const byteNumbers = new Array(slice.length);
+    for (let i = 0; i < slice.length; i++) {
+      byteNumbers[i] = slice.charCodeAt(i);
+    }
+    const byteArray = new Uint8Array(byteNumbers);
+    byteArrays.push(byteArray);
+  }
+  return new Blob(byteArrays, { type: contentType });
 }
 
 // Soru ve ses için tek fonksiyon (artık sadece text döner, sesli anlatım yok)
@@ -202,4 +221,5 @@ async function fetchGeminiQuestionAndTTS({ theme, concept, items }: { theme: str
 // Oyun akışında, yeni soru geldiğinde çağır:
 // örnek kullanım:
 // const { text, audioUrl } = await fetchGeminiQuestionAndTTS({ theme: child.theme, concept: roadmap[0]?.name, items: items.map(i=>i.name) });
+// setQuestionText(text); new Audio(audioUrl).play(); 
 // setQuestionText(text); new Audio(audioUrl).play(); 

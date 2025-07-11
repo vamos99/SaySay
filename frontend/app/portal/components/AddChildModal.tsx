@@ -92,10 +92,26 @@ export const AddChildModal: React.FC<AddChildModalProps> = ({ onAdd, onClose }) 
         <div style={{display:'flex',gap:10,flexWrap:'wrap',marginBottom:16}}>
           {avatars.map((a, index) => (
             <button key={index} type="button" onClick={()=>setAvatar(a.image_url)} style={{width:56,height:56,padding:0,display:'flex',alignItems:'center',justifyContent:'center',borderRadius:14,border:avatar===a.image_url?'2.5px solid #e67e22':'1.5px solid #dcdcdc',background:avatar===a.image_url?'#ffe6b3':'#fff',cursor:'pointer',transition:'all 0.2s'}}>
-              <span style={{display:'block',width:44,height:44}} dangerouslySetInnerHTML={{__html:a.image_url}} />
+              {a.image_url?.startsWith('<svg') ? (
+                <span style={{display:'block',width:44,height:44}} dangerouslySetInnerHTML={{__html:a.image_url}} />
+              ) : (
+                a.image_url ? <img src={a.image_url} alt="Avatar" style={{display:'block',width:44,height:44,borderRadius:'50%'}} /> : null
+              )}
             </button>
           ))}
         </div>
+        <input type="text" value={avatar} onChange={e=>setAvatar(e.target.value)} placeholder="Avatar SVG kodu veya resim linki (URL) girin" style={{ width: "100%", padding: 10, borderRadius: 10, border: "1.5px solid #dcdcdc", marginBottom: 16, fontSize:15 }} />
+        {/* Avatar önizleme */}
+        {avatar && (
+          <div style={{marginBottom:16}}>
+            <span style={{fontWeight:700,marginBottom:4,display:'block'}}>Avatar Önizleme:</span>
+            {avatar.startsWith('<svg') ? (
+              <span style={{display:'block',width:56,height:56}} dangerouslySetInnerHTML={{__html:avatar}} />
+            ) : (
+              avatar ? <img src={avatar} alt="Avatar" style={{display:'block',width:56,height:56,borderRadius:'50%'}} /> : null
+            )}
+          </div>
+        )}
         <label style={{fontWeight:700,marginBottom:4,display:'block'}}>Tema</label>
         <div style={{display:'flex',gap:10,flexWrap:'wrap',marginBottom:16}}>
           {themes.map(t => (

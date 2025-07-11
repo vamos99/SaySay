@@ -114,7 +114,11 @@ export default function ChildrenPage() {
                 ) : children.map(child => (
                   <div key={child.id} style={{background:'#fff',borderRadius:22,padding:'40px 32px',boxShadow:'0 4px 24px #e0e0e0',display:'flex',flexDirection:'column',alignItems:'flex-start',gap:24,minHeight:220,justifyContent:'space-between',transition:'box-shadow 0.2s'}}>
                     <div style={{display:'flex',alignItems:'center',gap:24,marginBottom:10}}>
-                      <span style={{display:'block',width:56,height:56}} dangerouslySetInnerHTML={{__html:child.avatar}} />
+                      {child.avatar?.startsWith('<svg') ? (
+                        <span style={{display:'block',width:56,height:56}} dangerouslySetInnerHTML={{__html:child.avatar}} />
+                      ) : (
+                        child.avatar ? <img src={child.avatar} alt="Avatar" style={{display:'block',width:56,height:56,borderRadius:'50%'}} /> : null
+                      )}
                       <div>
                         <div style={{fontWeight:900,fontSize:24,color:'#2c3e50',marginBottom:4,display:'flex',alignItems:'center',gap:10}}>
                           {child.name}
