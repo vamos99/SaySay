@@ -47,6 +47,19 @@ export default function ChildrenPage() {
     if (error) { setError("Kayıt hatası: " + error.message); return; }
     setChildren([...children, ...(data||[])]);
     setShowAdd(false);
+    // --- EK: Otomatik roadmap kavramı ekle ---
+    if (data && data[0] && data[0].id) {
+      const childId = data[0].id;
+      const { data: categories } = await supabase.from('categories').select('*').order('id', { ascending: true });
+      if (categories && categories.length > 0) {
+        await supabase.from('concept_roadmap').upsert([
+          {
+            child_id: childId,
+            concepts_order: [categories[0].id]
+          }
+        ], { onConflict: 'child_id' });
+      }
+    }
   };
 
   const handleDelete = async (id: string) => {

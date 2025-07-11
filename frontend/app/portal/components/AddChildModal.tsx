@@ -54,8 +54,19 @@ export const AddChildModal: React.FC<AddChildModalProps> = ({ onAdd, onClose }) 
   const handleSave = () => {
     if (!name.trim()) { setError('İsim zorunlu'); return; }
     if (!gender || (gender !== 'female' && gender !== 'male')) { setError('Cinsiyet seçin'); return; }
+    if (!theme) { setError('Tema seçin'); return; }
+    if (!birthYear) { setError('Doğum yılı seçin'); return; }
     setError('');
-    onAdd({ avatar, is_literate: isLiterate, wants_tts: wantsTTS });
+    onAdd({
+      name,
+      gender,
+      theme,
+      birthYear,
+      avatar,
+      note,
+      is_literate: isLiterate,
+      wants_tts: wantsTTS
+    });
   };
 
   return (
