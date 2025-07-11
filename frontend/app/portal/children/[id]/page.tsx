@@ -94,8 +94,10 @@ export default function ChildProfilePage() {
   // Çocuk yaşını hesapla (doğum yılı yoksa "-" göster)
   const childAge = child?.birth_year ? (new Date().getFullYear() - child.birth_year) : '-';
   // Avatar gösterimi
-  const avatar = child?.avatar ? (
+  const avatar = child?.avatar?.startsWith('<svg') ? (
     <span style={{display:'block',width:96,height:96}} dangerouslySetInnerHTML={{__html:child.avatar}} />
+  ) : child?.avatar ? (
+    <img src={child.avatar} alt="Avatar" style={{display:'block',width:96,height:96,borderRadius:'50%'}} />
   ) : null;
   const GenderSVG = child?.gender === 'female' ? (
     <svg width="22" height="22" viewBox="0 0 28 28"><circle cx="14" cy="14" r="13" fill="#f8c9d3" stroke="#e67e22" strokeWidth="2"/><ellipse cx="14" cy="16" rx="7" ry="8" fill="#fff"/><ellipse cx="14" cy="15" rx="5" ry="6" fill="#f8c9d3"/><ellipse cx="11" cy="13" rx="1.2" ry="1.5" fill="#fff"/><ellipse cx="17" cy="13" rx="1.2" ry="1.5" fill="#fff"/><ellipse cx="11" cy="13" rx="0.5" ry="0.7" fill="#7b8fa1"/><ellipse cx="17" cy="13" rx="0.5" ry="0.7" fill="#7b8fa1"/><ellipse cx="14" cy="17.5" rx="2" ry="1" fill="#e67e22"/></svg>
@@ -152,7 +154,9 @@ export default function ChildProfilePage() {
             {/* Profil Kartı */}
             <div style={{display:'flex',flexDirection:'row',alignItems:'center',gap:28,marginBottom:18,justifyContent:'flex-start'}}>
               {/* Avatar: 120x120 boyutunda, SVG içeriği tam kaplayacak */}
-              <span className="avatar-container" style={{display:'flex',width:120,height:120,minWidth:120,minHeight:120,borderRadius:'50%',boxShadow:'0 4px 12px rgba(230,126,34,0.3)',background:'#fff',alignItems:'center',justifyContent:'center',padding:4,border:'3px solid #e67e22'}} dangerouslySetInnerHTML={{__html:child.avatar}} />
+              <span className="avatar-container" style={{display:'flex',width:120,height:120,minWidth:120,minHeight:120,borderRadius:'50%',boxShadow:'0 4px 12px rgba(230,126,34,0.3)',background:'#fff',alignItems:'center',justifyContent:'center',padding:4,border:'3px solid #e67e22'}}>
+                {avatar}
+              </span>
               <div style={{display:'flex',flexDirection:'column',justifyContent:'center',gap:12}}>
                 <div style={{fontWeight:900,fontSize:28,color:'#2c3e50',letterSpacing:0.2}}>{child.name}</div>
                 <div style={{display:'flex',flexDirection:'column',gap:8}}>
