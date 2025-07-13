@@ -3,6 +3,7 @@
 import React, { FormEvent } from 'react';
 import { DidYouKnowCard } from '@/components/DidYouKnowCard';
 import { supabase } from '../utils/supabaseClient';
+import Link from "next/link";
 
 export default function LoginPage() {
   const handleSubmit = async (e: FormEvent) => {
@@ -30,7 +31,9 @@ export default function LoginPage() {
               <input type="password" id="password" required placeholder="Şifre" />
             </div>
             <button type="submit" className="btn-submit">Giriş</button>
-            <a href="/forgot-password" className="form-link">Şifreni mi Unuttun?</a>
+            <Link href="/forgot-password" className="form-link">
+            Şifreni mi Unuttun?
+            </Link>
           </form>
         </div>
       </div>
