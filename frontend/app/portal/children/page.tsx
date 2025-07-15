@@ -105,7 +105,19 @@ export default function ChildrenPage() {
             </div>
           ) : (
             <>
-              <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit, minmax(320px, 1fr))',gap:40,marginBottom:40}}>
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+                gridAutoRows: '1fr',
+                gap: 32,
+                marginBottom: 40,
+                maxWidth: 1200,
+                marginLeft: 'auto',
+                marginRight: 'auto',
+                overflow: 'auto', // kutular sığmazsa kaydırma aktif
+                minHeight: 320,
+                maxHeight: 'calc(100vh - 220px)', // ekranı taşarsa kaydırma
+              }}>
                 {children.length === 0 ? (
                   <div style={{background:'#fff',borderRadius:22,padding:'40px 0',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',minHeight:220,boxShadow:'0 4px 16px #f0f0f0',fontWeight:700,fontSize:20,color:'#7b8fa1',gap:16}}>
                     <CustomSadChildIcon />
@@ -137,9 +149,13 @@ export default function ChildrenPage() {
                     </div>
                   </div>
                 ))}
+                {/* Çocuk Ekle butonunu grid'in en sonunda kutu gibi göster */}
+                <div style={{background:'#4CAF50',borderRadius:22,padding:'40px 32px',boxShadow:'0 4px 24px #bde6d3',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',minHeight:220,cursor:'pointer',transition:'background 0.2s',color:'#fff',fontWeight:900,fontSize:22}} onClick={()=>setShowAdd(true)}>
+                  + Çocuk Ekle
+                </div>
               </div>
+              {/* Hata mesajı ve modalı grid dışında tutmaya devam et */}
               <div style={{display:'flex',alignItems:'center',gap:24,flexWrap:'wrap',marginBottom:12}}>
-                <button aria-label="Çocuk Ekle" style={{background:'#4CAF50',color:'#fff',borderRadius:12,padding:'18px 44px',fontWeight:900,border:'none',cursor:'pointer',transition:'background 0.2s',fontSize:20,boxShadow:'0 2px 8px #bde6d3'}} onClick={()=>setShowAdd(true)}>+ Çocuk Ekle</button>
                 {error && <div role="alert" style={{color:'#fff',background:'#e74c3c',borderRadius:12,padding:'14px 28px',display:'flex',alignItems:'center',gap:16,fontWeight:900,fontSize:19,boxShadow:'0 2px 8px #e74c3c'}}><span style={{fontWeight:900,fontSize:26}}>!</span> {error}</div>}
               </div>
               {showAdd && <AddChildModal onAdd={handleAddChild} onClose={()=>setShowAdd(false)} />}

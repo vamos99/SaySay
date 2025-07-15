@@ -22,3 +22,4 @@ build/
 # Test ve upload çıktıları
 coverage/
 uploads/ 
+ui-ux/ 
