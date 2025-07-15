@@ -2,31 +2,33 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { supabase } from "../utils/supabaseClient";
 import { HomeIcon } from '@/components/icons/HomeIcon';
 import { ChildIcon } from '@/components/icons/ChildIcon';
 import { GameIcon } from '@/components/icons/GameIcon';
 import { ReportIcon } from '@/components/icons/ReportIcon';
 import { SettingsIcon } from '@/components/icons/SettingsIcon';
+import { ExitIcon } from '@/components/icons/ExitIcon';
 import { CloseIcon } from '@/components/icons/CloseIcon';
 import { SunIcon } from '@/components/icons/SunIcon';
 import { MoonIcon } from '@/components/icons/MoonIcon';
 import { ExpandSidebarIcon } from '@/components/icons/ExpandSidebarIcon';
 
 const links = [
-  { href: "/portal", label: "Ana Sayfa", icon: <HomeIcon /> },
-  { href: "/portal/children", label: "Çocuklarım", icon: <ChildIcon /> },
-  { href: "/portal/games", label: "Oyun Ayarları", icon: <GameIcon /> },
-  { href: "/portal/reports", label: "Raporlar", icon: <ReportIcon /> },
-  { href: "/portal/settings", label: "Ayarlar", icon: <SettingsIcon /> },
+  { href: "/portal",            label: "Ana Sayfa",    icon: <HomeIcon /> },
+  { href: "/portal/children",   label: "Çocuklarım",   icon: <ChildIcon /> },
+  { href: "/portal/games",      label: "Oyun Ayarları", icon: <GameIcon /> },
+  { href: "/portal/reports",    label: "Raporlar",      icon: <ReportIcon /> },
+  { href: "/portal/settings",   label: "Ayarlar",       icon: <SettingsIcon /> },
 ];
 
-export const PortalSidebar: React.FC<{open: boolean, setOpen: (v: boolean) => void}> = ({open, setOpen}) => {
+export const PortalSidebar: React.FC<{ open: boolean; setOpen: (v: boolean) => void }> = ({ open, setOpen }) => {
   const pathname = usePathname();
+  const router = useRouter();
   const [isDark, setIsDark] = useState(false);
 
   useEffect(() => {
-    // Tema tercihini localStorage'dan al
     const theme = typeof window !== 'undefined' ? localStorage.getItem('theme') : null;
     if (theme === 'dark') setIsDark(true);
   }, []);
@@ -43,36 +45,71 @@ export const PortalSidebar: React.FC<{open: boolean, setOpen: (v: boolean) => vo
     }
   }, [isDark]);
 
+  const handleSignOut = async () => {
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      console.error("Çıkış yaparken hata oluştu:", error.message);
+      return;
+    }
+    router.push("/login");
+  };
+
   return (
-    <aside className={"portal-sidebar" + (open ? " open" : " closed") + (isDark ? " dark" : "") }>
+    <aside className={`portal-sidebar${open ? ' open' : ' closed'}${isDark ? ' dark' : ''}`}>
       <div className="sidebar-header">
         <div className="sidebar-title logo">SAY SAY</div>
-        {open && (
-          <button className="sidebar-hamburger sidebar-close" onClick={() => setOpen(false)} aria-label="Menüyü Kapat">
+        {open ? (
+          <button
+            className="sidebar-hamburger sidebar-close"
+            onClick={() => setOpen(false)}
+            aria-label="Menüyü Kapat"
+          >
             <CloseIcon />
+          </button>
+        ) : (
+          <button
+            className="sidebar-hamburger sidebar-open"
+            onClick={() => setOpen(true)}
+            aria-label="Menüyü Aç"
+          >
+            <ExpandSidebarIcon />
           </button>
         )}
       </div>
+
       <nav className="sidebar-links">
         {links.map((l) => (
           <Link
             key={l.href}
             href={l.href}
-            className={
-              "sidebar-link" + (pathname === l.href ? " active" : "")
-            }
+            className={`sidebar-link${pathname === l.href ? ' active' : ''}`}
           >
-            <span>{l.icon}</span>
-            {open && l.label}
+            <span className="icon">{l.icon}</span>
+            {open && <span className="label">{l.label}</span>}
           </Link>
         ))}
       </nav>
+
       <div className="sidebar-bottom">
-        <button className="sidebar-theme-toggle" onClick={() => setIsDark(d => !d)} title="Tema değiştir">
+        {/* Çıkış Butonu */}
+        <button
+          onClick={handleSignOut}
+          className="sidebar-logout flex items-center px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 mb-4"
+        >
+          <ExitIcon />
+          {open && <span className="ml-2">Çıkış Yap</span>}
+        </button>
+
+        {/* Tema Değiştirici */}
+        <button
+          className="sidebar-theme-toggle flex items-center"
+          onClick={() => setIsDark((d) => !d)}
+          title="Tema değiştir"
+        >
           {isDark ? <SunIcon /> : <MoonIcon />}
-          {open && <span style={{marginLeft:8, fontWeight:600}}>{isDark ? 'Gündüz Modu' : 'Gece Modu'}</span>}
+          {open && <span className="ml-2 theme-label">{isDark ? 'Gündüz Modu' : 'Gece Modu'}</span>}
         </button>
       </div>
     </aside>
   );
-}; 
+};
