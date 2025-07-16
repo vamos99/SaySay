@@ -1,11 +1,11 @@
 import React from 'react';
 const CustomGameIcon: React.FC = () => (
-  <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
-    <rect x="4" y="12" width="24" height="12" rx="6" fill="#ffe6b3" stroke="#e0b97d" strokeWidth="2"/>
-    <circle cx="10" cy="18" r="2" fill="#e0b97d"/>
-    <circle cx="22" cy="18" r="2" fill="#e0b97d"/>
-    <rect x="14" y="16" width="4" height="4" rx="1" fill="#f8c9d3"/>
-    <rect x="8" y="8" width="16" height="4" rx="2" fill="#bde6d3"/>
+  <svg width="100%" height="100%" viewBox="0 0 56 56" fill="none">
+    <rect x="7" y="21" width="42" height="21" rx="10.5" fill="#ffe6b3" stroke="#e0b97d" strokeWidth="3.5"/>
+    <circle cx="17.5" cy="31.5" r="3.5" fill="#e0b97d"/>
+    <circle cx="38.5" cy="31.5" r="3.5" fill="#e0b97d"/>
+    <rect x="24.5" y="28" width="7" height="7" rx="1.75" fill="#f8c9d3"/>
+    <rect x="14" y="14" width="28" height="7" rx="3.5" fill="#bde6d3"/>
   </svg>
 );
 export default CustomGameIcon; 

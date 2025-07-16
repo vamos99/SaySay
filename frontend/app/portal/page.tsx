@@ -69,7 +69,7 @@ export default function PortalPage() {
       setChildrenLoading(true);
       supabase
         .from('children')
-        .select('*')
+        .select('id, name, gender, theme, avatar, birth_year, is_literate, wants_tts')
         .eq('user_id', user.id)
         .then(({ data }) => {
           setChildren(data || []);
@@ -106,10 +106,10 @@ export default function PortalPage() {
   // Çocuk ekleme işlemi sonrası children'ı güncelle ve yeni çocuğu seçili yap
   const handleAddChild = async (name: string) => {
     if (!user?.id) return;
-    const { data: inserted, error } = await supabase.from('children').insert([{ user_id: user.id, name }]).select();
+    const { data: inserted, error } = await supabase.from('children').insert([{ user_id: user.id, name }]).select('id, name, gender, theme, avatar, birth_year, is_literate, wants_tts');
     // Yeniden fetch et
     setChildrenLoading(true);
-    const { data } = await supabase.from('children').select('*').eq('user_id', user.id);
+    const { data } = await supabase.from('children').select('id, name, gender, theme, avatar, birth_year, is_literate, wants_tts').eq('user_id', user.id);
     setChildren(data || []);
     setChildrenLoading(false);
     setShowAddChild(false);

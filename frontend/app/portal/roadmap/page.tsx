@@ -33,15 +33,15 @@ export default function RoadmapPage() {
     const fetchData = async () => {
       setLoading(true);
       // Kategorileri çek
-      const { data: cats } = await supabase.from('categories').select('*');
+      const { data: cats } = await supabase.from('categories').select('id, name, default_verb');
       setCategories(cats || []);
       // Çocuğu bul
       if (user?.id) {
-        const { data: children } = await supabase.from('children').select('*').eq('user_id', user.id);
+        const { data: children } = await supabase.from('children').select('id');
         if (children && children.length > 0) {
           setChildId(children[0].id);
           // Roadmap'i çek
-          const { data: roadmap } = await supabase.from('concept_roadmap').select('*').eq('child_id', children[0].id).single();
+          const { data: roadmap } = await supabase.from('concept_roadmap').select('concepts_order').eq('child_id', children[0].id).single();
           if (roadmap && roadmap.concepts_order) {
             // concepts_order: [category_id, ...]
             setPlan((cats || []).filter((c:any) => roadmap.concepts_order.includes(c.id)));

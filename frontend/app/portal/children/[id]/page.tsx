@@ -39,32 +39,35 @@ export default function ChildProfilePage() {
   useEffect(() => {
     if (!user?.id || !id) return;
     setLoading(true);
-    supabase.from('children').select('*').eq('id', id).eq('user_id', user.id).single().then(({ data }) => {
-      setChild(data);
-      setIsLiterate(data?.is_literate ?? false);
-      setWantsTTS(data?.wants_tts ?? false);
-      setLoading(false);
-    });
+    supabase.from('children')
+      .select('id, name, gender, theme, avatar, birth_year, is_literate, wants_tts')
+      .eq('id', id)
+      .eq('user_id', user.id)
+      .single()
+      .then(({ data }) => {
+        setChild(data);
+        setIsLiterate(data?.is_literate ?? false);
+        setWantsTTS(data?.wants_tts ?? false);
+        setLoading(false);
+      });
   }, [user, id]);
 
   useEffect(() => {
     if (!id) return;
     setPlanLoading(true);
-    // Kategorileri ve roadmap'i çek
     Promise.all([
-      supabase.from('categories').select('*'),
-      supabase.from('concept_roadmap').select('*').eq('child_id', id) // .single() kaldırıldı
+      supabase.from('categories').select('id, name, default_verb'),
+      supabase.from('concept_roadmap').select('concepts_order').eq('child_id', id)
     ]).then(([catRes, roadmapRes]) => {
       const allCats = catRes.data || [];
-      setCategories(allCats);
-      // Gelen veri array, ilk elemanını al
-      const roadmapData = roadmapRes.data?.[0]; 
+      const roadmapData = roadmapRes.data?.[0];
       if (roadmapData && roadmapData.concepts_order) {
         const planIds = new Set(roadmapData.concepts_order);
         setRoadmap(allCats.filter((c:any) => planIds.has(c.id)));
       } else {
         setRoadmap([]);
       }
+      setCategories(allCats);
       setPlanLoading(false);
     });
   }, [id]);

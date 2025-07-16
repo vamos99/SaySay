@@ -14,83 +14,77 @@ export default function Oyun1Page() {
   const [roadmap, setRoadmap] = useState<any[]>([]);
   const [items, setItems] = useState<any[]>([]);
   const [current, setCurrent] = useState(0);
-  const [feedback, setFeedback] = useState<null|"dogru"|"yanlis">(null);
-  // Soru metni state'i
+  const [feedback, setFeedback] = useState<null|"dogru"|"yanlis"|"disabled">(null);
   const [questionText, setQuestionText] = useState('');
-  // Soru metni loading state
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   // Kullanıcıdan seçili çocuk id'sini al
   useEffect(() => {
     const selectedId = typeof window !== 'undefined' ? localStorage.getItem('selected_child_id') : null;
     if (!selectedId) { router.push('/portal'); return; }
     setLoading(true);
-    // Çocuk ve roadmap'i çek
+    setError(null);
     Promise.all([
-      supabase.from('children').select('*').eq('id', selectedId).single(),
-      supabase.from('concept_roadmap').select('*').eq('child_id', selectedId).single()
+      supabase.from('children').select('id, theme, age, wants_tts').eq('id', selectedId).single(),
+      supabase.from('concept_roadmap').select('concepts_order').eq('child_id', selectedId).single()
     ]).then(async ([childRes, roadmapRes]) => {
-      if (!childRes.data) { router.push('/portal'); return; }
+      if (!childRes.data) { setError('Çocuk bulunamadı.'); router.push('/portal'); return; }
       setChild(childRes.data);
-      // Roadmap'teki ilk kavramı bul
       const conceptIds = roadmapRes.data?.concepts_order || [];
-      if (!conceptIds.length) { setLoading(false); return; }
-      // Kavramı çek
-      const { data: categories } = await supabase.from('categories').select('*').in('id', conceptIds);
+      if (!conceptIds.length) { setLoading(false); setError('Kavram bulunamadı.'); return; }
+      const { data: categories, error: catErr } = await supabase.from('categories').select('id, name').in('id', conceptIds);
+      if (catErr) { setError('Kavramlar yüklenemedi.'); setLoading(false); return; }
       setRoadmap(categories || []);
-      // İlk kavram ve temaya göre itemları çek
       const firstConcept = categories?.[0];
-      if (!firstConcept) { setLoading(false); return; }
-      const { data: itemsData } = await supabase.from('items').select('*').eq('category_id', firstConcept.id).contains('themes', [childRes.data.theme]);
-      setItems(itemsData || []);
+      if (!firstConcept) { setLoading(false); setError('Kavram bulunamadı.'); return; }
+      const { data: itemsData, error: itemsErr } = await supabase.from('items').select('id, name, is_correct, themes, category_id, image_url').eq('category_id', firstConcept.id).contains('themes', [childRes.data.theme]);
+      if (itemsErr) { setError('Seçenekler yüklenemedi.'); setLoading(false); return; }
+      setItems(itemsData && itemsData.length > 1 ? shuffleArray(itemsData) : (itemsData || []));
+      setLoading(false);
+    }).catch(() => {
+      setError('Veri yüklenirken hata oluştu.');
       setLoading(false);
     });
   }, [router]);
 
-  // Soruları randomize et
-  useEffect(() => {
-    if (items.length > 1) {
-      setItems(shuffleArray(items));
-    }
-  }, [items.length]);
+  // Shuffle sadece veri ilk çekildiğinde yapılır, ekstra useEffect yok
   function shuffleArray(array: any[]) {
     return array.map(value => ({ value, sort: Math.random() })).sort((a, b) => a.sort - b.sort).map(({ value }) => value);
   }
-
-  // Soru gösterildiğinde seslendir (GEREKSİZ, kaldırıldı)
-  // useEffect(() => {
-  //   if (child?.wants_tts && items[current]) {
-  //     fetchGeminiTTS(items[current].name);
-  //   }
-  // }, [current, child, items]);
 
   // Dinamik prompt oluşturucu
   function createDynamicPrompt({ theme, concept, items, age }: { theme: string, concept: string, items: string[], age: number }) {
     return `Sen bir çocuk oyun asistanısın. ${age} yaşında bir çocuk için, tema: ${theme}, kavram: ${concept}, seçenekler: ${items.join(", ")}. Sadece 1 kısa, eğlenceli ve anlaşılır soru üret. Maksimum 20 kelime, tek cümle, çocuk dostu, Türkçe. Sadece soruyu döndür, açıklama veya hikaye ekleme.`;
   }
 
-  // Soru ve sesli anlatım üretimi
+  // Soru ve sesli anlatım üretimi (değişmedi)
   useEffect(() => {
     async function generateQuestion() {
       if (!child || !roadmap.length || !items.length) return;
       setIsLoading(true);
-      const prompt = createDynamicPrompt({
-        theme: child.theme,
-        concept: roadmap[0]?.name,
-        items: items.map(i => i.name),
-        age: child.age || 5
-      });
-      const text = await fetchGeminiText(prompt);
-      setQuestionText(text);
-      setIsLoading(false);
-      // Seslendirme: window.speechSynthesis ile
-      if (child.wants_tts && text) {
-        const utter = new window.SpeechSynthesisUtterance(text);
-        utter.lang = 'tr-TR';
-        utter.rate = 1;
-        utter.pitch = 1.1;
-        window.speechSynthesis.speak(utter);
+      setError(null);
+      try {
+        const prompt = createDynamicPrompt({
+          theme: child.theme,
+          concept: roadmap[0]?.name,
+          items: items.map(i => i.name),
+          age: child.age || 5
+        });
+        const text = await fetchGeminiText(prompt);
+        setQuestionText(text);
+        // Seslendirme: window.speechSynthesis ile
+        if (child.wants_tts && text) {
+          const utter = new window.SpeechSynthesisUtterance(text);
+          utter.lang = 'tr-TR';
+          utter.rate = 1;
+          utter.pitch = 1.1;
+          window.speechSynthesis.speak(utter);
+        }
+      } catch (e) {
+        setError('Soru oluşturulamadı.');
       }
+      setIsLoading(false);
     }
     generateQuestion();
     // eslint-disable-next-line
@@ -98,17 +92,20 @@ export default function Oyun1Page() {
 
   // Cevap seçimi
   const handleSelect = (item: any) => {
+    if (feedback === 'disabled') return;
     const isCorrect = typeof item.is_correct === 'boolean' ? item.is_correct : item.id === items[0]?.id;
     if (isCorrect) {
       setFeedback("dogru");
       setTimeout(() => { setFeedback(null); setCurrent(c => c+1); }, 1200);
     } else {
       setFeedback("yanlis");
+      setTimeout(() => setFeedback("disabled"), 400); // kısa süreli disable
       setTimeout(() => setFeedback(null), 1200);
     }
   };
 
   if (loading) return <LoadingScreen />;
+  if (error) return <div style={{padding:40, color:'#e74c3c', fontWeight:700}}>{error}</div>;
   if (!child || !roadmap.length || !items.length) return <div style={{padding:40}}>Oynamak için önce kavram ve tema seçmelisiniz.</div>;
 
   return (
@@ -126,9 +123,7 @@ export default function Oyun1Page() {
       <main style={{flex:1,padding:'40px 0 0 0',minHeight:'100vh',background:'var(--light-blue-bg)'}}>
         <div style={{maxWidth:700,margin:'0 auto',padding:'0 24px'}}>
           <h1 style={{fontWeight:900,fontSize:'2rem',color:'var(--dark-text)',marginBottom:24}}>Kavram Oyunu</h1>
-          {/* Çocuk tercihleri info kutusu */}
           <div style={{marginBottom:24,fontWeight:700,fontSize:20,color:'var(--primary-yellow)'}}>Kavram: {roadmap[0]?.name} | Tema: {child.theme}</div>
-          {/* Soru metni kutuların üstünde, büyük ve belirgin */}
           {isLoading ? (
             <div className="question-loading">Soru hazırlanıyor...</div>
           ) : (
@@ -136,7 +131,7 @@ export default function Oyun1Page() {
           )}
           <div style={{display:'flex',gap:32,flexWrap:'wrap',justifyContent:'center'}}>
             {items.map((item:any, i:number) => (
-              <button key={item.id} onClick={()=>handleSelect(item)} style={{background:'#fff',border:'2.5px solid #e0b97d',borderRadius:18,padding:24,minWidth:160,minHeight:160,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',fontWeight:800,fontSize:20,boxShadow:'0 2px 8px #f0f0f0',color:'#2c3e50',cursor:'pointer',transition:'all 0.2s',outline:feedback && item.is_correct && feedback==='dogru' ? '3px solid #4CAF50' : feedback && !item.is_correct && feedback==='yanlis' ? '3px solid #e74c3c' : 'none',opacity:feedback && !item.is_correct && feedback==='dogru' ? 0.5 : 1}}>
+              <button key={item.id} onClick={()=>handleSelect(item)} disabled={feedback==='disabled'} style={{background:'#fff',border:'2.5px solid #e0b97d',borderRadius:18,padding:24,minWidth:160,minHeight:160,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',fontWeight:800,fontSize:20,boxShadow:'0 2px 8px #f0f0f0',color:'#2c3e50',cursor:feedback==='disabled'?'not-allowed':'pointer',transition:'all 0.2s',outline:feedback && item.is_correct && feedback==='dogru' ? '3px solid #4CAF50' : feedback && !item.is_correct && feedback==='yanlis' ? '3px solid #e74c3c' : 'none',opacity:feedback && !item.is_correct && feedback==='dogru' ? 0.5 : 1}}>
                 <img src={item.image_url} alt={item.name} style={{width:80,height:80,marginBottom:12}} />
                 {item.name}
               </button>
@@ -194,7 +189,6 @@ function b64toBlob(b64Data: string, contentType = '', sliceSize = 512) {
   return new Blob(byteArrays, { type: contentType });
 }
 
-// Soru ve ses için tek fonksiyon (artık sadece text döner, sesli anlatım yok)
 async function fetchGeminiQuestionAndTTS({ theme, concept, items }: { theme: string, concept: string, items: string[] }): Promise<{text: string, audioUrl: string}> {
   const apiKey = process.env.NEXT_PUBLIC_GEMINI_API_KEY;
   const endpoint = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent';

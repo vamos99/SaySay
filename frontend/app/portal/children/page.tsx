@@ -20,10 +20,13 @@ export default function ChildrenPage() {
   useEffect(() => {
     if (!user?.id) return;
     setLoading(true);
-    supabase.from('children').select('*').eq('user_id', user.id).then(({ data }) => {
-      setChildren(data || []);
-      setLoading(false);
-    });
+    supabase.from('children')
+      .select('id, name, gender, theme, avatar, birth_year, is_literate, wants_tts')
+      .eq('user_id', user.id)
+      .then(({ data }) => {
+        setChildren(data || []);
+        setLoading(false);
+      });
   }, [user]);
 
   const handleAddChild = async (child: any) => {
@@ -50,7 +53,7 @@ export default function ChildrenPage() {
     // --- EK: Otomatik roadmap kavramı ekle ---
     if (data && data[0] && data[0].id) {
       const childId = data[0].id;
-      const { data: categories } = await supabase.from('categories').select('*').order('id', { ascending: true });
+      const { data: categories } = await supabase.from('categories').select('id, name, default_verb').order('id', { ascending: true });
       if (categories && categories.length > 0) {
         await supabase.from('concept_roadmap').upsert([
           {

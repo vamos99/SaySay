@@ -1,9 +1,9 @@
 import React from 'react';
 const CustomMessageIcon: React.FC = () => (
-  <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
-    <rect x="6" y="10" width="20" height="12" rx="5" fill="#ffe6b3" stroke="#e0b97d" strokeWidth="2"/>
-    <polygon points="16,28 12,22 20,22" fill="#ffe6b3" stroke="#e0b97d" strokeWidth="2"/>
-    <rect x="10" y="14" width="12" height="2" rx="1" fill="#e0b97d"/>
+  <svg width="100%" height="100%" viewBox="0 0 56 56" fill="none">
+    <rect x="10.5" y="17.5" width="35" height="21" rx="8.75" fill="#ffe6b3" stroke="#e0b97d" strokeWidth="3.5"/>
+    <polygon points="28,49 21,38.5 35,38.5" fill="#ffe6b3" stroke="#e0b97d" strokeWidth="3.5"/>
+    <rect x="17.5" y="24.5" width="21" height="3.5" rx="1.75" fill="#e0b97d"/>
   </svg>
 );
 export default CustomMessageIcon; 

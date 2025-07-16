@@ -37,7 +37,7 @@ export const AddChildModal: React.FC<AddChildModalProps> = ({ onAdd, onClose }) 
   const [wantsTTS, setWantsTTS] = useState(false);
 
   useEffect(() => {
-    supabase.from('themes').select('*').then(({ data }) => setThemes(data || []));
+    supabase.from('themes').select('name').then(({ data }) => setThemes(data || []));
   }, []);
 
   useEffect(() => {
@@ -45,7 +45,7 @@ export const AddChildModal: React.FC<AddChildModalProps> = ({ onAdd, onClose }) 
   }, [themes]);
 
   useEffect(() => {
-    supabase.from('avatars').select('*').then(({ data }) => setAvatars(data || []));
+    supabase.from('avatars').select('name, image_url').then(({ data }) => setAvatars(data || []));
   }, []);
   useEffect(() => {
     if (avatars.length > 0 && !avatar) setAvatar(avatars[0].image_url);
