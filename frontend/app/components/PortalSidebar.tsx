@@ -19,7 +19,7 @@ const links = [
   { href: "/portal",            label: "Ana Sayfa",    icon: <HomeIcon /> },
   { href: "/portal/children",   label: "Çocuklarım",   icon: <ChildIcon /> },
   { href: "/portal/games",      label: "Oyun Ayarları", icon: <GameIcon /> },
-  { href: "/portal/reports",    label: "Raporlar",      icon: <ReportIcon /> },
+  { href: "/portal/raporlar",    label: "Raporlar",      icon: <ReportIcon /> },
   { href: "/portal/settings",   label: "Ayarlar",       icon: <SettingsIcon /> },
 ];
 
