@@ -127,7 +127,7 @@ Aşağıdaki görselde UI/UX ve uygulama özellikleri üzerine yapılan tartış
 </details>
 
 <details>
-<summary><h4>Sprint Review & Retrospective</h4></summary>
+<summary><h4>Sprint Review</h4></summary>
 
 <strong>Review (Neler Başarıldı?):</strong>
 
@@ -138,6 +138,11 @@ Aşağıdaki görselde UI/UX ve uygulama özellikleri üzerine yapılan tartış
 ✅ (5 Puan) Giriş ve Kayıt Sayfaları UI kodlaması tamamlandı.
 
 ✅ (8 Puan) Tüm sayfalar için responsive tasarım yapıldı.
+
+</details>
+
+<details>
+<summary><h4>Sprint Retrospective</h4></summary>
 
 <strong>Retrospective (Neler Öğrendik?):</strong>
 
@@ -254,7 +259,7 @@ Aşağıdaki görsellerde Sprint 2 sürecinde yapılan toplantılardan kesitler 
 </details>
 
 <details>
-<summary><h4>Sprint Review & Retrospective</h4></summary>
+<summary><h4>Sprint Review</h4></summary>
 
 <strong>Review (Neler Başarıldı?):</strong>
 
@@ -281,6 +286,11 @@ Aşağıdaki görsellerde Sprint 2 sürecinde yapılan toplantılardan kesitler 
 - Notion'a geçiş ile ekip içi iletişim ve görev takibi kolaylaştı
 - Git workflow standardize edildi ve environment setup süreçleri otomatikleştirildi
 - Code cleanup ile kod kalitesi artırıldı ve maintainability iyileştirildi
+
+</details>
+
+<details>
+<summary><h4>Sprint Retrospective</h4></summary>
 
 <strong>Retrospective (Neler Öğrendik?):</strong>
 
