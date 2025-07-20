@@ -207,25 +207,25 @@ Aşağıdaki görsellerde Sprint 2 sürecinde yapılan toplantılardan kesitler 
 
 <div style="border: 2px solid #e0b97d; border-radius: 12px; padding: 15px; background: #fff; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
 
-![Daily Scrum Meeting 1](./assets/sprint2/Sprint%202%20meet%201.png)
-
 **Toplantı 1:** Görsel oluşturma teknolojileri ve AI entegrasyonu planları
+
+![Daily Scrum Meeting 1](./assets/sprint2/Sprint%202%20meet%201.png)
 
 </div>
 
 <div style="border: 2px solid #e0b97d; border-radius: 12px; padding: 15px; background: #fff; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
-
-![Daily Scrum Meeting 2](./assets/sprint2/Sprint%202%20meet%202.jpeg)
 
 **Toplantı 2:** Google Cloud Vertex AI değerlendirmesi ve ücretsiz kredi süreci
 
+![Daily Scrum Meeting 2](./assets/sprint2/Sprint%202%20meet%202.jpeg)
+
 </div>
 
 <div style="border: 2px solid #e0b97d; border-radius: 12px; padding: 15px; background: #fff; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
 
-![Daily Scrum Meeting 3](./assets/sprint2/Sprint%202%20meet%203.jpeg)
-
 **Toplantı 3:** AI entegrasyonu teknik detayları ve implementasyon planları
+
+![Daily Scrum Meeting 3](./assets/sprint2/Sprint%202%20meet%203.jpeg)
 
 </div>
 
@@ -250,45 +250,6 @@ Aşağıdaki görsellerde Sprint 2 sürecinde yapılan toplantılardan kesitler 
 | Çocuklar | Oyunlar | Raporlar | Ayarlar |
 |----------|---------|----------|---------|
 | ![Çocuklar](./assets/sprint2/kids.png) | ![Oyunlar](./assets/sprint2/games.png) | ![Raporlar](./assets/sprint2/report.png) | ![Ayarlar](./assets/sprint2/setting.png) |
-
-</details>
-
-<details>
-<summary><h4>Tamamlanan Görevler</h4></summary>
-
-<strong>✅ Tamamlanan Görevler (55 Puan):</strong>
-
-✅ (8 Puan) Next.js 15 refactor & modern folder structure - Eray İNAN
-
-✅ (3 Puan) Create .gitignore & env setup - Yusuf Aydın
-
-✅ (2 Puan) Restore image layout table & update visuals - Sevde Altunköse
-
-✅ (3 Puan) LoadingScreen reusable component - Eray İNAN
-
-✅ (8 Puan) AddChildModal + Profile modal merge & Supabase save logic - Yusuf Aydın
-
-✅ (1 Puan) Code cleanup - remove dead comments - Sevde Altunköse
-
-✅ (3 Puan) Avatar component SVG / link support - Eray İNAN
-
-✅ (3 Puan) Auto-roadmap item after child add - Yusuf Aydın
-
-✅ (8 Puan) Forgot-password / Reset-password flow - Sevde Altunköse
-
-✅ (5 Puan) Logout button - Yuşa Güler
-
-✅ (3 Puan) Portal children horizontal layout & UX fixes - Halil Kıyak
-
-✅ (8 Puan) Supabase integration + global UI/UX improvements - Eray İNAN
-
-<strong>🔄 Devam Eden Görevler (18 Puan):</strong>
-
-🔄 (8 Puan) Reports & Settings UIs - Yusuf Aydın
-
-🔄 (5 Puan) Buffer for bug-fix & polish - Yuşa Güler & Halil Kıyak
-
-🔄 (5 Puan) Sprint Review, Retro docs & Screenshots - Halil Kıyak
 
 </details>
 
