@@ -241,7 +241,11 @@ Aşağıdaki görsellerde Sprint 2 sürecinde yapılan toplantılardan kesitler 
 <details>
 <summary><h4>Sprint Board</h4></summary>
 
-![alt text](./assets/sprint2/Sprint%202%20To%20Do.png)
+<div style="display:flex; gap:8px; flex-wrap:wrap;">
+  <img src="./assets/sprint2/Sprint%202%20To%20Do.png" alt="Sprint 2 To Do" width="45%"/>
+  <img src="./assets/sprint2/timeline.png" alt="Sprint 2 Zaman Çizelgesi" width="45%"/>
+  <img src="./assets/sprint2/ToDo2.png" alt="Sprint 2 ToDo Listesi 2" width="45%"/>
+</div>
 
 </details>
 
