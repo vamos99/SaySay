@@ -1,0 +1,1389 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Özel Gereksinimli Çocuklar Eğitim Uygulaması - Kavram Haritası</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            overflow-x: auto;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 20px;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            border-radius: 15px;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .concept-map {
+            position: relative;
+            min-height: 1400px;
+            background: linear-gradient(45deg, #f0f8ff, #e6f3ff);
+            border-radius: 15px;
+            padding: 60px;
+            margin-bottom: 40px;
+            overflow: hidden;
+        }
+
+        .central-node {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 320px;
+            height: 130px;
+            background: linear-gradient(135deg, #ff6b6b, #ee5a6f);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.3em;
+            font-weight: bold;
+            text-align: center;
+            box-shadow: 0 15px 35px rgba(255, 107, 107, 0.4);
+            z-index: 10;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .central-node:hover {
+            transform: translate(-50%, -50%) scale(1.05);
+            box-shadow: 0 20px 45px rgba(255, 107, 107, 0.6);
+        }
+
+        .branch {
+            position: absolute;
+            width: 280px;
+            height: 110px;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            text-align: center;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1.1em;
+        }
+
+        .branch:hover {
+            transform: scale(1.08);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+        }
+
+        .branch.auth {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            top: 8%;
+            left: 8%;
+        }
+
+        .branch.profile {
+            background: linear-gradient(135deg, #f093fb, #f5576c);
+            top: 8%;
+            right: 8%;
+        }
+
+        .branch.management {
+            background: linear-gradient(135deg, #4facfe, #00f2fe);
+            left: 2%;
+            top: 68%;
+        }
+
+        .branch.communication {
+            background: linear-gradient(135deg, #43e97b, #38f9d7);
+            right: 2%;
+            top: 68%;
+        }
+
+        .branch.learning {
+            background: linear-gradient(135deg, #fa709a, #fee140);
+            bottom: 8%;
+            left: 8%;
+        }
+
+        .branch.tracking {
+            background: linear-gradient(135deg, #a8edea, #fed6e3);
+            bottom: 8%;
+            right: 8%;
+            color: #333;
+        }
+
+        .connection-line {
+            position: absolute;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            opacity: 0.6;
+            z-index: 1;
+            border-radius: 2px;
+        }
+
+        .sub-concepts {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 10px;
+            padding: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            font-size: 0.9em;
+            color: #333;
+            max-width: 200px;
+            line-height: 1.4;
+        }
+
+        .sub-concepts h4 {
+            color: #667eea;
+            margin-bottom: 8px;
+            font-size: 1em;
+        }
+
+        .sub-concepts ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .sub-concepts li {
+            padding: 3px 0;
+            border-left: 3px solid #4ecdc4;
+            padding-left: 8px;
+            margin: 3px 0;
+        }
+
+        .endpoints-section {
+            background: linear-gradient(135deg, #ffeaa7, #fab1a0);
+            border-radius: 20px;
+            padding: 30px;
+            margin: 30px 0;
+        }
+
+        .endpoints-section h2 {
+            color: #2d3436;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.2em;
+        }
+
+        .endpoint-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+            margin-top: 20px;
+        }
+
+        .endpoint-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            border-left: 5px solid;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .endpoint-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+        }
+
+        .endpoint-card.user { border-left-color: #667eea; }
+        .endpoint-card.child { border-left-color: #f093fb; }
+        .endpoint-card.admin { border-left-color: #4facfe; }
+        .endpoint-card.communication { border-left-color: #43e97b; }
+        .endpoint-card.learning { border-left-color: #fa709a; }
+        .endpoint-card.data { border-left-color: #a8edea; }
+
+        .endpoint-card h3 {
+            color: #2d3436;
+            margin-bottom: 15px;
+            font-size: 1.4em;
+        }
+
+        .endpoint-item {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 12px;
+            margin: 10px 0;
+            border-left: 3px solid #4ecdc4;
+        }
+
+        .endpoint-item strong {
+            color: #667eea;
+            font-size: 1.1em;
+        }
+
+        .endpoint-item p {
+            margin: 5px 0 0 0;
+            color: #636e72;
+            line-height: 1.4;
+        }
+
+        .benefits-section {
+            background: linear-gradient(135deg, #74b9ff, #0984e3);
+            border-radius: 20px;
+            padding: 30px;
+            color: white;
+            text-align: center;
+        }
+
+        .benefits-section h2 {
+            margin-bottom: 25px;
+            font-size: 2.2em;
+        }
+
+        .benefits-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .benefit-card {
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 15px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .benefit-card h3 {
+            margin-bottom: 10px;
+            font-size: 1.3em;
+        }
+
+        .icon {
+            font-size: 2.5em;
+            margin-bottom: 15px;
+        }
+
+        /* Modal Stilleri */
+        .detail-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            transform: translate(-50%, -50%) scale(0.8);
+            transition: all 0.3s ease;
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 20px;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+            color: white;
+            position: relative;
+        }
+
+        .modal-header {
+            padding: 25px 30px 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h2 {
+            margin: 0;
+            font-size: 1.8em;
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5em;
+            cursor: pointer;
+            padding: 5px 10px;
+            border-radius: 50%;
+            transition: background 0.3s ease;
+        }
+
+        .close-modal:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .modal-body {
+            padding: 25px 30px;
+        }
+
+        .modal-description {
+            font-size: 1.1em;
+            margin-bottom: 25px;
+            opacity: 0.9;
+            line-height: 1.6;
+        }
+
+        .modal-section {
+            margin-bottom: 25px;
+        }
+
+        .modal-section h3 {
+            font-size: 1.3em;
+            margin-bottom: 15px;
+            color: #ffeaa7;
+        }
+
+        .feature-list, .endpoint-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .feature-list li, .endpoint-list li {
+            background: rgba(255, 255, 255, 0.1);
+            margin: 8px 0;
+            padding: 12px 15px;
+            border-radius: 8px;
+            border-left: 4px solid #4ecdc4;
+            transition: all 0.3s ease;
+        }
+
+        .feature-list li:hover, .endpoint-list li:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateX(5px);
+        }
+
+        .endpoint-list code {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            color: #74b9ff;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 25px;
+        }
+
+        .demo-btn, .tech-btn {
+            flex: 1;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 25px;
+            font-size: 1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .demo-btn {
+            background: linear-gradient(45deg, #ff6b6b, #ff8e53);
+            color: white;
+        }
+
+        .tech-btn {
+            background: linear-gradient(45deg, #4ecdc4, #44a08d);
+            color: white;
+        }
+
+        .demo-btn:hover, .tech-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Bildirim Sistemi */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            border-radius: 10px;
+            color: white;
+            font-weight: bold;
+            z-index: 2000;
+            opacity: 0;
+            transform: translateY(-20px);
+            transition: all 0.3s ease;
+            max-width: 400px;
+        }
+
+        .notification.success {
+            background: linear-gradient(45deg, #00b894, #00a085);
+        }
+
+        .notification.info {
+            background: linear-gradient(45deg, #0984e3, #74b9ff);
+        }
+
+        /* Sistem Genel Bakış */
+        .system-overview {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1500;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .overview-content {
+            background: linear-gradient(135deg, #2d3436, #636e72);
+            border-radius: 20px;
+            padding: 40px;
+            color: white;
+            text-align: center;
+            max-width: 600px;
+        }
+
+        .overview-content h2 {
+            font-size: 2.5em;
+            margin-bottom: 30px;
+            color: #ffeaa7;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 15px;
+            padding: 25px;
+            transition: transform 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: scale(1.05);
+        }
+
+        .stat-number {
+            font-size: 3em;
+            font-weight: bold;
+            color: #ffeaa7;
+            margin-bottom: 10px;
+        }
+
+        .stat-label {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .close-overview {
+            background: linear-gradient(45deg, #ff6b6b, #ff8e53);
+            border: none;
+            color: white;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .close-overview:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.4);
+        }
+
+        /* Endpoint Kartları Genişletme */
+        .endpoint-card.expanded {
+            transform: scale(1.02);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Animasyonlar */
+        @keyframes pulse {
+            0%, 100% { opacity: 0.6; }
+            50% { opacity: 1; }
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .central-node {
+            cursor: pointer;
+            animation: subtle-pulse 3s infinite;
+        }
+
+        @keyframes subtle-pulse {
+            0%, 100% { transform: translate(-50%, -50%) scale(1); }
+            50% { transform: translate(-50%, -50%) scale(1.02); }
+        }
+
+        /* Responsive düzenlemeler */
+        @media (max-width: 1200px) {
+            .concept-map {
+                min-height: 1200px;
+                padding: 40px 20px;
+            }
+            
+            .branch {
+                width: 240px;
+                height: 95px;
+                font-size: 1em;
+            }
+            
+            .central-node {
+                width: 280px;
+                height: 110px;
+                font-size: 1.2em;
+            }
+
+            .sub-concepts {
+                max-width: 180px;
+                font-size: 0.85em;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .concept-map {
+                min-height: 1000px;
+                padding: 30px 15px;
+            }
+            
+            .branch {
+                width: 200px;
+                height: 80px;
+                font-size: 0.9em;
+            }
+            
+            .central-node {
+                width: 220px;
+                height: 90px;
+                font-size: 1em;
+            }
+
+            .sub-concepts {
+                max-width: 160px;
+                font-size: 0.8em;
+                padding: 10px;
+            }
+
+            /* Mobilde alt kavramları gizle veya yeniden konumlandır */
+            .sub-concepts {
+                display: none;
+            }
+            
+            .endpoint-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .modal-content {
+                margin: 20px;
+                max-width: none;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .modal-actions {
+                flex-direction: column;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .concept-map {
+                min-height: 800px;
+                padding: 20px 10px;
+            }
+
+            .branch {
+                width: 160px;
+                height: 70px;
+                font-size: 0.8em;
+            }
+            
+            .central-node {
+                width: 180px;
+                height: 80px;
+                font-size: 0.9em;
+            }
+
+            .branch.auth { top: 12%; left: 5%; }
+            .branch.profile { top: 12%; right: 5%; }
+            .branch.management { left: 5%; top: 72%; }
+            .branch.communication { right: 5%; top: 72%; }
+            .branch.learning { bottom: 12%; left: 5%; }
+            .branch.tracking { bottom: 12%; right: 5%; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎯 Özel Gereksinimli Çocuklar İçin Eğitim Uygulaması</h1>
+            <p>İnteraktif Kavram Haritası ve Sistem Mimarisi</p>
+            <div style="margin-top: 15px; font-size: 0.9em; opacity: 0.8;">
+                💡 <strong>Nasıl Kullanılır:</strong> Dallara tıklayarak detayları keşfedin | Merkeze tıklayarak genel bakış | ESC ile kapat | SPACE ile sıfırla
+            </div>
+        </div>
+
+        <div class="concept-map">
+            <div class="central-node">
+                📱 Özel Gereksinimli Çocuklar<br>Eğitim & İletişim Uygulaması
+            </div>
+
+            <!-- Bağlantı Çizgileri - Yeniden düzenlenmiş -->
+            <div class="connection-line" style="width: 220px; height: 3px; top: 20%; left: 30%; transform: rotate(15deg);"></div>
+            <div class="connection-line" style="width: 200px; height: 3px; top: 22%; right: 32%; transform: rotate(-15deg);"></div>
+            <div class="connection-line" style="width: 280px; height: 3px; bottom: 38%; left: 20%; transform: rotate(-25deg);"></div>
+            <div class="connection-line" style="width: 260px; height: 3px; bottom: 36%; right: 22%; transform: rotate(25deg);"></div>
+            <div class="connection-line" style="width: 240px; height: 3px; bottom: 18%; left: 32%; transform: rotate(8deg);"></div>
+            <div class="connection-line" style="width: 220px; height: 3px; bottom: 20%; right: 34%; transform: rotate(-8deg);"></div>
+
+            <!-- Ana Dallar -->
+            <div class="branch auth">
+                🔐 Kullanıcı Girişi<br>& Hesap Yönetimi
+            </div>
+
+            <div class="branch profile">
+                👶 Çocuk Profili<br>Oluşturma
+            </div>
+
+            <div class="branch management">
+                ⚙️ Yönetim Portalı<br>Ebeveyn Kontrolü
+            </div>
+
+            <div class="branch communication">
+                💬 İletişim Panosu<br>Görsel İletişim
+            </div>
+
+            <div class="branch learning">
+                🎮 Kavram Oyunu<br>Öğrenme Modülü
+            </div>
+
+            <div class="branch tracking">
+                📊 Veri Toplama<br>& Gelişim Takibi
+            </div>
+
+            <!-- Alt Kavramlar - Yeniden konumlandırılmış -->
+            <div class="sub-concepts" style="top: 2%; left: 48%; z-index: 15;">
+                <h4>🔐 Kimlik Doğrulama</h4>
+                <ul>
+                    <li>E-posta kayıt</li>
+                    <li>Şifre güvenliği</li>
+                    <li>JWT token</li>
+                    <li>HTTPS şifreleme</li>
+                </ul>
+            </div>
+
+            <div class="sub-concepts" style="top: 2%; right: 38%; z-index: 15;">
+                <h4>👶 Kişiselleştirme</h4>
+                <ul>
+                    <li>Gelişim düzeyi</li>
+                    <li>İlgi alanları</li>
+                    <li>İletişim seviyesi</li>
+                    <li>Tema tercihleri</li>
+                </ul>
+            </div>
+
+            <div class="sub-concepts" style="left: 32%; top: 82%; z-index: 15;">
+                <h4>⚙️ Kontrol Paneli</h4>
+                <ul>
+                    <li>Profil ayarları</li>
+                    <li>İletişim panosu</li>
+                    <li>Müfredat oluşturma</li>
+                    <li>Tema yönetimi</li>
+                </ul>
+            </div>
+
+            <div class="sub-concepts" style="right: 32%; top: 82%; z-index: 15;">
+                <h4>💬 Görsel İletişim</h4>
+                <ul>
+                    <li>Görsel kartlar</li>
+                    <li>Ses çıkışı</li>
+                    <li>Kategori sistemi</li>
+                    <li>Kişisel kütüphane</li>
+                </ul>
+            </div>
+
+            <div class="sub-concepts" style="bottom: 2%; left: 42%; z-index: 15;">
+                <h4>🎮 Eğitici Oyunlar</h4>
+                <ul>
+                    <li>Kavram öğretimi</li>
+                    <li>Tematik içerik</li>
+                    <li>Animasyonlu ödül</li>
+                    <li>Kademeli zorluk</li>
+                </ul>
+            </div>
+
+            <div class="sub-concepts" style="bottom: 2%; right: 42%; z-index: 15;">
+                <h4>📊 Analitik</h4>
+                <ul>
+                    <li>Etkileşim kayıtları</li>
+                    <li>Başarı oranları</li>
+                    <li>Tepki süreleri</li>
+                    <li>Gelişim raporları</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="endpoints-section">
+            <h2>🔗 Sistem Uç Noktaları (API Endpoints)</h2>
+            
+            <div class="endpoint-grid">
+                <div class="endpoint-card user">
+                    <h3>👤 Kullanıcı Yönetimi</h3>
+                    
+                    <div class="endpoint-item">
+                        <strong>POST /api/auth/register</strong>
+                        <p>Ebeveyn hesabı oluşturma, e-posta doğrulama süreciyle birlikte</p>
+                    </div>
+                    
+                    <div class="endpoint-item">
+                        <strong>POST /api/auth/login</strong>
+                        <p>Güvenli giriş yapma ve JWT token alma</p>
+                    </div>
+                    
+                    <div class="endpoint-item">
+                        <strong>POST /api/auth/verify-email</strong>
+                        <p>E-posta adresini doğrulama</p>
+                    </div>
+                    
+                    <div class="endpoint-item">
+                        <strong>POST /api/auth/reset-password</strong>
+                        <p>Şifre sıfırlama işlemi</p>
+                    </div>
+                    
+                    <div class="endpoint-item">
+                        <strong>GET /api/user/profile</strong>
+                        <p>Kullanıcı profil bilgilerini getirme</p>
+                    </div>
+                </div>
+
+                <div class="endpoint-card child">
+                    <h3>👶 Çocuk Profil Yönetimi</h3>
+                    
+                    <div class="endpoint-item">
+                        <strong>POST /api/children</strong>
+                        <p>Yeni çocuk profili oluşturma</p>
+                    </div>
+                    
+                    <div class="endpoint-item">
+                        <strong>GET /api/children</strong>
+                        <p>Ebeveyne ait tüm çocuk profillerini listeleme</p>
+                    </div>
+                    
+                    <div class="endpoint-item">
+                        <strong>PUT /api/children/:id</strong>
+                        <p>Çocuk profil bilgilerini güncelleme</p>
+                    </div>
+                    
+                    <div class="endpoint-item">
+                        <strong>DELETE /api/children/:id</strong>
+                        <p>Çocuk profilini silme</p>
+                    </div>
+                    
+                    <div class="endpoint-item">
+                        <strong>POST /api/children/:id/settings</strong>
+                        <p>Çocuğa özel ayarları kaydetme (tema, cinsiyet, seviye)</p>
+                    </div>
+                </div>
+
+                <div class="endpoint-card admin">
+                    <h3>⚙️ Yönetim Paneli</h3>
+                    
+                    <div class="endpoint-item">
+                        <strong>GET /api/content/library</strong>
+                        <p>Görsel-işitsel kütüphane içeriklerini getirme</p>
+                    </div>
+                    
+                    <div class="endpoint-item">
+                        <strong>POST /api/children/:id/communication-board</strong>
+                        <p>İletişim panosuna öge ekleme/çıkarma</p>
+                    </div>
+                    
+                    <div class="endpoint-item">
+                        <strong>POST /api/children/:id/curriculum</strong>
+                        <p>Öğrenme müfredatını oluşturma ve sıralama</p>
+                    </div>
+                    
+                    <div class="endpoint-item">
+                        <strong>GET /api/themes</strong>
+                        <p>Kullanılabilir temaları listeleme</p>
+                    </div>
+                    
+                    <div class="endpoint-item">
+                        <strong>PUT /api/children/:id/theme</strong>
+                        <p>Çocuk için tema değiştirme</p>
+                    </div>
+                </div>
+
+                <div class="endpoint-card communication">
+                    <h3>💬 İletişim Modülü</h3>
+                    
+                    <div class="endpoint-item">
+                        <strong>GET /api/children/:id/communication-board</strong>
+                        <p>Çocuğun kişisel iletişim panosunu getirme</p>
+                    </div>
+                    
+                    <div class="endpoint-item">
+                        <strong>POST /api/communication/speak</strong>
+                        <p>Seçili ögeleri birleştirip sesli ifadeye dönüştürme</p>
+                    </div>
+                    
+                    <div class="endpoint-item">
+                        <strong>GET /api/communication/categories</strong>
+                        <p>İletişim kartı kategorilerini getirme</p>
+                    </div>
+                    
+                    <div class="endpoint-item">
+                        <strong>POST /api/communication/log</strong>
+                        <p>İletişim etkileşimlerini kaydetme</p>
+                    </div>
+                </div>
+
+                <div class="endpoint-card learning">
+                    <h3>🎮 Öğrenme Oyunları</h3>
+                    
+                    <div class="endpoint-item">
+                        <strong>GET /api/children/:id/current-lesson</strong>
+                        <p>Çocuğun mevcut ders konusunu getirme</p>
+                    </div>
+                    
+                    <div class="endpoint-item">
+                        <strong>POST /api/learning/answer</strong>
+                        <p>Oyun cevabını kaydetme ve değerlendirme</p>
+                    </div>
+                    
+                    <div class="endpoint-item">
+                        <strong>GET /api/learning/concepts</strong>
+                        <p>Öğretilebilir kavramları listeleme</p>
+                    </div>
+                    
+                    <div class="endpoint-item">
+                        <strong>POST /api/learning/progress</strong>
+                        <p>Öğrenme ilerlemesini güncelleme</p>
+                    </div>
+                    
+                    <div class="endpoint-item">
+                        <strong>GET /api/learning/next-level</strong>
+                        <p>Bir sonraki zorluk seviyesini belirleme</p>
+                    </div>
+                </div>
+
+                <div class="endpoint-card data">
+                    <h3>📊 Veri Analizi</h3>
+                    
+                    <div class="endpoint-item">
+                        <strong>POST /api/analytics/interaction</strong>
+                        <p>Kullanıcı etkileşimlerini kaydetme</p>
+                    </div>
+                    
+                    <div class="endpoint-item">
+                        <strong>GET /api/analytics/child/:id/report</strong>
+                        <p>Çocuğun gelişim raporunu oluşturma</p>
+                    </div>
+                    
+                    <div class="endpoint-item">
+                        <strong>GET /api/analytics/child/:id/stats</strong>
+                        <p>Başarı oranları ve tepki sürelerini getirme</p>
+                    </div>
+                    
+                    <div class="endpoint-item">
+                        <strong>GET /api/analytics/child/:id/usage-patterns</strong>
+                        <p>Kullanım desenlerini analiz etme</p>
+                    </div>
+                    
+                    <div class="endpoint-item">
+                        <strong>POST /api/analytics/export</strong>
+                        <p>Verileri PDF veya Excel formatında dışa aktarma</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="benefits-section">
+            <h2>✨ Sistemin Faydaları</h2>
+            
+            <div class="benefits-grid">
+                <div class="benefit-card">
+                    <div class="icon">🎯</div>
+                    <h3>Kişiselleştirilmiş Eğitim</h3>
+                    <p>Her çocuğun bireysel ihtiyaçlarına göre özelleştirilmiş öğrenme deneyimi</p>
+                </div>
+                
+                <div class="benefit-card">
+                    <div class="icon">👨‍👩‍👧‍👦</div>
+                    <h3>Ebeveyn Kontrolü</h3>
+                    <p>Tam ebeveyn denetimi ile güvenli ve kontrollü öğrenme ortamı</p>
+                </div>
+                
+                <div class="benefit-card">
+                    <div class="icon">📊</div>
+                    <h3>Gelişim Takibi</h3>
+                    <p>Detaylı raporlama ile çocuğun ilerlemesini objektif şekilde izleme</p>
+                </div>
+                
+                <div class="benefit-card">
+                    <div class="icon">🔒</div>
+                    <h3>Güvenlik ve Gizlilik</h3>
+                    <p>Çocuk verilerinin maksimum güvenlik ile korunması</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global state
+        let activeModal = null;
+        let selectedBranch = null;
+        let connectionAnimations = [];
+
+        // Ana dalları tıklanabilir yapma
+        document.querySelectorAll('.branch').forEach(branch => {
+            branch.style.cursor = 'pointer';
+            
+            branch.addEventListener('click', function() {
+                showBranchDetails(this);
+                highlightConnections(this);
+            });
+
+            branch.addEventListener('mouseenter', function() {
+                this.style.transform = 'scale(1.1)';
+                this.style.zIndex = '15';
+                showBranchPreview(this);
+            });
+            
+            branch.addEventListener('mouseleave', function() {
+                if (this !== selectedBranch) {
+                    this.style.transform = 'scale(1)';
+                    this.style.zIndex = '5';
+                }
+                hideBranchPreview();
+            });
+        });
+
+        // Merkezi düğüm animasyonu
+        const centralNode = document.querySelector('.central-node');
+        centralNode.addEventListener('click', function() {
+            resetAllHighlights();
+            showSystemOverview();
+        });
+
+        // Dal detaylarını gösterme
+        function showBranchDetails(branch) {
+            selectedBranch = branch;
+            
+            // Diğer dalları soluklaştır
+            document.querySelectorAll('.branch').forEach(b => {
+                if (b !== branch) {
+                    b.style.opacity = '0.3';
+                    b.style.transform = 'scale(0.9)';
+                } else {
+                    b.style.opacity = '1';
+                    b.style.transform = 'scale(1.15)';
+                    b.style.zIndex = '20';
+                }
+            });
+
+            // Modal oluştur
+            createDetailModal(branch);
+        }
+
+        // Bağlantıları vurgulama
+        function highlightConnections(branch) {
+            const connections = document.querySelectorAll('.connection-line');
+            connections.forEach((line, index) => {
+                line.style.background = 'linear-gradient(45deg, #ff6b6b, #4ecdc4)';
+                line.style.opacity = '0.8';
+                line.style.height = '5px';
+                line.style.animation = `pulse 1.5s infinite ${index * 0.2}s`;
+            });
+        }
+
+        // Detay modal oluşturma
+        function createDetailModal(branch) {
+            // Mevcut modalı kapat
+            if (activeModal) {
+                activeModal.remove();
+            }
+
+            const modal = document.createElement('div');
+            modal.className = 'detail-modal';
+            modal.innerHTML = getModalContent(branch);
+            
+            document.body.appendChild(modal);
+            activeModal = modal;
+
+            // Modal animasyonu
+            setTimeout(() => {
+                modal.style.opacity = '1';
+                modal.style.transform = 'translate(-50%, -50%) scale(1)';
+            }, 10);
+
+            // Kapatma olayları
+            modal.querySelector('.close-modal').addEventListener('click', closeModal);
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) closeModal();
+            });
+        }
+
+        // Modal içeriği
+        function getModalContent(branch) {
+            const branchData = {
+                'auth': {
+                    title: '🔐 Kullanıcı Girişi & Hesap Yönetimi',
+                    description: 'Güvenli kimlik doğrulama ve hesap yönetimi sistemi',
+                    features: [
+                        'JWT Token tabanlı güvenlik',
+                        'E-posta doğrulama sistemi',
+                        'HTTPS şifreleme',
+                        'Şifre sıfırlama mekanizması',
+                        'Çoklu güvenlik katmanları'
+                    ],
+                    endpoints: [
+                        'POST /api/auth/register',
+                        'POST /api/auth/login',
+                        'POST /api/auth/verify-email',
+                        'POST /api/auth/reset-password'
+                    ]
+                },
+                'profile': {
+                    title: '👶 Çocuk Profili Oluşturma',
+                    description: 'Her çocuk için özelleştirilmiş profil yönetimi',
+                    features: [
+                        'Bireysel gelişim seviyesi tanımlama',
+                        'İlgi alanı bazlı kişiselleştirme',
+                        'İletişim düzeyi belirleme',
+                        'Tema ve görsel tercihler',
+                        'Özel eğitim planı oluşturma'
+                    ],
+                    endpoints: [
+                        'POST /api/children',
+                        'GET /api/children',
+                        'PUT /api/children/:id',
+                        'POST /api/children/:id/settings'
+                    ]
+                },
+                'management': {
+                    title: '⚙️ Yönetim Portalı - Ebeveyn Kontrolü',
+                    description: 'Tam ebeveyn denetimi ile güvenli ortam',
+                    features: [
+                        'İçerik kütüphanesi yönetimi',
+                        'İletişim panosu düzenleme',
+                        'Öğrenme müfredatı oluşturma',
+                        'Tema ve görsel ayarları',
+                        'Erişim kontrolü'
+                    ],
+                    endpoints: [
+                        'GET /api/content/library',
+                        'POST /api/children/:id/communication-board',
+                        'POST /api/children/:id/curriculum',
+                        'PUT /api/children/:id/theme'
+                    ]
+                },
+                'communication': {
+                    title: '💬 İletişim Panosu - Görsel İletişim',
+                    description: 'Konuşamayan çocuklar için görsel iletişim araçları',
+                    features: [
+                        'Görsel kartlar ile ifade',
+                        'Sesli geri bildirim sistemi',
+                        'Kategori bazlı organizasyon',
+                        'Kişisel kütüphane oluşturma',
+                        'Hızlı erişim paneli'
+                    ],
+                    endpoints: [
+                        'GET /api/children/:id/communication-board',
+                        'POST /api/communication/speak',
+                        'GET /api/communication/categories',
+                        'POST /api/communication/log'
+                    ]
+                },
+                'learning': {
+                    title: '🎮 Kavram Oyunu - Öğrenme Modülü',
+                    description: 'Eğlenceli ve etkileşimli öğrenme deneyimi',
+                    features: [
+                        'Kademeli zorluk sistemi',
+                        'Tematik içerik sunumu',
+                        'Animasyonlu ödül sistemi',
+                        'İlerleme takibi',
+                        'Bireysel hız uyarlaması'
+                    ],
+                    endpoints: [
+                        'GET /api/children/:id/current-lesson',
+                        'POST /api/learning/answer',
+                        'GET /api/learning/concepts',
+                        'POST /api/learning/progress'
+                    ]
+                },
+                'tracking': {
+                    title: '📊 Veri Toplama & Gelişim Takibi',
+                    description: 'Detaylı analiz ve raporlama sistemi',
+                    features: [
+                        'Etkileşim verisi toplama',
+                        'Başarı oranı analizi',
+                        'Tepki süresi ölçümü',
+                        'Gelişim raporları',
+                        'PDF/Excel dışa aktarım'
+                    ],
+                    endpoints: [
+                        'POST /api/analytics/interaction',
+                        'GET /api/analytics/child/:id/report',
+                        'GET /api/analytics/child/:id/stats',
+                        'POST /api/analytics/export'
+                    ]
+                }
+            };
+
+            const branchClass = branch.classList[1];
+            const data = branchData[branchClass];
+
+            return `
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h2>${data.title}</h2>
+                        <button class="close-modal">✕</button>
+                    </div>
+                    <div class="modal-body">
+                        <p class="modal-description">${data.description}</p>
+                        
+                        <div class="modal-section">
+                            <h3>🌟 Özellikler</h3>
+                            <ul class="feature-list">
+                                ${data.features.map(feature => `<li>${feature}</li>`).join('')}
+                            </ul>
+                        </div>
+                        
+                        <div class="modal-section">
+                            <h3>🔌 API Endpoints</h3>
+                            <ul class="endpoint-list">
+                                ${data.endpoints.map(endpoint => `<li><code>${endpoint}</code></li>`).join('')}
+                            </ul>
+                        </div>
+                        
+                        <div class="modal-actions">
+                            <button onclick="simulateFeature('${branchClass}')" class="demo-btn">🚀 Demo Göster</button>
+                            <button onclick="showTechnicalDetails('${branchClass}')" class="tech-btn">⚙️ Teknik Detay</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Demo simülasyonu
+        function simulateFeature(branchType) {
+            const demoMessages = {
+                'auth': 'Kullanıcı kayıt süreci simüle ediliyor... ✅ E-posta doğrulandı!',
+                'profile': 'Çocuk profili oluşturuluyor... ✅ Kişiselleştirme tamamlandı!',
+                'management': 'Yönetim paneli açılıyor... ✅ Ebeveyn kontrolü aktif!',
+                'communication': 'İletişim panosu hazırlanıyor... ✅ Görsel kartlar yüklendi!',
+                'learning': 'Oyun modülü başlatılıyor... ✅ Eğitici içerik hazır!',
+                'tracking': 'Analiz raporu oluşturuluyor... ✅ Veriler işlendi!'
+            };
+
+            showNotification(demoMessages[branchType], 'success');
+        }
+
+        // Teknik detayları gösterme
+        function showTechnicalDetails(branchType) {
+            const techInfo = {
+                'auth': 'Node.js + Express, bcrypt hash, JWT tokens, rate limiting',
+                'profile': 'MongoDB collections, schema validation, file upload',
+                'management': 'React admin panel, drag-drop UI, real-time updates',
+                'communication': 'WebRTC audio, Canvas API, touch gestures',
+                'learning': 'Game engine integration, progress algorithms, AI difficulty',
+                'tracking': 'Time-series database, analytics engine, export tools'
+            };
+
+            showNotification(`Teknoloji: ${techInfo[branchType]}`, 'info');
+        }
+
+        // Bildirim sistemi
+        function showNotification(message, type) {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.textContent = message;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.opacity = '1';
+                notification.style.transform = 'translateY(0)';
+            }, 10);
+
+            setTimeout(() => {
+                notification.style.opacity = '0';
+                notification.style.transform = 'translateY(-20px)';
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+
+        // Modal kapatma
+        function closeModal() {
+            if (activeModal) {
+                activeModal.style.opacity = '0';
+                activeModal.style.transform = 'translate(-50%, -50%) scale(0.8)';
+                setTimeout(() => {
+                    activeModal.remove();
+                    activeModal = null;
+                }, 300);
+            }
+            resetAllHighlights();
+        }
+
+        // Vurguları sıfırlama
+        function resetAllHighlights() {
+            selectedBranch = null;
+            
+            document.querySelectorAll('.branch').forEach(branch => {
+                branch.style.opacity = '1';
+                branch.style.transform = 'scale(1)';
+                branch.style.zIndex = '5';
+            });
+
+            document.querySelectorAll('.connection-line').forEach(line => {
+                line.style.background = 'linear-gradient(45deg, #667eea, #764ba2)';
+                line.style.opacity = '0.6';
+                line.style.height = '3px';
+                line.style.animation = '';
+            });
+        }
+
+        // Sistem genel bakış
+        function showSystemOverview() {
+            const overview = document.createElement('div');
+            overview.className = 'system-overview';
+            overview.innerHTML = `
+                <div class="overview-content">
+                    <h2>🎯 Sistem Genel Bakış</h2>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-number">6</div>
+                            <div class="stat-label">Ana Modül</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">30+</div>
+                            <div class="stat-label">API Endpoint</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">100%</div>
+                            <div class="stat-label">Güvenlik</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">∞</div>
+                            <div class="stat-label">Kişiselleştirme</div>
+                        </div>
+                    </div>
+                    <button onclick="closeOverview()" class="close-overview">Kapat</button>
+                </div>
+            `;
+            
+            document.body.appendChild(overview);
+            setTimeout(() => overview.style.opacity = '1', 10);
+        }
+
+        // Genel bakışı kapatma
+        function closeOverview() {
+            const overview = document.querySelector('.system-overview');
+            if (overview) {
+                overview.style.opacity = '0';
+                setTimeout(() => overview.remove(), 300);
+            }
+        }
+
+        // Endpoint kartları interaktif hale getirme
+        document.querySelectorAll('.endpoint-card').forEach(card => {
+            card.addEventListener('click', function() {
+                this.classList.toggle('expanded');
+                const items = this.querySelectorAll('.endpoint-item');
+                items.forEach((item, index) => {
+                    setTimeout(() => {
+                        item.style.transform = this.classList.contains('expanded') ? 
+                            'translateX(10px)' : 'translateX(0)';
+                    }, index * 100);
+                });
+            });
+
+            card.addEventListener('mouseenter', function() {
+                this.style.borderLeftWidth = '8px';
+            });
+            
+            card.addEventListener('mouseleave', function() {
+                this.style.borderLeftWidth = '5px';
+            });
+        });
+
+        // Klavye kısayolları
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeModal();
+                closeOverview();
+            }
+            if (e.key === ' ') {
+                e.preventDefault();
+                resetAllHighlights();
+            }
+        });
+
+        // Sayfa yüklendiğinde animasyon
+        window.addEventListener('load', function() {
+            const branches = document.querySelectorAll('.branch');
+            branches.forEach((branch, index) => {
+                setTimeout(() => {
+                    branch.style.opacity = '0';
+                    branch.style.transform += ' translateY(-20px)';
+                    
+                    setTimeout(() => {
+                        branch.style.transition = 'all 0.8s ease';
+                        branch.style.opacity = '1';
+                        branch.style.transform = branch.style.transform.replace('translateY(-20px)', 'translateY(0)');
+                    }, 100);
+                }, index * 200);
+            });
+
+            // Hoş geldin mesajı
+            setTimeout(() => {
+                showNotification('🎉 İnteraktif kavram haritasına hoş geldiniz! Dallara tıklayarak keşfedin.', 'info');
+            }, 2000);
+        });
+    </script>
+</body>
+</html>
