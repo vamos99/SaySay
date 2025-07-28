@@ -13,12 +13,11 @@ COPY generator/ai_question.py ./
 COPY generator/ai_tts.py ./
 COPY generator/db_client.py ./
 COPY generator/storage_utils.py ./
-COPY generator/plated-shelter-466317-a7-9f02f535400f.json ./
 
-# Sadece gerekli olmayan environment variables
+# Environment variables
 ENV PYTHONUNBUFFERED=1
 ENV USE_LOCAL_CREDENTIALS=false
-ENV PROJECT_ID=plated-shelter-466317-a7
+# PROJECT_ID environment'tan alınacak
 ENV LOCATION=us-central1
 
 EXPOSE 8080

@@ -1,5 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
+import { useRouter } from 'next/navigation';
 
 // Gelecekte eklenecek: Çocuk seçici, tarih aralığı seçici, grafik ve tablo için placeholderlar
 
@@ -19,8 +20,12 @@ const RaporlarPage = () => {
     }, 1200);
   }, []);
 
+  const router = useRouter();
+
   return (
     <div style={{ padding: "32px 0 0 0", minHeight: "100vh", background: "#FFF8E7" }}>
+      {/* Back button */}
+      <button onClick={()=>router.push('/portal')} style={{position:'absolute',top:24,left:40,zIndex:20,background:'#fffbe6',border:'none',borderRadius:12,padding:'10px 24px',fontWeight:800,fontSize:18,boxShadow:'0 2px 8px #ffd600',color:'#2c3e50',cursor:'pointer'}}>← Geri</button>
       <div style={{ maxWidth: 900, margin: "0 auto", position: 'relative' }}>
         {/* Sağ üstte rol seçici kutucuklar */}
         <div style={{ position: 'absolute', top: 0, right: 0, display: 'flex', gap: 12 }}>

@@ -22,4 +22,6 @@ build/
 # Test ve upload çıktıları
 coverage/
 uploads/ 
-ui-ux/ 
+ui-ux/ *.json
+backend/generator/*.json
+*.json

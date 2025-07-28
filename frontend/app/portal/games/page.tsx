@@ -49,6 +49,18 @@ export default function GamesPage() {
                 <button disabled style={{background:'#fff',color:'#aaa',border:'1.5px solid #e0b97d',borderRadius:12,padding:'12px 24px',fontWeight:800,fontSize:16,cursor:'not-allowed',display:'flex',alignItems:'center',gap:8}}><SettingsIcon /> Ayarlar</button>
               </div>
             </div>
+            {/* Oyun 3: Yeni aktif oyun kartı */}
+            <div style={{background:'var(--sidebar-bg)',borderRadius:22,padding:32,minWidth:320,maxWidth:380,boxShadow:'0 4px 24px #e0e0e0',display:'flex',flexDirection:'column',alignItems:'flex-start',gap:18}}>
+              <div style={{display:'flex',alignItems:'center',gap:14}}>
+                <GameIcon />
+                <span style={{fontWeight:800,fontSize:'1.3rem',color:'var(--dark-text)'}}>Oyun 3</span>
+              </div>
+              <div style={{color:'var(--light-text)',fontSize:16,margin:'8px 0 18px 0'}}>Yeni bir oyun! Eğlenceli ve öğretici içerikler çok yakında burada.</div>
+              <div style={{display:'flex',gap:14}}>
+                <button onClick={()=>router.push('/portal/games/oyun3')} style={{background:'var(--primary-yellow)',color:'#2c3e50',border:'none',borderRadius:12,padding:'12px 32px',fontWeight:900,fontSize:17,cursor:'pointer',boxShadow:'0 2px 8px #ffd600'}}>Başlat</button>
+                <button onClick={()=>router.push('/portal/games/oyun3/settings')} style={{background:'var(--white)',color:'var(--dark-text)',border:'1.5px solid #e0b97d',borderRadius:12,padding:'12px 24px',fontWeight:800,fontSize:16,cursor:'pointer',display:'flex',alignItems:'center',gap:8}}><SettingsIcon /> Ayarlar</button>
+              </div>
+            </div>
           </div>
         </div>
       </main>
