@@ -32,8 +32,8 @@ export default function RoadmapPage() {
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
-      // Kategorileri çek
-      const { data: cats } = await supabase.from('categories').select('id, name, default_verb');
+      // Tüm kategorileri çek (dinamik)
+      const { data: cats } = await supabase.from('categories').select('id, name, default_verb').order('id');
       setCategories(cats || []);
       // Çocuğu bul
       if (user?.id) {
@@ -43,9 +43,9 @@ export default function RoadmapPage() {
           // Roadmap'i çek
           const { data: roadmap } = await supabase.from('concept_roadmap').select('concepts_order').eq('child_id', children[0].id).single();
           if (roadmap && roadmap.concepts_order) {
-            // concepts_order: [category_id, ...]
-            setPlan((cats || []).filter((c:any) => roadmap.concepts_order.includes(c.id)));
-            setCategories((cats || []).filter((c:any) => !roadmap.concepts_order.includes(c.id)));
+            // concepts_order: [category_id, ...] - string olarak karşılaştır
+            setPlan((cats || []).filter((c:any) => roadmap.concepts_order.includes(c.id.toString())));
+            setCategories((cats || []).filter((c:any) => !roadmap.concepts_order.includes(c.id.toString())));
           }
         }
       }
@@ -70,11 +70,11 @@ export default function RoadmapPage() {
     const newPlan = [...plan, cat];
     setPlan(newPlan);
     setCategories(categories.filter(c => c.id !== cat.id));
-    // DB'ye yaz
+    // DB'ye yaz - string olarak kaydet
     await supabase.from('concept_roadmap').upsert([
       {
         child_id: childId,
-        concepts_order: newPlan.map((c: any) => Number(c.id))
+        concepts_order: newPlan.map((c: any) => c.id.toString())
       }
     ], { onConflict: 'child_id' });
   };
@@ -83,11 +83,11 @@ export default function RoadmapPage() {
     const newPlan = plan.filter((c: any) => c.id !== cat.id);
     setPlan(newPlan);
     setCategories([...categories, cat]);
-    // DB'ye yaz
+    // DB'ye yaz - string olarak kaydet
     await supabase.from('concept_roadmap').upsert([
       {
         child_id: childId,
-        concepts_order: newPlan.map((c: any) => Number(c.id))
+        concepts_order: newPlan.map((c: any) => c.id.toString())
       }
     ], { onConflict: 'child_id' });
   };

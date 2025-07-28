@@ -56,14 +56,15 @@ export default function ChildProfilePage() {
     if (!id) return;
     setPlanLoading(true);
     Promise.all([
-      supabase.from('categories').select('id, name, default_verb'),
+      supabase.from('categories').select('id, name, default_verb').order('id'),
       supabase.from('concept_roadmap').select('concepts_order').eq('child_id', id)
     ]).then(([catRes, roadmapRes]) => {
       const allCats = catRes.data || [];
       const roadmapData = roadmapRes.data?.[0];
       if (roadmapData && roadmapData.concepts_order) {
+        // concepts_order string array olduğu için string olarak karşılaştır
         const planIds = new Set(roadmapData.concepts_order);
-        setRoadmap(allCats.filter((c:any) => planIds.has(c.id)));
+        setRoadmap(allCats.filter((c:any) => planIds.has(c.id.toString())));
       } else {
         setRoadmap([]);
       }
@@ -75,11 +76,11 @@ export default function ChildProfilePage() {
   const handleAddConcept = async (cat: any) => {
     const newPlan = [...roadmap, cat];
     setRoadmap(newPlan);
-    // DB'ye yaz
+    // DB'ye yaz - string olarak kaydet
     await supabase.from('concept_roadmap').upsert([
       {
         child_id: id,
-        concepts_order: newPlan.map((c: any) => Number(c.id))
+        concepts_order: newPlan.map((c: any) => c.id.toString())
       }
     ], { onConflict: 'child_id' });
   };
@@ -89,7 +90,7 @@ export default function ChildProfilePage() {
     await supabase.from('concept_roadmap').upsert([
       {
         child_id: id,
-        concepts_order: newPlan.map((c: any) => Number(c.id))
+        concepts_order: newPlan.map((c: any) => c.id.toString())
       }
     ], { onConflict: 'child_id' });
   };

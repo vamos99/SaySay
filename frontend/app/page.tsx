@@ -13,6 +13,7 @@ import CustomClockIcon from '@/components/icons/CustomClockIcon';
 import CustomChartIcon from '@/components/icons/CustomChartIcon';
 import CustomMessageIcon from '@/components/icons/CustomMessageIcon';
 import CustomProfileIcon from '@/components/icons/CustomProfileIcon';
+import ImageGenerator from '@/components/ImageGenerator';
 
 export default function HomePage() {
   const { session, loading } = useAuth();
@@ -25,7 +26,8 @@ export default function HomePage() {
   if (loading) return null;
   if (session) return null;
   return (
-    <div className="page-container container">
+    <div className="page-container container" style={{ minHeight: '100vh' }}>
+      {/* Geçici çözüm: Kaydırma çubuğu için minHeight eklendi, sonradan kaldırılacak! */}
       <div className="home-layout">
         <div className="home-left-column">
           <section className="hero-section">
@@ -72,6 +74,11 @@ export default function HomePage() {
             </div>
           </section>
         </div>
+      </div>
+      {/* Görsel Üretici Bileşeni */}
+      <div style={{ marginTop: 40, marginBottom: 40 }}>
+        <h2 style={{ textAlign: 'center', fontWeight: 700, fontSize: '1.3rem', marginBottom: 16 }}>Görsel Üretici</h2>
+        <ImageGenerator />
       </div>
     </div>
   );

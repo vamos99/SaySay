@@ -26,19 +26,21 @@ export default function Oyun1Page() {
     setLoading(true);
     setError(null);
     Promise.all([
-      supabase.from('children').select('id, theme, age, wants_tts').eq('id', selectedId).single(),
+      supabase.from('children').select('id, theme, birth_year, wants_tts').eq('id', selectedId).single(),
       supabase.from('concept_roadmap').select('concepts_order').eq('child_id', selectedId).single()
     ]).then(async ([childRes, roadmapRes]) => {
       if (!childRes.data) { setError('Çocuk bulunamadı.'); router.push('/portal'); return; }
       setChild(childRes.data);
       const conceptIds = roadmapRes.data?.concepts_order || [];
       if (!conceptIds.length) { setLoading(false); setError('Kavram bulunamadı.'); return; }
-      const { data: categories, error: catErr } = await supabase.from('categories').select('id, name').in('id', conceptIds);
+      // conceptIds string array olduğu için number'a çevir
+      const numericIds = conceptIds.map((id: string) => parseInt(id));
+      const { data: categories, error: catErr } = await supabase.from('categories').select('id, name').in('id', numericIds);
       if (catErr) { setError('Kavramlar yüklenemedi.'); setLoading(false); return; }
       setRoadmap(categories || []);
       const firstConcept = categories?.[0];
       if (!firstConcept) { setLoading(false); setError('Kavram bulunamadı.'); return; }
-      const { data: itemsData, error: itemsErr } = await supabase.from('items').select('id, name, is_correct, themes, category_id, image_url').eq('category_id', firstConcept.id).contains('themes', [childRes.data.theme]);
+      const { data: itemsData, error: itemsErr } = await supabase.from('items').select('id, name, themes, category_id, image_url').eq('category_id', firstConcept.id);
       if (itemsErr) { setError('Seçenekler yüklenemedi.'); setLoading(false); return; }
       setItems(itemsData && itemsData.length > 1 ? shuffleArray(itemsData) : (itemsData || []));
       setLoading(false);
@@ -69,7 +71,7 @@ export default function Oyun1Page() {
           theme: child.theme,
           concept: roadmap[0]?.name,
           items: items.map(i => i.name),
-          age: child.age || 5
+          age: child.birth_year ? (new Date().getFullYear() - child.birth_year) : 5
         });
         const text = await fetchGeminiText(prompt);
         setQuestionText(text);
@@ -93,7 +95,8 @@ export default function Oyun1Page() {
   // Cevap seçimi
   const handleSelect = (item: any) => {
     if (feedback === 'disabled') return;
-    const isCorrect = typeof item.is_correct === 'boolean' ? item.is_correct : item.id === items[0]?.id;
+    // Basit doğru cevap: ilk item her zaman doğru
+    const isCorrect = item.id === items[0]?.id;
     if (isCorrect) {
       setFeedback("dogru");
       setTimeout(() => { setFeedback(null); setCurrent(c => c+1); }, 1200);
