@@ -23,7 +23,7 @@ const RaporlarPage = () => {
   const router = useRouter();
 
   return (
-    <div style={{ padding: "32px 0 0 0", minHeight: "100vh", background: "#FFF8E7" }}>
+    <div style={{ padding: "32px 0 0 0", minHeight: "100vh", background: "#FFF8E7", overflow: "auto" }}>
       {/* Back button */}
       <button onClick={()=>router.push('/portal')} style={{position:'absolute',top:24,left:40,zIndex:20,background:'#fffbe6',border:'none',borderRadius:12,padding:'10px 24px',fontWeight:800,fontSize:18,boxShadow:'0 2px 8px #ffd600',color:'#2c3e50',cursor:'pointer'}}>← Geri</button>
       <div style={{ maxWidth: 900, margin: "0 auto", position: 'relative' }}>

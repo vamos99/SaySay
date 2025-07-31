@@ -10,6 +10,7 @@ import { AddChildModal } from './components/AddChildModal';
 import { AnimatedBubbles } from './components/AnimatedBubbles';
 import { PortalCard } from './components/PortalCard';
 import LoadingScreen from '@/components/LoadingScreen';
+import { ChildSelectionModal } from '@/components/ChildSelectionModal';
 
 const MOTIVATION = [
   'Her çocuk bir dünyadır! 🌍',
@@ -39,9 +40,14 @@ export default function PortalPage() {
   const progressRef = useRef<NodeJS.Timeout | null>(null);
   const [isClient, setIsClient] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [showChildSelection, setShowChildSelection] = useState(false);
 
   useEffect(() => {
     setIsClient(true);
+    // Portal sayfasında user_type'ı parent olarak ayarla
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('user_type', 'parent');
+    }
     // Rastgele motivasyon ve baloncuklar sadece client'ta
     setMotivation(MOTIVATION[getRandomInt(0, MOTIVATION.length - 1)]);
     setBubbles(Array.from({length: 3}).map((_, i) => {
@@ -145,7 +151,7 @@ export default function PortalPage() {
           <ExpandSidebarIcon />
         </button>
       )}
-      <main className="portal-main-content" style={{paddingTop: 0}}>
+      <main className="portal-main-content" style={{paddingTop: 0, overflow: 'auto'}}>
         <h1 style={{ fontSize: "2rem", fontWeight: 800, color: "#2c3e50", marginBottom: 12, display:'flex', alignItems:'center', gap:8 }}>
           Hoş geldiniz <WelcomeSmileHandIcon />
         </h1>
@@ -171,6 +177,8 @@ export default function PortalPage() {
             ))}
             {/* Çocuk ekleme butonu kaldırıldı, yerine yönlendirme */}
             <button onClick={()=>router.push('/portal/children')} style={{padding:'6px 16px',borderRadius:8,border:'1.5px dashed #4CAF50',background:'#f8fff8',color:'#4CAF50',fontWeight:600,cursor:'pointer',fontSize:15,minWidth:80}}>Çocukları Yönet</button>
+            {/* Çocuk Seçimi Butonu */}
+            <button onClick={()=>setShowChildSelection(true)} style={{padding:'6px 16px',borderRadius:8,border:'1.5px solid #667eea',background:'#f0f4ff',color:'#667eea',fontWeight:600,cursor:'pointer',fontSize:15,minWidth:80}}>Çocuk Seç</button>
           </div>
         </div>
         {/* Portal özet alanı */}
@@ -185,6 +193,17 @@ export default function PortalPage() {
         </div>
         {/* PortalCard ve tekrar eden kartlar kaldırıldı */}
       </main>
+
+      {/* Çocuk Seçimi Modal */}
+      <ChildSelectionModal
+        isOpen={showChildSelection}
+        onClose={() => setShowChildSelection(false)}
+        onChildSelect={(childId) => {
+          setSelectedChildId(childId);
+          localStorage.setItem('selected_child_id', childId);
+          setShowChildSelection(false);
+        }}
+      />
     </div>
   );
 }

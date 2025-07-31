@@ -6,7 +6,7 @@ import { usePathname } from 'next/navigation';
 
 export const Header: React.FC = () => {
   const pathname = usePathname();
-  if (pathname && pathname.startsWith('/portal')) {
+  if (pathname && (pathname.startsWith('/portal') || pathname.startsWith('/child-dashboard') || pathname.startsWith('/games'))) {
     return null;
   }
   return (

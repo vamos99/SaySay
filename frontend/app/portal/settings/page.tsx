@@ -29,7 +29,7 @@ const SettingsPage = () => {
   };
 
   return (
-    <div style={{ minHeight: '100vh', background: '#fdf6e3', padding: '40px 0 0 0', position: 'relative' }}>
+    <div style={{ minHeight: '100vh', background: '#fdf6e3', padding: '40px 0 0 0', position: 'relative', overflow: 'auto' }}>
       {/* Back button */}
       <button onClick={()=>router.push('/portal')} style={{position:'absolute',top:24,left:40,zIndex:20,background:'#fffbe6',border:'none',borderRadius:12,padding:'10px 24px',fontWeight:800,fontSize:18,boxShadow:'0 2px 8px #ffd600',color:'#2c3e50',cursor:'pointer'}}>← Geri</button>
       <div style={{ maxWidth: 600, margin: "40px auto", background: "#fff", borderRadius: 18, boxShadow: "0 2px 16px #eee", padding: 32 }}>

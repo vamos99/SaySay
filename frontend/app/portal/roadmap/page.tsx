@@ -65,29 +65,34 @@ export default function RoadmapPage() {
     setMotivation(MOTIVATION[Math.floor(Math.random() * MOTIVATION.length)]);
   }, []);
 
+  const ALLOWED_CONCEPTS = ['Renkler', 'Sayılar', 'Büyük/Küçük', 'Duygular'];
+
   const handleAdd = async (cat: any) => {
     if (!childId) return;
+    if (!ALLOWED_CONCEPTS.includes(cat.name)) return;
     const newPlan = [...plan, cat];
     setPlan(newPlan);
     setCategories(categories.filter(c => c.id !== cat.id));
-    // DB'ye yaz - string olarak kaydet
+    // Sadece allowed ve isimle ekle
+    const concepts_order = newPlan.map((c: any) => c.name).filter((name: string) => ALLOWED_CONCEPTS.includes(name));
+    if (concepts_order.length === 0) return;
     await supabase.from('concept_roadmap').upsert([
       {
         child_id: childId,
-        concepts_order: newPlan.map((c: any) => c.id.toString())
+        concepts_order
       }
     ], { onConflict: 'child_id' });
   };
   const handleRemove = async (cat: any) => {
-    if (!childId) return;
     const newPlan = plan.filter((c: any) => c.id !== cat.id);
     setPlan(newPlan);
     setCategories([...categories, cat]);
-    // DB'ye yaz - string olarak kaydet
+    // Sadece allowed ve isimle ekle
+    const concepts_order = newPlan.map((c: any) => c.name).filter((name: string) => ALLOWED_CONCEPTS.includes(name));
     await supabase.from('concept_roadmap').upsert([
       {
         child_id: childId,
-        concepts_order: newPlan.map((c: any) => c.id.toString())
+        concepts_order
       }
     ], { onConflict: 'child_id' });
   };
@@ -109,7 +114,7 @@ export default function RoadmapPage() {
         </button>
       )}
       <PortalSidebar open={sidebarOpen} setOpen={setSidebarOpen} />
-      <main className="portal-main-content" style={{paddingTop: 0}}>
+      <main className="portal-main-content" style={{paddingTop: 0, overflow: 'auto'}}>
         <h1 style={{ fontSize: "2rem", fontWeight: 800, color: "#2c3e50", marginBottom: 12 }}>Kavram Oyunu Öğrenme Yolu</h1>
         <div style={{ display: 'flex', gap: 32, alignItems: 'flex-start', marginTop: 24 }}>
           {/* Sol: Tüm kavramlar */}

@@ -974,6 +974,23 @@ main {
   background: #353b45;
   color: #FFD600;
 }
+
+/* Çocuk Portalı butonu için özel stil */
+.sidebar-link .icon svg circle:last-child {
+  stroke: #667eea;
+}
+
+.sidebar-link:hover .icon svg circle:last-child {
+  stroke: var(--error-red);
+}
+
+.portal-sidebar.dark .sidebar-link .icon svg circle:last-child {
+  stroke: var(--sidebar-dark-link);
+}
+
+.portal-sidebar.dark .sidebar-link:hover .icon svg circle:last-child {
+  stroke: #FFD600;
+}
 /* Menü kapatma ikonunu sağ üstte belirgin yap */
 .portal-sidebar.open .sidebar-header .sidebar-hamburger {
   display: flex;

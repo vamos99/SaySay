@@ -14,6 +14,7 @@ import { CloseIcon } from '@/components/icons/CloseIcon';
 import { SunIcon } from '@/components/icons/SunIcon';
 import { MoonIcon } from '@/components/icons/MoonIcon';
 import { ExpandSidebarIcon } from '@/components/icons/ExpandSidebarIcon';
+import { ChildPortalIcon } from '@/components/icons/ChildPortalIcon';
 
 const links = [
   { href: "/portal",            label: "Ana Sayfa",    icon: <HomeIcon /> },
@@ -88,6 +89,44 @@ export const PortalSidebar: React.FC<{ open: boolean; setOpen: (v: boolean) => v
             {open && <span className="label">{l.label}</span>}
           </Link>
         ))}
+        
+        {/* Çocuk Portalı Butonu - Ayarların altında */}
+        <button
+          onClick={() => {
+            localStorage.setItem('user_type', 'child');
+            window.location.href = '/child-dashboard';
+          }}
+          className="sidebar-link"
+          style={{
+            width: '100%',
+            marginTop: '8px',
+            background: 'transparent',
+            border: 'none',
+            cursor: 'pointer',
+            padding: '12px 16px',
+            borderRadius: '8px',
+            transition: 'all 0.2s',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            fontSize: '14px',
+            fontWeight: '600',
+            color: '#2c3e50'
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.background = '#ffe6b3';
+            e.currentTarget.style.color = '#e74c3c';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.background = 'transparent';
+            e.currentTarget.style.color = '#2c3e50';
+          }}
+        >
+          <span className="icon">
+            <ChildPortalIcon />
+          </span>
+          {open && <span className="label">Çocuk Portalı</span>}
+        </button>
       </nav>
 
       <div className="sidebar-bottom">
