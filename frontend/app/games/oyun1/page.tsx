@@ -42,9 +42,9 @@ export default function Oyun1Page() {
         if (children && children.length > 0) {
           // Oyun ayarlarından seçilen çocuğu kontrol et
           const localSelectedId = localStorage.getItem('selected_child_id');
-          if (localSelectedId && children.find(c => c.id === localSelectedId)) {
+          if (localSelectedId && children.find((c: any) => c.id === localSelectedId)) {
             setSelectedChildId(localSelectedId);
-            setChild(children.find(c => c.id === localSelectedId));
+            setChild(children.find((c: any) => c.id === localSelectedId));
           } else {
             setSelectedChildId(children[0].id);
             setChild(children[0]);
@@ -62,7 +62,7 @@ export default function Oyun1Page() {
   }, [router]);
 
   const handleSelectChild = (id: string) => {
-    const selectedChild = childList.find(c => c.id === id);
+    const selectedChild = childList.find((c: any) => c.id === id);
     setSelectedChildId(id);
     setChild(selectedChild);
     setShowChildModal(false);
