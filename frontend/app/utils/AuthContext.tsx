@@ -1,72 +1,125 @@
-"use client";
+'use client';
 
-import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { supabase } from './supabaseClient';
-
-interface ParentProfile {
-  id: string;
-  full_name?: string;
-  settings?: any;
-  created_at?: string;
-}
+import { gameCache } from './gameCache';
 
 interface AuthContextType {
-  session: any;
   user: any;
-  profile: ParentProfile | null;
+  session: any;
   loading: boolean;
-  refreshProfile: () => Promise<void>;
+  login: (email: string, password: string) => Promise<{ error: string | null }>;
+  register: (email: string, password: string) => Promise<{ error: string | null }>;
+  logout: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [session, setSession] = useState<any>(null);
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (context === undefined) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
+};
+
+interface AuthProviderProps {
+  children: ReactNode;
+}
+
+export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<any>(null);
-  const [profile, setProfile] = useState<ParentProfile | null>(null);
+  const [session, setSession] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
-  const fetchProfile = async (uid: string) => {
-    const { data, error } = await supabase
-      .from('parent_profiles')
-      .select('id, full_name, settings, created_at')
-      .eq('id', uid)
-      .single();
-    if (!error) setProfile(data);
-    else setProfile(null);
-  };
-
-  const refreshProfile = async () => {
-    if (user?.id) await fetchProfile(user.id);
-  };
-
   useEffect(() => {
+    let mounted = true;
+
     const getSession = async () => {
-      const { data } = await supabase.auth.getSession();
-      setSession(data.session);
-      setUser(data.session?.user ?? null);
-      if (data.session?.user?.id) await fetchProfile(data.session.user.id);
-      setLoading(false);
+      try {
+        const { data: { session }, error } = await supabase.auth.getSession();
+        if (error) {
+          console.error('Session getirme hatası:', error);
+        }
+        if (mounted) {
+          setSession(session);
+          setUser(session?.user || null);
+          setLoading(false);
+        }
+      } catch (error) {
+        console.error('Session getirme exception:', error);
+        if (mounted) {
+          setLoading(false);
+        }
+      }
     };
+
     getSession();
-    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      if (session?.user?.id) fetchProfile(session.user.id);
-      else setProfile(null);
-    });
-    return () => { listener.subscription.unsubscribe(); };
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        if (mounted) {
+          setSession(session);
+          setUser(session?.user || null);
+          setLoading(false);
+        }
+      }
+    );
+
+    return () => {
+      mounted = false;
+      if (subscription) {
+        subscription.unsubscribe();
+      }
+    };
   }, []);
 
+  const login = async (email: string, password: string) => {
+    try {
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      return { error: error?.message || null };
+    } catch (error) {
+      console.error('Login exception:', error);
+      return { error: 'Giriş yapılırken bir hata oluştu' };
+    }
+  };
+
+  const register = async (email: string, password: string) => {
+    try {
+      const { error } = await supabase.auth.signUp({ email, password });
+      return { error: error?.message || null };
+    } catch (error) {
+      console.error('Register exception:', error);
+      return { error: 'Kayıt olurken bir hata oluştu' };
+    }
+  };
+
+  const logout = async () => {
+    try {
+      // Çıkış yaparken cache'i temizle
+      gameCache.clear();
+      
+      const { error } = await supabase.auth.signOut();
+      if (error) {
+        console.error('Logout hatası:', error);
+      }
+    } catch (error) {
+      console.error('Logout exception:', error);
+    }
+  };
+
+  const value = {
+    user,
+    session,
+    loading,
+    login,
+    register,
+    logout
+  };
+
   return (
-    <AuthContext.Provider value={{ session, user, profile, loading, refreshProfile }}>
+    <AuthContext.Provider value={value}>
       {children}
     </AuthContext.Provider>
   );
-};
-
-export const useAuth = () => {
-  const ctx = useContext(AuthContext);
-  if (!ctx) throw new Error('useAuth must be used within AuthProvider');
-  return ctx;
 }; 

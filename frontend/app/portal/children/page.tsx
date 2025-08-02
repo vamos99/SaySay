@@ -3,10 +3,9 @@ import React, { useEffect, useState } from "react";
 import { useAuth } from '../../utils/AuthContext';
 import { supabase } from '../../utils/supabaseClient';
 import { useRouter } from 'next/navigation';
-import { PortalSidebar } from "@/components/PortalSidebar";
+import { PortalLayout } from "@/components/layout/PortalLayout";
 import { AddChildModal } from "../components/AddChildModal";
-import CustomSadChildIcon from "@/components/icons/CustomSadChildIcon";
-import { ExpandSidebarIcon } from '@/components/icons/ExpandSidebarIcon';
+import { CustomSadChildIcon } from '../../components/icons/CustomIcons';
 
 export default function ChildrenPage() {
   const { user } = useAuth();
@@ -16,7 +15,6 @@ export default function ChildrenPage() {
   const [showAdd, setShowAdd] = useState(false);
   const [error, setError] = useState("");
   const [sidebarOpen, setSidebarOpen] = useState(true);
-  // Çocuk seçimi için state'ler
   const [selectedChildId, setSelectedChildId] = useState<string | null>(null);
   const [childStats, setChildStats] = useState<{[key: string]: any}>({});
   const [statsLoading, setStatsLoading] = useState(false);
@@ -31,20 +29,17 @@ export default function ChildrenPage() {
         setChildren(data || []);
         setLoading(false);
         
-        // localStorage'dan seçili çocuğu al
         const localSelectedId = localStorage.getItem('selected_child_id');
         if (localSelectedId && data?.find(c => c.id === localSelectedId)) {
           setSelectedChildId(localSelectedId);
         }
         
-        // Tüm çocukların istatistiklerini yükle
         if (data && data.length > 0) {
           await loadAllChildStats();
         }
       });
   }, [user]);
 
-  // Sayfa focus olduğunda istatistikleri yenile
   useEffect(() => {
     const handleFocus = () => {
       refreshStats();
@@ -54,31 +49,44 @@ export default function ChildrenPage() {
     return () => window.removeEventListener('focus', handleFocus);
   }, [children]);
 
-  // Tüm çocukların istatistiklerini yükle
   const loadAllChildStats = async () => {
     setStatsLoading(true);
     try {
       const stats: {[key: string]: any} = {};
       
+      // Tüm çocuk ID'lerini topla
+      const childIds = children.map(child => child.id);
+      
+      if (childIds.length === 0) {
+        setStatsLoading(false);
+        return;
+      }
+      
+      // Tek seferde tüm interaction_logs'ları çek
+      const { data: allLogs } = await supabase
+        .from('interaction_logs')
+        .select('*')
+        .in('child_id', childIds);
+      
+      // Tek seferde tüm ai_content'leri çek
+      const { data: allContent } = await supabase
+        .from('ai_content')
+        .select('child_id, concept')
+        .in('child_id', childIds)
+        .eq('is_active', true);
+      
+      // Her çocuk için istatistikleri hesapla
       for (const child of children) {
-        // Interaction logs'dan istatistikler
-        const { data: logs } = await supabase
-          .from('interaction_logs')
-          .select('*')
-          .eq('child_id', child.id);
-        
-        // AI content'ten kavram sayısı
-        const { data: content } = await supabase
-          .from('ai_content')
-          .select('concept')
-          .eq('child_id', child.id)
-          .eq('is_active', true);
+        const childLogs = allLogs?.filter(log => log.child_id === child.id) || [];
+        const childContent = allContent?.filter(content => content.child_id === child.id) || [];
         
         stats[child.id] = {
-          totalInteractions: logs?.length || 0,
-          correctAnswers: logs?.filter(l => l.details?.is_correct).length || 0,
-          conceptsLearned: content?.length || 0,
-          lastPlayed: logs && logs.length > 0 ? new Date(Math.max(...logs.map(l => new Date(l.created_at).getTime()))).toLocaleDateString('tr-TR') : 'Hiç oynamamış'
+          totalInteractions: childLogs.length,
+          correctAnswers: childLogs.filter(l => l.details?.is_correct).length,
+          conceptsLearned: childContent.length,
+          lastPlayed: childLogs.length > 0 
+            ? new Date(Math.max(...childLogs.map(l => new Date(l.created_at).getTime()))).toLocaleDateString('tr-TR') 
+            : 'Hiç oynamamış'
         };
       }
       
@@ -90,13 +98,11 @@ export default function ChildrenPage() {
     }
   };
 
-  // Çocuk seçme fonksiyonu
   const handleSelectChild = (childId: string) => {
     setSelectedChildId(childId);
     localStorage.setItem('selected_child_id', childId);
   };
 
-  // İstatistikleri yenile
   const refreshStats = () => {
     if (children.length > 0) {
       loadAllChildStats();
@@ -106,7 +112,6 @@ export default function ChildrenPage() {
   const handleAddChild = async (child: any) => {
     setError("");
     if (!user?.id) return;
-    // Sadece yeni çocuk ekleme için, gerekli alanlar varsa ekle
     if (!child.name || !child.birthYear || !child.gender || !child.theme) return;
     const { data, error } = await supabase.from('children').insert([
       {
@@ -124,7 +129,6 @@ export default function ChildrenPage() {
     if (error) { setError("Kayıt hatası: " + error.message); return; }
     setChildren([...children, ...(data||[])]);
     setShowAdd(false);
-    // Roadmap oluşturma işlemi AddChildModal'da yapılıyor, burada kaldırıldı
   };
 
   const handleDelete = async (id: string) => {
@@ -132,13 +136,11 @@ export default function ChildrenPage() {
     setChildren(children.filter(c => c.id !== id));
   };
 
-  // Yaş hesaplama fonksiyonu
   const getAge = (birthYear: number) => {
     if (!birthYear) return '-';
     return new Date().getFullYear() - birthYear;
   };
 
-  // Gender ve yaş için custom SVG ikonlar
   const GenderSVG = (g: string) => g === 'female' ? (
     <svg width="22" height="22" viewBox="0 0 28 28"><circle cx="14" cy="14" r="13" fill="#f8c9d3" stroke="#e67e22" strokeWidth="2"/><ellipse cx="14" cy="16" rx="7" ry="8" fill="#fff"/><ellipse cx="14" cy="15" rx="5" ry="6" fill="#f8c9d3"/><ellipse cx="11" cy="13" rx="1.2" ry="1.5" fill="#fff"/><ellipse cx="17" cy="13" rx="1.2" ry="1.5" fill="#fff"/><ellipse cx="11" cy="13" rx="0.5" ry="0.7" fill="#7b8fa1"/><ellipse cx="17" cy="13" rx="0.5" ry="0.7" fill="#7b8fa1"/><ellipse cx="14" cy="17.5" rx="2" ry="1" fill="#e67e22"/></svg>
   ) : (
@@ -149,42 +151,87 @@ export default function ChildrenPage() {
   );
 
   return (
-    <div style={{display:'flex',minHeight:'100vh',background:'#f8f8f8'}}>
-      <PortalSidebar open={sidebarOpen} setOpen={setSidebarOpen} />
-      {!sidebarOpen && (
-        <button
-          className="sidebar-expand-btn"
-          onClick={() => setSidebarOpen(true)}
-          aria-label="Menüyü Aç"
-        >
-          <ExpandSidebarIcon />
-        </button>
-      )}
-      <main style={{flex:1,padding:'40px 0 0 0',minHeight:'100vh',background:'#f8f8f8',overflow:'auto'}}>
-        <div style={{maxWidth:1440,margin:'0 auto',padding:'0 24px 40px 24px'}}>
-          <h2 style={{fontWeight:900, color:'#2c3e50',marginBottom:36,fontSize:'2.3rem',textAlign:'left',letterSpacing:0.2}}>Çocuklarınızı Yönetin</h2>
+    <PortalLayout sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen}>
+          {/* Header Section */}
+          <div style={{
+            textAlign: 'center',
+            marginBottom: '3rem'
+          }}>
+            <h1 style={{
+              fontSize: 'clamp(2rem, 4vw, 3rem)',
+              fontWeight: 'bold',
+              marginBottom: '1rem',
+              background: 'linear-gradient(to right, #2563eb, #7c3aed, #ec4899)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              backgroundClip: 'text'
+            }}>
+              Çocuklarınızı Yönetin 👶
+            </h1>
+            <p style={{
+              fontSize: 'clamp(1rem, 2vw, 1.25rem)',
+              color: '#6b7280',
+              maxWidth: '600px',
+              margin: '0 auto',
+              lineHeight: '1.6'
+            }}>
+              Çocuklarınızın profillerini düzenleyin ve gelişimlerini takip edin
+            </p>
+          </div>
+
           {loading ? (
-            <div style={{display:'flex',flexDirection:'column',alignItems:'center',gap:16,padding:48}}>
-              <span className="loader" aria-label="Yükleniyor" />
-              <span style={{color:'#7b8fa1',fontWeight:700,fontSize:18}}>Yükleniyor...</span>
+            <div style={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              gap: '1rem',
+              padding: '3rem',
+              background: 'rgba(255, 255, 255, 0.9)',
+              backdropFilter: 'blur(10px)',
+              borderRadius: '1rem',
+              boxShadow: '0 10px 25px rgba(0, 0, 0, 0.1)',
+              border: '1px solid rgba(59, 130, 246, 0.1)'
+            }}>
+              <div style={{
+                width: '3rem',
+                height: '3rem',
+                border: '3px solid #3b82f6',
+                borderTop: '3px solid transparent',
+                borderRadius: '50%',
+                animation: 'spin 1s linear infinite'
+              }}></div>
+              <span style={{
+                color: '#6b7280',
+                fontWeight: '600',
+                fontSize: '1.125rem'
+              }}>Yükleniyor...</span>
             </div>
           ) : (
             <>
               <div style={{
                 display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fit, minmax(304px, 1fr))',
-                gridAutoRows: '1fr',
-                gap: 30,
-                marginBottom: 38,
-                maxWidth: 1200,
-                marginLeft: 'auto',
-                marginRight: 'auto',
-                overflow: 'visible', // kaydırma yerine visible
-                minHeight: 304,
-                paddingBottom: 19, // kaydırma çubuğu için boşluk
+                gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
+                gap: '1.5rem',
+                marginBottom: '2rem'
               }}>
                 {children.length === 0 ? (
-                  <div style={{background:'#fff',borderRadius:21,padding:'38px 0',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',minHeight:266,boxShadow:'0 4px 16px #f0f0f0',fontWeight:700,fontSize:20,color:'#7b8fa1',gap:16}}>
+                  <div style={{
+                    background: 'rgba(255, 255, 255, 0.9)',
+                    backdropFilter: 'blur(10px)',
+                    borderRadius: '1rem',
+                    padding: '2rem',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    minHeight: '300px',
+                    boxShadow: '0 10px 25px rgba(0, 0, 0, 0.1)',
+                    border: '1px solid rgba(59, 130, 246, 0.1)',
+                    fontWeight: '600',
+                    fontSize: '1.125rem',
+                    color: '#6b7280',
+                    gap: '1rem'
+                  }}>
                     <CustomSadChildIcon />
                     Henüz çocuk eklenmedi.
                   </div>
@@ -192,91 +239,318 @@ export default function ChildrenPage() {
                   <div 
                     key={child.id} 
                     style={{
-                      background: selectedChildId === child.id ? '#eaffea' : '#fff',
-                      borderRadius:21,
-                      padding:'38px 30px',
-                      boxShadow:'0 4px 24px #e0e0e0',
-                      display:'flex',
-                      flexDirection:'column',
-                      alignItems:'flex-start',
-                      gap:23,
-                      minHeight:266,
-                      justifyContent:'space-between',
-                      transition:'box-shadow 0.2s',
-                      cursor:'pointer',
-                      border: selectedChildId === child.id ? '2px solid #4CAF50' : 'none'
+                      background: selectedChildId === child.id ? 'rgba(16, 185, 129, 0.1)' : 'rgba(255, 255, 255, 0.9)',
+                      backdropFilter: 'blur(10px)',
+                      borderRadius: '1rem',
+                      padding: '1.5rem',
+                      boxShadow: '0 10px 25px rgba(0, 0, 0, 0.1)',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '1rem',
+                      minHeight: '300px',
+                      justifyContent: 'space-between',
+                      transition: 'all 0.3s ease',
+                      cursor: 'pointer',
+                      border: selectedChildId === child.id ? '2px solid #10b981' : '1px solid rgba(59, 130, 246, 0.1)',
+                      position: 'relative',
+                      overflow: 'hidden'
                     }}
                     onClick={() => handleSelectChild(child.id)}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.transform = 'translateY(-4px)';
+                      e.currentTarget.style.boxShadow = '0 20px 40px rgba(0, 0, 0, 0.15)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.transform = 'translateY(0)';
+                      e.currentTarget.style.boxShadow = '0 10px 25px rgba(0, 0, 0, 0.1)';
+                    }}
                   >
-                    <div style={{display:'flex',alignItems:'center',gap:23,marginBottom:10}}>
+                    <div style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '1rem',
+                      marginBottom: '0.5rem'
+                    }}>
                       {child.avatar?.startsWith('<svg') ? (
-                        <span style={{display:'block',width:53,height:53}} dangerouslySetInnerHTML={{__html:child.avatar}} />
+                        <div style={{
+                          width: '3rem',
+                          height: '3rem',
+                          background: 'linear-gradient(45deg, #3b82f6, #7c3aed)',
+                          borderRadius: '50%',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          boxShadow: '0 4px 12px rgba(59, 130, 246, 0.3)'
+                        }}>
+                          <span style={{display:'block',width:32,height:32}} dangerouslySetInnerHTML={{__html:child.avatar}} />
+                        </div>
                       ) : (
-                        child.avatar ? <img src={child.avatar} alt="Avatar" style={{display:'block',width:53,height:53,borderRadius:'50%'}} /> : null
-                      )}
-                      <div>
-                        <div style={{fontWeight:900,fontSize:23,color:'#2c3e50',marginBottom:4,display:'flex',alignItems:'center',gap:10}}>
-                          {child.name}
-                          {selectedChildId === child.id && <span style={{color:'#4CAF50',fontSize:16}}>✓ Seçili</span>}
-                          {child.birth_year && (
-                            <span style={{color:'#7b8fa1',fontWeight:700,fontSize:16,marginLeft:12}}>
-                              Yaş: {getAge(child.birth_year)}
+                        <div style={{
+                          width: '3rem',
+                          height: '3rem',
+                          background: 'linear-gradient(45deg, #3b82f6, #7c3aed)',
+                          borderRadius: '50%',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          boxShadow: '0 4px 12px rgba(59, 130, 246, 0.3)'
+                        }}>
+                          {child.avatar ? (
+                            <img src={child.avatar} alt="Avatar" style={{width:32,height:32,borderRadius:'50%'}} />
+                          ) : (
+                            <span style={{color:'white',fontWeight:'bold',fontSize:'1.25rem'}}>
+                              {child.name.charAt(0).toUpperCase()}
                             </span>
                           )}
                         </div>
-                        {child.note && <div style={{color:'#e67e22',fontWeight:700,fontSize:14,marginTop:4}}>{child.note}</div>}
+                      )}
+                      <div>
+                        <div style={{
+                          fontWeight: 'bold',
+                          fontSize: '1.25rem',
+                          color: '#1f2937',
+                          marginBottom: '0.25rem',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '0.5rem'
+                        }}>
+                          {child.name}
+                          {selectedChildId === child.id && (
+                            <span style={{
+                              color: '#10b981',
+                              fontSize: '0.875rem',
+                              background: 'rgba(16, 185, 129, 0.1)',
+                              padding: '0.25rem 0.5rem',
+                              borderRadius: '0.5rem',
+                              fontWeight: '600'
+                            }}>✓ Seçili</span>
+                          )}
+                        </div>
+                        {child.birth_year && (
+                          <div style={{
+                            color: '#6b7280',
+                            fontWeight: '600',
+                            fontSize: '0.875rem'
+                          }}>
+                            Yaş: {getAge(child.birth_year)} | Tema: {child.theme}
+                          </div>
+                        )}
+                        {child.note && (
+                          <div style={{
+                            color: '#f59e0b',
+                            fontWeight: '600',
+                            fontSize: '0.75rem',
+                            marginTop: '0.25rem'
+                          }}>{child.note}</div>
+                        )}
                       </div>
                     </div>
                     
-                    {/* Tüm çocukların istatistikleri */}
-                    {childStats[child.id] && (
-                      <div style={{background:'#f8f9fa',borderRadius:12,padding:16,marginBottom:16,width:'100%'}}>
-                        <h4 style={{fontWeight:800,fontSize:16,marginBottom:12,color:'#2c3e50'}}>📊 İstatistikler</h4>
-                        {statsLoading ? (
-                          <div style={{color:'#7b8fa1',fontSize:14}}>Yükleniyor...</div>
-                        ) : (
-                          <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:12,fontSize:14}}>
-                            <div>
-                              <span style={{fontWeight:700,color:'#7b8fa1'}}>Toplam Etkileşim:</span>
-                              <div style={{fontWeight:900,color:'#2c3e50'}}>{childStats[child.id].totalInteractions}</div>
-                            </div>
-                            <div>
-                              <span style={{fontWeight:700,color:'#7b8fa1'}}>Doğru Cevaplar:</span>
-                              <div style={{fontWeight:900,color:'#4CAF50'}}>{childStats[child.id].correctAnswers}</div>
-                            </div>
-                            <div>
-                              <span style={{fontWeight:700,color:'#7b8fa1'}}>Öğrenilen Kavram:</span>
-                              <div style={{fontWeight:900,color:'#2c3e50'}}>{childStats[child.id].conceptsLearned}</div>
-                            </div>
-                            <div>
-                              <span style={{fontWeight:700,color:'#7b8fa1'}}>Son Oynama:</span>
-                              <div style={{fontWeight:900,color:'#e67e22'}}>{childStats[child.id].lastPlayed}</div>
-                            </div>
+                    {/* İstatistikler */}
+                    <div style={{
+                      background: 'rgba(59, 130, 246, 0.05)',
+                      borderRadius: '0.75rem',
+                      padding: '1rem',
+                      marginBottom: '1rem',
+                      border: '1px solid rgba(59, 130, 246, 0.1)'
+                    }}>
+                      <h4 style={{
+                        fontWeight: 'bold',
+                        fontSize: '1rem',
+                        marginBottom: '0.75rem',
+                        color: '#1f2937'
+                      }}>📊 İstatistikler</h4>
+                      {statsLoading ? (
+                        <div style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '0.5rem',
+                          color: '#6b7280',
+                          fontSize: '0.875rem'
+                        }}>
+                          <div style={{
+                            width: '1rem',
+                            height: '1rem',
+                            border: '2px solid #3b82f6',
+                            borderTop: '2px solid transparent',
+                            borderRadius: '50%',
+                            animation: 'spin 1s linear infinite'
+                          }}></div>
+                          İstatistikler yükleniyor...
+                        </div>
+                      ) : childStats[child.id] ? (
+                        <div style={{
+                          display: 'grid',
+                          gridTemplateColumns: '1fr 1fr',
+                          gap: '0.75rem',
+                          fontSize: '0.875rem'
+                        }}>
+                          <div>
+                            <span style={{fontWeight:'600',color:'#6b7280'}}>Toplam Etkileşim:</span>
+                            <div style={{fontWeight:'bold',color:'#1f2937'}}>{childStats[child.id].totalInteractions}</div>
                           </div>
-                        )}
-                      </div>
-                    )}
+                          <div>
+                            <span style={{fontWeight:'600',color:'#6b7280'}}>Doğru Cevaplar:</span>
+                            <div style={{fontWeight:'bold',color:'#10b981'}}>{childStats[child.id].correctAnswers}</div>
+                          </div>
+                          <div>
+                            <span style={{fontWeight:'600',color:'#6b7280'}}>Öğrenilen Kavram:</span>
+                            <div style={{fontWeight:'bold',color:'#1f2937'}}>{childStats[child.id].conceptsLearned}</div>
+                          </div>
+                          <div>
+                            <span style={{fontWeight:'600',color:'#6b7280'}}>Son Oynama:</span>
+                            <div style={{fontWeight:'bold',color:'#f59e0b'}}>{childStats[child.id].lastPlayed}</div>
+                          </div>
+                        </div>
+                      ) : (
+                        <div style={{
+                          color: '#6b7280',
+                          fontSize: '0.875rem',
+                          fontStyle: 'italic'
+                        }}>
+                          İstatistik bulunamadı
+                        </div>
+                      )}
+                    </div>
                     
-                    <div style={{display:'flex',gap:15,flexWrap:'wrap',marginBottom:15}}>
-                      <button aria-label="Profili ve Ayarları Görüntüle" style={{background:'#bde6d3',color:'#2c3e50',borderRadius:11,padding:'13px 30px',fontWeight:900,border:'none',cursor:'pointer',transition:'background 0.2s',fontSize:17,boxShadow:'0 2px 8px #bde6d3'}} onClick={(e) => {e.stopPropagation(); router.push(`/portal/children/${child.id}`);}}>Profili & Ayarları</button>
-                      <button aria-label="Çocuğu Sil" style={{background:'#ffe6b3',color:'#e74c3c',borderRadius:11,padding:'13px 30px',fontWeight:900,border:'none',cursor:'pointer',transition:'background 0.2s',fontSize:17,boxShadow:'0 2px 8px #ffe6b3'}} onClick={(e) => {e.stopPropagation(); handleDelete(child.id);}}>Sil</button>
+                    <div style={{
+                      display: 'flex',
+                      gap: '0.75rem',
+                      flexWrap: 'wrap'
+                    }}>
+                      <button 
+                        aria-label="Profili ve Ayarları Görüntüle" 
+                        style={{
+                          background: 'linear-gradient(to right, #3b82f6, #2563eb)',
+                          color: 'white',
+                          borderRadius: '0.5rem',
+                          padding: '0.75rem 1rem',
+                          fontWeight: '600',
+                          border: 'none',
+                          cursor: 'pointer',
+                          transition: 'all 0.3s ease',
+                          fontSize: '0.875rem',
+                          boxShadow: '0 4px 12px rgba(59, 130, 246, 0.3)',
+                          flex: 1
+                        }}
+                        onClick={(e) => {
+                          e.stopPropagation(); 
+                          router.push(`/portal/children/${child.id}`);
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.transform = 'translateY(-2px)';
+                          e.currentTarget.style.boxShadow = '0 8px 20px rgba(59, 130, 246, 0.4)';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.transform = 'translateY(0)';
+                          e.currentTarget.style.boxShadow = '0 4px 12px rgba(59, 130, 246, 0.3)';
+                        }}
+                      >
+                        Profili & Ayarları
+                      </button>
+                      <button 
+                        aria-label="Çocuğu Sil" 
+                        style={{
+                          background: 'linear-gradient(to right, #ef4444, #dc2626)',
+                          color: 'white',
+                          borderRadius: '0.5rem',
+                          padding: '0.75rem 1rem',
+                          fontWeight: '600',
+                          border: 'none',
+                          cursor: 'pointer',
+                          transition: 'all 0.3s ease',
+                          fontSize: '0.875rem',
+                          boxShadow: '0 4px 12px rgba(239, 68, 68, 0.3)',
+                          flex: 1
+                        }}
+                        onClick={(e) => {
+                          e.stopPropagation(); 
+                          handleDelete(child.id);
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.transform = 'translateY(-2px)';
+                          e.currentTarget.style.boxShadow = '0 8px 20px rgba(239, 68, 68, 0.4)';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.transform = 'translateY(0)';
+                          e.currentTarget.style.boxShadow = '0 4px 12px rgba(239, 68, 68, 0.3)';
+                        }}
+                      >
+                        Sil
+                      </button>
                     </div>
                   </div>
                 ))}
-                {/* Çocuk Ekle butonunu grid'in en sonunda kutu gibi göster */}
-                <div style={{background:'#4CAF50',borderRadius:21,padding:'38px 30px',boxShadow:'0 4px 24px #bde6d3',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',minHeight:266,cursor:'pointer',transition:'background 0.2s',color:'#fff',fontWeight:900,fontSize:21}} onClick={()=>setShowAdd(true)}>
-                  + Çocuk Ekle
+                
+                {/* Çocuk Ekle Butonu */}
+                <div 
+                  style={{
+                    background: 'linear-gradient(135deg, #10b981, #059669)',
+                    borderRadius: '1rem',
+                    padding: '1.5rem',
+                    boxShadow: '0 10px 25px rgba(16, 185, 129, 0.3)',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    minHeight: '300px',
+                    cursor: 'pointer',
+                    transition: 'all 0.3s ease',
+                    color: 'white',
+                    fontWeight: 'bold',
+                    fontSize: '1.25rem',
+                    border: '1px solid rgba(16, 185, 129, 0.2)',
+                    position: 'relative',
+                    overflow: 'hidden'
+                  }} 
+                  onClick={() => setShowAdd(true)}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = 'translateY(-4px)';
+                    e.currentTarget.style.boxShadow = '0 20px 40px rgba(16, 185, 129, 0.4)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = 'translateY(0)';
+                    e.currentTarget.style.boxShadow = '0 10px 25px rgba(16, 185, 129, 0.3)';
+                  }}
+                >
+                  <div style={{
+                    width: '4rem',
+                    height: '4rem',
+                    background: 'rgba(255, 255, 255, 0.2)',
+                    borderRadius: '50%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    marginBottom: '1rem',
+                    fontSize: '2rem'
+                  }}>
+                    +
+                  </div>
+                  Çocuk Ekle
                 </div>
               </div>
-              {/* Hata mesajı ve modalı grid dışında tutmaya devam et */}
-              <div style={{display:'flex',alignItems:'center',gap:24,flexWrap:'wrap',marginBottom:12}}>
-                {error && <div role="alert" style={{color:'#fff',background:'#e74c3c',borderRadius:12,padding:'14px 28px',display:'flex',alignItems:'center',gap:16,fontWeight:900,fontSize:19,boxShadow:'0 2px 8px #e74c3c'}}><span style={{fontWeight:900,fontSize:26}}>!</span> {error}</div>}
-              </div>
-              {showAdd && <AddChildModal onAdd={handleAddChild} onClose={()=>setShowAdd(false)} />}
+              
+              {/* Hata Mesajı */}
+              {error && (
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '1rem',
+                  marginBottom: '1rem',
+                  background: 'rgba(239, 68, 68, 0.1)',
+                  border: '1px solid rgba(239, 68, 68, 0.2)',
+                  borderRadius: '0.75rem',
+                  padding: '1rem',
+                  color: '#dc2626',
+                  fontWeight: '600'
+                }}>
+                  <span style={{fontSize:'1.5rem'}}>⚠️</span> {error}
+                </div>
+              )}
+              
+              {showAdd && <AddChildModal onAdd={handleAddChild} onClose={() => setShowAdd(false)} />}
             </>
           )}
-        </div>
-      </main>
-    </div>
+    </PortalLayout>
   );
 } 

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./styles/index.css";
-import { Header } from "@/components/Header";
+import { ModernHeader } from "@/components/layout/ModernHeader";
 import { AuthProvider } from './utils/AuthContext';
 import { UserTypeProvider } from './utils/UserTypeContext';
 import { RouteGuard } from './components/RouteGuard';
@@ -16,11 +16,11 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="tr">
-      <body className="app-root-body">
+      <body className={inter.className}>
         <AuthProvider>
           <UserTypeProvider>
             <RouteGuard>
-              <Header />
+              <ModernHeader />
               {children}
             </RouteGuard>
           </UserTypeProvider>

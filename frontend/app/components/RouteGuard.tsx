@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { useAuth } from '../utils/AuthContext';
 import { useUserType } from '../utils/UserTypeContext';
+import LoadingScreen from './layout/LoadingScreen';
 
 interface RouteGuardProps {
   children: React.ReactNode;
@@ -25,18 +26,11 @@ export const RouteGuard = ({ children }: RouteGuardProps) => {
     }
   }, [pathname]);
 
-  // Korumalı sayfalar (giriş yapmış kullanıcılar erişemez)
-  const protectedFromAuth = ['/login', '/register', '/forgot-password', '/reset-password'];
-  
-  // Korumalı sayfalar (giriş yapmamış kullanıcılar erişemez)
-  const protectedFromUnauth = ['/portal', '/child-dashboard'];
-
   useEffect(() => {
-    if (loading || userTypeLoading) return; // Yükleme sırasında bekle
+    if (loading || userTypeLoading) return;
 
     // Giriş yapmış kullanıcı korumalı sayfalara erişmeye çalışırsa
-    if (user && protectedFromAuth.some(path => pathname.startsWith(path))) {
-      // Kullanıcı tipine göre yönlendir
+    if (user && ['/login', '/register', '/forgot-password', '/reset-password'].some(path => pathname.startsWith(path))) {
       if (userType === 'child') {
         router.push('/child-dashboard');
       } else {
@@ -46,20 +40,18 @@ export const RouteGuard = ({ children }: RouteGuardProps) => {
     }
 
     // Giriş yapmamış kullanıcı portal sayfalarına erişmeye çalışırsa
-    if (!user && protectedFromUnauth.some(path => pathname.startsWith(path))) {
+    if (!user && ['/portal', '/child-dashboard'].some(path => pathname.startsWith(path))) {
       router.push('/login');
       return;
     }
 
     // Kullanıcı tipine göre yönlendirme
     if (user && userType) {
-      // Çocuk kullanıcı portal'a erişmeye çalışıyorsa
       if (userType === 'child' && pathname.startsWith('/portal')) {
         router.push('/child-dashboard');
         return;
       }
 
-      // Parent kullanıcı child-dashboard'a erişmeye çalışıyorsa
       if (userType === 'parent' && pathname.startsWith('/child-dashboard')) {
         router.push('/portal');
         return;
@@ -71,22 +63,7 @@ export const RouteGuard = ({ children }: RouteGuardProps) => {
 
   // Yükleme sırasında loading göster
   if (loading || userTypeLoading || isChecking) {
-    return (
-      <div style={{
-        display: 'flex',
-        minHeight: '100vh',
-        alignItems: 'center',
-        justifyContent: 'center',
-        background: 'var(--light-blue-bg)'
-      }}>
-        <div style={{ textAlign: 'center', color: '#2c3e50' }}>
-          <div style={{ fontSize: 24, fontWeight: 700, marginBottom: 16 }}>
-            Yükleniyor...
-          </div>
-          <div style={{ fontSize: 16, color: '#7b8fa1' }}>Lütfen bekleyin</div>
-        </div>
-      </div>
-    );
+    return <LoadingScreen text="Yükleniyor..." />;
   }
 
   return <>{children}</>;

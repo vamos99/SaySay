@@ -1,6 +1,7 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { supabase } from '../../utils/supabaseClient';
 import { useAuth } from '../../utils/AuthContext';
+import { gameCache } from '../../utils/gameCache';
 import { useSecureCache } from '../../utils/cacheManager';
 
 interface AddChildModalProps {
@@ -164,6 +165,30 @@ export const AddChildModal: React.FC<AddChildModalProps> = ({ onAdd, onClose, is
       return; 
     }
 
+    // Mevcut PIN'i yeni çocuğa ekle
+    try {
+      const { data: existingPin, error: pinQueryError } = await supabase
+        .from('children')
+        .select('pin_hash')
+        .eq('user_id', user.id)
+        .not('pin_hash', 'is', null);
+
+      if (pinQueryError) {
+        console.error('PIN sorgu hatası:', pinQueryError);
+      } else if (existingPin && existingPin.length > 0 && existingPin[0]?.pin_hash) {
+        const { error: pinUpdateError } = await supabase
+          .from('children')
+          .update({ pin_hash: existingPin[0].pin_hash })
+          .eq('id', child.id);
+        
+                   if (pinUpdateError) {
+             console.error('PIN güncelleme hatası:', pinUpdateError);
+           }
+         }
+    } catch (pinError) {
+      console.error('PIN ekleme genel hatası:', pinError);
+    }
+
     // Roadmap datası hazırla
     const roadmap = {
       child_id: child.id,
@@ -177,6 +202,8 @@ export const AddChildModal: React.FC<AddChildModalProps> = ({ onAdd, onClose, is
     if (!roadmapData) return;
     setIsGenerating(true);
     try {
+  
+      
       // Roadmap'i DB'ye kaydet (upsert ile)
       const { error: roadmapError } = await supabase
         .from('concept_roadmap')
@@ -185,28 +212,44 @@ export const AddChildModal: React.FC<AddChildModalProps> = ({ onAdd, onClose, is
         });
       
       if (roadmapError) {
+        console.error('Roadmap kaydetme hatası:', roadmapError);
         setError('Roadmap kaydedilemedi: ' + roadmapError.message);
         setIsGenerating(false);
         return;
       }
 
-      // Modal'ı hemen kapat, backend işlemi arka planda devam etsin
+
+      // API route üzerinden backend'e istek at (arka planda)
+      
+      // Modal'ı kapat ve backend işlemini arka planda yap
       onClose();
       
-      // Backend'e istek at (arka planda)
-      fetch('https://vertex-ai-backend-1003061737705.us-central1.run.app/generate-full-content', {
+      // Backend işlemini arka planda yap
+      fetch('/api/generate-content', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ child_id: roadmapData.child_id })
-      }).then(response => {
+      }).then(async response => {
         if (!response.ok) {
-          console.error('Backend hatası:', response.statusText);
+          const errorText = await response.text();
+          console.error('API route hatası:', response.status, errorText);
+          console.warn('Backend işlemi başarısız, ancak çocuk eklendi. Daha sonra tekrar deneyebilirsiniz.');
+        } else {
+          const data = await response.json();
+          
+          // Backend işlemi başarılıysa cache'e kaydet
+          if (data.all_concepts && data.all_concepts.length > 0) {
+            const filteredContent = data.all_concepts.filter((c: any) => !c.error);
+            gameCache.set(roadmapData.child_id, filteredContent, 'Yeni Çocuk');
+ 
+          }
         }
       }).catch(err => {
-        console.error('Backend isteği hatası:', err);
+        console.error('API route isteği hatası:', err);
+        console.warn('Backend işlemi başarısız, ancak çocuk eklendi. Daha sonra tekrar deneyebilirsiniz.');
       });
       
-      window.location.reload();
+      // Sayfa yenileme kaldırıldı - kullanıcı manuel olarak yenileyebilir
     } catch (err) {
       console.error('Roadmap kaydetme hatası:', err);
       setError('Roadmap kaydedilemedi: ' + (err instanceof Error ? err.message : 'Bilinmeyen hata'));
@@ -227,13 +270,11 @@ export const AddChildModal: React.FC<AddChildModalProps> = ({ onAdd, onClose, is
         .from('children')
         .select('pin_hash')
         .eq('user_id', user.id)
-        .not('pin_hash', 'is', null)
-        .limit(1)
-        .single();
+        .not('pin_hash', 'is', null);
       
-      if (existingPin?.pin_hash) {
+      if (existingPin && existingPin.length > 0 && existingPin[0]?.pin_hash) {
         // PIN zaten var, göster
-        setPinSuccess(`Mevcut PIN: ${existingPin.pin_hash}\nBu PIN'i güvenli bir yerde saklayın!\nTüm çocuklarınız için aynı PIN kullanılacak.`);
+        setPinSuccess(`Mevcut PIN: ${existingPin[0].pin_hash}\nBu PIN'i güvenli bir yerde saklayın!\nTüm çocuklarınız için aynı PIN kullanılacak.`);
       } else {
         // PIN yok, kullanıcıya PIN girmesini söyle
         setPinError('Henüz PIN oluşturulmamış. Lütfen aşağıdan PIN girin ve "PIN Güncelle" butonuna tıklayın.');

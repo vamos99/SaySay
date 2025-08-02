@@ -1,30 +1,15 @@
 "use client";
 
-import React, { useEffect, useState, useRef } from "react";
-import { PortalSidebar } from "@/components/PortalSidebar";
+import React, { useEffect, useState, Fragment } from "react";
+import { PortalLayout } from "@/components/layout/PortalLayout";
 import { useAuth } from '../utils/AuthContext';
 import { supabase } from '../utils/supabaseClient';
 import { useRouter } from 'next/navigation';
-import { ExpandSidebarIcon } from '@/components/icons/ExpandSidebarIcon';
+import { AIBrainIcon, CustomChartIcon, GameIcon as GameIconComponent, ReportIcon as ReportIconComponent, SettingsIcon as SettingsIconComponent } from '../components/icons/CustomIcons';
 import { AddChildModal } from './components/AddChildModal';
-import { AnimatedBubbles } from './components/AnimatedBubbles';
 import { PortalCard } from './components/PortalCard';
-import LoadingScreen from '@/components/LoadingScreen';
-import { ChildSelectionModal } from '@/components/ChildSelectionModal';
-
-const MOTIVATION = [
-  'Her çocuk bir dünyadır! 🌍',
-  'Birlikte öğrenmek çok eğlenceli! 🎈',
-  'Güvenli ve mutlu bir gelişim için buradayız!',
-  'Her gün yeni bir keşif! 🚀',
-  'Oyunla öğren, sevgiyle büyü! 💛',
-  'Hayal gücünün sınırı yok!',
-  'Senin için en iyisi hazırlanıyor...'
-];
-
-function getRandomInt(min: number, max: number) {
-  return Math.floor(Math.random() * (max - min + 1)) + min;
-}
+import LoadingScreen from '../components/layout/LoadingScreen';
+import { ChildSelectionModal } from '@/components/modals/ChildSelectionModal';
 
 export default function PortalPage() {
   const { session, user, loading } = useAuth();
@@ -33,34 +18,14 @@ export default function PortalPage() {
   const [children, setChildren] = useState<any[]>([]);
   const [childrenLoading, setChildrenLoading] = useState(true);
   const [selectedChildId, setSelectedChildId] = useState<string | null>(null);
-  // Hydration hatası için: SSR'da sabit başlat, client'ta güncelle
-  const [progress, setProgress] = useState(20); // SSR'da sabit
-  const [motivation, setMotivation] = useState(MOTIVATION[0]); // SSR'da sabit
-  const [bubbles, setBubbles] = useState<any[]>([]); // SSR'da boş
-  const progressRef = useRef<NodeJS.Timeout | null>(null);
   const [isClient, setIsClient] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [showChildSelection, setShowChildSelection] = useState(false);
 
   useEffect(() => {
     setIsClient(true);
-    // Portal sayfasında user_type'ı parent olarak ayarla
     if (typeof window !== 'undefined') {
       localStorage.setItem('user_type', 'parent');
-    }
-    // Rastgele motivasyon ve baloncuklar sadece client'ta
-    setMotivation(MOTIVATION[getRandomInt(0, MOTIVATION.length - 1)]);
-    setBubbles(Array.from({length: 3}).map((_, i) => {
-      const size = getRandomInt(40, 90);
-      const top = getRandomInt(20, 70);
-      const left = getRandomInt(10, 80);
-      const color = ['#f8c9d3','#ffe6b3','#e0b97d'][i];
-      const opacity = 0.10 + 0.08 * i;
-      const anim = `bubble${i+1} ${(4+i)}s infinite alternate`;
-      return { size, top, left, color, opacity, anim, i };
-    }));
-    // Seçili çocuk localStorage'dan yükle
-    if (typeof window !== 'undefined') {
       const stored = localStorage.getItem('selected_child_id');
       if (stored) setSelectedChildId(stored);
     }
@@ -71,7 +36,7 @@ export default function PortalPage() {
       router.replace('/login');
       return;
     }
-    if (user?.id && isClient) { // localStorage erişimi sadece client'ta
+    if (user?.id && isClient) {
       setChildrenLoading(true);
       supabase
         .from('children')
@@ -84,7 +49,6 @@ export default function PortalPage() {
             setShowAddChild(true);
           } else {
             setShowAddChild(false);
-            // Eğer seçili çocuk yoksa ilkini seç
             if ((!selectedChildId || !(data || []).find(c=>c.id===selectedChildId)) && data && data.length > 0) {
               setSelectedChildId(data[0].id);
               localStorage.setItem('selected_child_id', data[0].id);
@@ -94,156 +58,397 @@ export default function PortalPage() {
     }
   }, [user, session, loading, router, isClient]);
 
-  useEffect(() => {
-    if ((loading || childrenLoading) && isClient) {
-      progressRef.current = setInterval(() => {
-        setProgress((p) => {
-          if (p < 98) return p + getRandomInt(1, 3);
-          return p;
-        });
-      }, 350);
-    } else {
-      setProgress(100);
-      if (progressRef.current) clearInterval(progressRef.current);
-    }
-    return () => { if (progressRef.current) clearInterval(progressRef.current); };
-  }, [loading, childrenLoading, isClient]);
-
-  // Çocuk ekleme işlemi sonrası children'ı güncelle ve yeni çocuğu seçili yap
-  const handleAddChild = async (name: string) => {
+  const handleAddChild = async (childData: any) => {
     if (!user?.id) return;
-    const { data: inserted, error } = await supabase.from('children').insert([{ user_id: user.id, name }]).select('id, name, gender, theme, avatar, birth_year, is_literate, wants_tts');
-    // Yeniden fetch et
-    setChildrenLoading(true);
-    const { data } = await supabase.from('children').select('id, name, gender, theme, avatar, birth_year, is_literate, wants_tts').eq('user_id', user.id);
-    setChildren(data || []);
-    setChildrenLoading(false);
-    setShowAddChild(false);
-    localStorage.setItem('child_added_once', '1');
-    // Eklenen çocuğu seçili yap
-    if (inserted && inserted[0]) {
-      setSelectedChildId(inserted[0].id);
-      localStorage.setItem('selected_child_id', inserted[0].id);
+    
+    const { data, error } = await supabase
+      .from('children')
+      .insert([
+        {
+          name: childData.name,
+          user_id: user.id,
+          gender: childData.gender || 'other',
+          theme: childData.theme || 'default',
+          birth_year: childData.birthYear || new Date().getFullYear() - 5,
+          is_literate: childData.is_literate || false,
+          wants_tts: childData.wants_tts || true
+        }
+      ])
+      .select();
+
+    if (error) {
+      console.error('Çocuk eklenirken hata:', error);
+      return;
+    }
+
+    if (data && data.length > 0) {
+      setChildren(prev => [...prev, data[0]]);
+      setSelectedChildId(data[0].id);
+      localStorage.setItem('selected_child_id', data[0].id);
+      localStorage.setItem('child_added_once', 'true');
+      setShowAddChild(false);
     }
   };
 
-  // Çocuk seçimi değişince localStorage'a yaz
-  useEffect(() => {
-    if (selectedChildId) {
-      localStorage.setItem('selected_child_id', selectedChildId);
-    }
-  }, [selectedChildId]);
-
-  if (!isClient) return null;
   if (loading || childrenLoading) {
-    return <LoadingScreen />;
+    return <LoadingScreen text="Portal Yükleniyor..." />;
   }
 
-  return (
-    <div className="app-portal-root" style={{position:'relative', overflow:'visible', zIndex:1}}>
-      <PortalSidebar open={sidebarOpen} setOpen={setSidebarOpen} />
-      {!sidebarOpen && (
-        <button
-          className="sidebar-expand-btn"
-          onClick={() => setSidebarOpen(true)}
-          aria-label="Menüyü Aç"
-        >
-          <ExpandSidebarIcon />
-        </button>
-      )}
-      <main className="portal-main-content" style={{paddingTop: 0, overflow: 'auto'}}>
-        <h1 style={{ fontSize: "2rem", fontWeight: 800, color: "#2c3e50", marginBottom: 12, display:'flex', alignItems:'center', gap:8 }}>
-          Hoş geldiniz <WelcomeSmileHandIcon />
-        </h1>
-        {/* Çocuklar listesi ve seçimi */}
-        <div style={{marginBottom: 18}}>
-          <div style={{fontWeight:700, color:'#2c3e50', marginBottom:6}}>Çocuklarınız:</div>
-          <div style={{background:'#f8c9d3',borderRadius:16,padding:'12px 10px',boxShadow:'0 2px 8px #f8c9d3',maxWidth:420,minWidth:220,height:70,display:'flex',alignItems:'center',overflowX:'auto',gap:10}}>
-            {children.map(child => (
-              <button key={child.id} onClick={()=>setSelectedChildId(child.id)} style={{
-                padding:'6px 16px',
-                borderRadius:8,
-                border: child.id===selectedChildId ? '2px solid #4CAF50' : '1.5px solid #dcdcdc',
-                background: child.id===selectedChildId ? '#eaffea' : '#fff',
-                color:'#2c3e50',
-                fontWeight:600,
-                cursor:'pointer',
-                outline:'none',
-                boxShadow: child.id===selectedChildId ? '0 2px 8px #bde6d3' : 'none',
-                transition:'all .2s',
-                fontSize:15,
-                minWidth:80
-              }}>{child.name}</button>
-            ))}
-            {/* Çocuk ekleme butonu kaldırıldı, yerine yönlendirme */}
-            <button onClick={()=>router.push('/portal/children')} style={{padding:'6px 16px',borderRadius:8,border:'1.5px dashed #4CAF50',background:'#f8fff8',color:'#4CAF50',fontWeight:600,cursor:'pointer',fontSize:15,minWidth:80}}>Çocukları Yönet</button>
-            {/* Çocuk Seçimi Butonu */}
-            <button onClick={()=>setShowChildSelection(true)} style={{padding:'6px 16px',borderRadius:8,border:'1.5px solid #667eea',background:'#f0f4ff',color:'#667eea',fontWeight:600,cursor:'pointer',fontSize:15,minWidth:80}}>Çocuk Seç</button>
-          </div>
-        </div>
-        {/* Portal özet alanı */}
-        <div style={{marginBottom: 24, background:'#f8f8ff', borderRadius:16, padding:24, boxShadow:'0 2px 8px #f0f0f0'}}>
-          <div style={{fontWeight:700, fontSize:'1.1rem', color:'#2c3e50', marginBottom:8}}>Özet</div>
-          <ul style={{margin:0, paddingLeft:18, color:'#5a6a78', fontSize:'1rem'}}>
-            <li>Toplam çocuk: {children.length}</li>
-            {/* Buraya roadmap, gelişim, son aktivite vb. özetler eklenebilir */}
-            <li>Son aktivite: -</li>
-            <li>Roadmap durumu: -</li>
-          </ul>
-        </div>
-        {/* PortalCard ve tekrar eden kartlar kaldırıldı */}
-      </main>
+  if (!session) {
+    return <LoadingScreen text="Yönlendiriliyor..." />;
+  }
 
-      {/* Çocuk Seçimi Modal */}
-      <ChildSelectionModal
-        isOpen={showChildSelection}
-        onClose={() => setShowChildSelection(false)}
-        onChildSelect={(childId) => {
-          setSelectedChildId(childId);
-          localStorage.setItem('selected_child_id', childId);
-          setShowChildSelection(false);
-        }}
-      />
+  const selectedChild = children.find(c => c.id === selectedChildId);
+
+  return (
+    <Fragment>
+      <PortalLayout sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen}>
+          {/* Header Section - Küçültülmüş */}
+          <div style={{
+            textAlign: 'center',
+            marginBottom: '1.25rem'
+          }}>
+            <h1 style={{
+              fontSize: 'clamp(1.375rem, 2.8vw, 2.25rem)',
+              fontWeight: 'bold',
+              marginBottom: '0.375rem',
+              background: 'linear-gradient(to right, #2563eb, #7c3aed, #ec4899)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              backgroundClip: 'text'
+            }}>
+              Hoş Geldiniz! 👋
+            </h1>
+            <p style={{
+              fontSize: 'clamp(0.8125rem, 1.4vw, 0.9375rem)',
+              color: '#6b7280',
+              maxWidth: '500px',
+              margin: '0 auto',
+              lineHeight: '1.5'
+            }}>
+              Çocuğunuzun eğitim yolculuğunu birlikte keşfedelim
+            </p>
+          </div>
+
+          {/* Selected Child Info - Küçültülmüş */}
+          {selectedChild && (
+            <div style={{
+              background: 'rgba(255, 255, 255, 0.9)',
+              backdropFilter: 'blur(10px)',
+              borderRadius: '1rem',
+              padding: '1rem',
+              marginBottom: '1rem',
+              boxShadow: '0 10px 25px rgba(0, 0, 0, 0.1)',
+              border: '1px solid rgba(59, 130, 246, 0.1)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              flexWrap: 'wrap',
+              gap: '1rem'
+            }}>
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '1rem'
+              }}>
+                <div style={{
+                  width: '2.5rem',
+                  height: '2.5rem',
+                  background: 'linear-gradient(45deg, #3b82f6, #7c3aed)',
+                  borderRadius: '50%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: 'white',
+                  fontWeight: 'bold',
+                  fontSize: '1rem'
+                }}>
+                  {selectedChild.name.charAt(0).toUpperCase()}
+                </div>
+                <div>
+                  <h3 style={{
+                    fontSize: '1.125rem',
+                    fontWeight: 'bold',
+                    color: '#1f2937',
+                    margin: 0
+                  }}>
+                    {selectedChild.name} ✓ Seçili
+                  </h3>
+                  <p style={{
+                    fontSize: '0.75rem',
+                    color: '#6b7280',
+                    margin: 0
+                  }}>
+                    Tema: {selectedChild.theme} | Yaş: {new Date().getFullYear() - selectedChild.birth_year}
+                  </p>
+                </div>
+              </div>
+              <button 
+                onClick={() => setShowChildSelection(true)}
+                style={{
+                  background: 'linear-gradient(to right, #3b82f6, #7c3aed)',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '0.5rem',
+                  padding: '0.5rem 1rem',
+                  fontWeight: '600',
+                  fontSize: '0.75rem',
+                  cursor: 'pointer',
+                  transition: 'all 0.3s ease',
+                  boxShadow: '0 4px 12px rgba(59, 130, 246, 0.3)'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = 'translateY(-2px)';
+                  e.currentTarget.style.boxShadow = '0 8px 20px rgba(59, 130, 246, 0.4)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'translateY(0)';
+                  e.currentTarget.style.boxShadow = '0 4px 12px rgba(59, 130, 246, 0.3)';
+                }}
+              >
+                Çocuk Değiştir
+              </button>
+            </div>
+          )}
+
+          {/* Portal Cards Grid */}
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+            gap: '1rem',
+            marginBottom: '1rem'
+          }}>
+            <PortalCard
+              title="Çocuklarım"
+              description="Çocuklarınızın profillerini yönetin ve gelişimlerini takip edin"
+              icon={<ChildIcon />}
+              href="/portal/children"
+              color="#3b82f6"
+            />
+            <PortalCard
+              title="Oyun Ayarları"
+              description="Eğitici oyunları yapılandırın ve çocuğunuzun seviyesini ayarlayın"
+              icon={<GameIcon />}
+              href="/portal/games"
+              color="#8b5cf6"
+            />
+            <PortalCard
+              title="Raporlar"
+              description="Detaylı gelişim raporlarını görüntüleyin ve analiz edin"
+              icon={<ReportIcon />}
+              href="/portal/raporlar"
+              color="#ec4899"
+            />
+            <PortalCard
+              title="Ayarlar"
+              description="Hesap ayarlarınızı ve tercihlerinizi yönetin"
+              icon={<SettingsIcon />}
+              href="/portal/settings"
+              color="#10b981"
+            />
+          </div>
+
+          {/* Quick Stats - Büyütülmüş */}
+          <div style={{
+            background: 'rgba(255, 255, 255, 0.9)',
+            backdropFilter: 'blur(10px)',
+            borderRadius: '1rem',
+            padding: '1.5rem',
+            boxShadow: '0 10px 25px rgba(0, 0, 0, 0.1)',
+            border: '1px solid rgba(59, 130, 246, 0.1)'
+          }}>
+            <h3 style={{
+              fontSize: '1.125rem',
+              fontWeight: 'bold',
+              color: '#1f2937',
+              marginBottom: '1rem',
+              textAlign: 'center'
+            }}>
+              📊 Hızlı İstatistikler
+            </h3>
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))',
+              gap: '1rem'
+            }}>
+              <div style={{
+                textAlign: 'center',
+                padding: '1rem',
+                background: 'rgba(59, 130, 246, 0.1)',
+                borderRadius: '0.75rem',
+                border: '1px solid rgba(59, 130, 246, 0.2)'
+              }}>
+                <div style={{
+                  fontSize: '1.5rem',
+                  fontWeight: 'bold',
+                  color: '#3b82f6',
+                  marginBottom: '0.5rem'
+                }}>
+                  {children.length}
+                </div>
+                <div style={{
+                  fontSize: '0.875rem',
+                  color: '#6b7280'
+                }}>
+                  Aktif Çocuk
+                </div>
+              </div>
+              
+              <div style={{
+                textAlign: 'center',
+                padding: '1rem',
+                background: 'rgba(139, 92, 246, 0.1)',
+                borderRadius: '0.75rem',
+                border: '1px solid rgba(139, 92, 246, 0.2)'
+              }}>
+                <div style={{
+                  fontSize: '1.5rem',
+                  fontWeight: 'bold',
+                  color: '#8b5cf6',
+                  marginBottom: '0.5rem'
+                }}>
+                  3
+                </div>
+                <div style={{
+                  fontSize: '0.875rem',
+                  color: '#6b7280'
+                }}>
+                  Aktif Oyun
+                </div>
+              </div>
+              
+              <div style={{
+                textAlign: 'center',
+                padding: '1rem',
+                background: 'rgba(236, 72, 153, 0.1)',
+                borderRadius: '0.75rem',
+                border: '1px solid rgba(236, 72, 153, 0.2)'
+              }}>
+                <div style={{
+                  fontSize: '1.5rem',
+                  fontWeight: 'bold',
+                  color: '#ec4899',
+                  marginBottom: '0.5rem'
+                }}>
+                  12
+                </div>
+                <div style={{
+                  fontSize: '0.875rem',
+                  color: '#6b7280'
+                }}>
+                  Öğrenilen Kavram
+                </div>
+              </div>
+              
+              <div style={{
+                textAlign: 'center',
+                padding: '1rem',
+                background: 'rgba(16, 185, 129, 0.1)',
+                borderRadius: '0.75rem',
+                border: '1px solid rgba(16, 185, 129, 0.2)'
+              }}>
+                <div style={{
+                  fontSize: '1.5rem',
+                  fontWeight: 'bold',
+                  color: '#10b981',
+                  marginBottom: '0.5rem'
+                }}>
+                  85%
+                </div>
+                <div style={{
+                  fontSize: '0.875rem',
+                  color: '#6b7280'
+                }}>
+                  Başarı Oranı
+                </div>
+              </div>
+            </div>
+          </div>
+      </PortalLayout>
+
+      {showAddChild && (
+        <AddChildModal
+          onClose={() => setShowAddChild(false)}
+          onAdd={handleAddChild}
+        />
+      )}
+
+      {showChildSelection && (
+        <ChildSelectionModal
+          isOpen={showChildSelection}
+          onClose={() => setShowChildSelection(false)}
+          onChildSelect={(childId: string) => {
+            setSelectedChildId(childId);
+            localStorage.setItem('selected_child_id', childId);
+            setShowChildSelection(false);
+          }}
+        />
+      )}
+    </Fragment>
+  );
+}
+
+// Icon Components
+function ChildIcon() {
+  return (
+    <div style={{
+      width: '2.5rem',
+      height: '2.5rem',
+      background: 'linear-gradient(45deg, #3b82f6, #2563eb)',
+      borderRadius: '50%',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center'
+    }}>
+      <AIBrainIcon />
     </div>
   );
 }
 
-function ChildIcon() {
-  return (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="4" fill="#ffe6b3" stroke="#e0b97d" strokeWidth="2"/><ellipse cx="12" cy="17" rx="7" ry="4" fill="#a9dff5" stroke="#5a6a78" strokeWidth="2"/></svg>
-  );
-}
 function GameIcon() {
   return (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><rect x="4" y="8" width="16" height="8" rx="4" fill="#bde6d3" stroke="#4b5f43" strokeWidth="2"/><circle cx="8" cy="12" r="1.5" fill="#e74c3c"/><circle cx="16" cy="12" r="1.5" fill="#e74c3c"/></svg>
+    <div style={{
+      width: '2.5rem',
+      height: '2.5rem',
+      background: 'linear-gradient(45deg, #8b5cf6, #7c3aed)',
+      borderRadius: '50%',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center'
+    }}>
+      <GameIconComponent />
+    </div>
   );
 }
+
 function ReportIcon() {
   return (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><rect x="5" y="4" width="14" height="16" rx="3" fill="#a9dff5" stroke="#5a6a78" strokeWidth="2"/><path d="M8 14L11 11L14 15L16 13" stroke="#e74c3c" strokeWidth="2"/></svg>
+    <div style={{
+      width: '2.5rem',
+      height: '2.5rem',
+      background: 'linear-gradient(45deg, #ec4899, #db2777)',
+      borderRadius: '50%',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center'
+    }}>
+      <CustomChartIcon />
+    </div>
   );
 }
-function WelcomeSmileHandIcon() {
-  // Modern, sade el sallayan çocuk yüzü
+
+function SettingsIcon() {
   return (
-    <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
-      <circle cx="16" cy="16" r="15" fill="#ffe6b3" stroke="#e0b97d" strokeWidth="2" />
-      <ellipse cx="16" cy="21" rx="7" ry="4" fill="#fff" />
-      <ellipse cx="16" cy="21" rx="4" ry="2.2" fill="#f9d7a0" />
-      <ellipse cx="11.5" cy="15" rx="2.2" ry="2.8" fill="#fff" />
-      <ellipse cx="20.5" cy="15" rx="2.2" ry="2.8" fill="#fff" />
-      <ellipse cx="11.5" cy="15.7" rx="1.1" ry="1.4" fill="#5a6a78" />
-      <ellipse cx="20.5" cy="15.7" rx="1.1" ry="1.4" fill="#5a6a78" />
-      <ellipse cx="16" cy="24.5" rx="2.2" ry="1.1" fill="#e0b97d" />
-      <path d="M12 12 Q16 9 20 12" stroke="#e0b97d" strokeWidth="1.5" fill="none" />
-      <path d="M13 24 Q16 27 19 24" stroke="#e0b97d" strokeWidth="1" fill="none" />
-      {/* El sallama */}
-      <g>
-        <ellipse cx="27" cy="8" rx="2.2" ry="1.1" fill="#ffe6b3" stroke="#e0b97d" strokeWidth="1" transform="rotate(18 27 8)">
-          <animateTransform attributeName="transform" type="rotate" from="18 27 8" to="38 27 8" dur="0.7s" repeatCount="indefinite" direction="alternate" />
-        </ellipse>
-        <ellipse cx="29.2" cy="10" rx="1.1" ry="0.7" fill="#ffe6b3" stroke="#e0b97d" strokeWidth="0.7" />
-      </g>
-    </svg>
+    <div style={{
+      width: '2.5rem',
+      height: '2.5rem',
+      background: 'linear-gradient(45deg, #10b981, #059669)',
+      borderRadius: '50%',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center'
+    }}>
+      <SettingsIconComponent />
+    </div>
   );
 } 

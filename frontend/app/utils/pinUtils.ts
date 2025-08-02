@@ -72,7 +72,7 @@ export const updateChildPIN = async (childId: string, newPIN: string): Promise<v
 export const verifyChildPIN = async (childId: string, inputPIN: string): Promise<boolean> => {
   const { data, error } = await supabase
     .from('children')
-    .select('pin_hash')
+    .select('pin_hash, user_id')
     .eq('id', childId)
     .single();
   
@@ -80,9 +80,22 @@ export const verifyChildPIN = async (childId: string, inputPIN: string): Promise
     return false;
   }
   
-  // Eğer pin_hash yoksa, PIN yok demektir
+  // Eğer pin_hash yoksa, kullanıcının diğer çocuklarından PIN al
   if (!data.pin_hash) {
-    return false;
+    // Aynı kullanıcının diğer çocuklarından PIN bul
+    const { data: otherChildren } = await supabase
+      .from('children')
+      .select('pin_hash')
+      .eq('user_id', data.user_id)
+      .not('pin_hash', 'is', null);
+    
+    if (!otherChildren || otherChildren.length === 0) {
+      return false; // Hiçbir çocukta PIN yok
+    }
+    
+    // Diğer çocuktaki PIN'i kullan
+    const otherPIN = otherChildren[0].pin_hash;
+    return inputPIN === otherPIN;
   }
   
   // DB'de açık PIN saklanıyor, direkt karşılaştır

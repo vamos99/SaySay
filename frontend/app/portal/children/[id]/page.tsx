@@ -4,13 +4,10 @@ import { useParams, useRouter } from 'next/navigation';
 import { useAuth } from '../../../utils/AuthContext';
 import { supabase } from '../../../utils/supabaseClient';
 
-import { PortalSidebar } from "@/components/PortalSidebar";
+import { PortalSidebar } from "@/components/layout/PortalSidebar";
 import { AddChildModal } from '../../components/AddChildModal';
-import CustomThemeIcon from "@/components/icons/CustomThemeIcon";
-import CustomEditIcon from "@/components/icons/CustomEditIcon";
-import CustomTrashIcon from "@/components/icons/CustomTrashIcon";
-import { ExpandSidebarIcon } from '@/components/icons/ExpandSidebarIcon';
-import LoadingScreen from '@/components/LoadingScreen';
+import { CustomThemeIcon, CustomEditIcon, CustomTrashIcon, ExpandSidebarIcon } from '../../../components/icons/CustomIcons';
+import LoadingScreen from '../../../components/layout/LoadingScreen';
 import { createChildPIN, updateChildPIN } from '../../../utils/pinUtils';
 
 export default function ChildProfilePage() {
@@ -19,35 +16,29 @@ export default function ChildProfilePage() {
   const router = useRouter();
   const [child, setChild] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  // Roadmap ve ayar state'leri
   const [roadmap, setRoadmap] = useState<any[]>([]);
   const [categories, setCategories] = useState<any[]>([]);
   const [planLoading, setPlanLoading] = useState(true);
   const [sidebarOpen, setSidebarOpen] = useState(true);
-  // Mobil kontrolünü useEffect ile state'e taşı
   const [isMobile, setIsMobile] = useState(false);
+  const [activeTab, setActiveTab] = useState<'profile'|'roadmap'>('profile');
+  const [showAvatarModal, setShowAvatarModal] = useState(false);
+  const [isLiterate, setIsLiterate] = useState(child?.is_literate ?? false);
+  const [wantsTTS, setWantsTTS] = useState(child?.wants_tts ?? false);
+  const [showApprovalModal, setShowApprovalModal] = useState(false);
+  const [pendingConcept, setPendingConcept] = useState<any>(null);
+  const [showPINModal, setShowPINModal] = useState(false);
+  const [pinMessage, setPinMessage] = useState('');
+  const [newPIN, setNewPIN] = useState('');
+  const [pinError, setPinError] = useState('');
+  const [pinSuccess, setPinSuccess] = useState('');
+
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth < 768);
     checkMobile();
     window.addEventListener('resize', checkMobile);
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
-  const [activeTab, setActiveTab] = useState<'profile'|'roadmap'>('profile');
-  const [showAvatarModal, setShowAvatarModal] = useState(false);
-  // Yeni state'ler
-  const [isLiterate, setIsLiterate] = useState(child?.is_literate ?? false);
-  const [wantsTTS, setWantsTTS] = useState(child?.wants_tts ?? false);
-  // Onay modal state'i
-  const [showApprovalModal, setShowApprovalModal] = useState(false);
-  const [pendingConcept, setPendingConcept] = useState<any>(null);
-  // PIN yönetimi state'leri
-  const [showPINModal, setShowPINModal] = useState(false);
-  const [pinMessage, setPinMessage] = useState('');
-  const [newPIN, setNewPIN] = useState('');
-  const [pinError, setPinError] = useState('');
-  const [pinSuccess, setPinSuccess] = useState('');
-  
-
 
   useEffect(() => {
     if (!user?.id || !id) return;
@@ -73,21 +64,19 @@ export default function ChildProfilePage() {
       supabase.from('concept_roadmap').select('concepts_order').eq('child_id', id)
     ]).then(([catRes, roadmapRes]) => {
       const allCats = catRes.data || [];
-              const roadmapData = roadmapRes.data?.[0];
-        if (roadmapData && roadmapData.concepts_order) {
-          // concepts_order artık concept name'leri içeriyor
-          const planNames = new Set(roadmapData.concepts_order);
-          setRoadmap(allCats.filter((c:any) => planNames.has(c.name)));
-        } else {
-          setRoadmap([]);
-        }
+      const roadmapData = roadmapRes.data?.[0];
+      if (roadmapData && roadmapData.concepts_order) {
+        const planNames = new Set(roadmapData.concepts_order);
+        setRoadmap(allCats.filter((c:any) => planNames.has(c.name)));
+      } else {
+        setRoadmap([]);
+      }
       setCategories(allCats);
       setPlanLoading(false);
     });
   }, [id]);
 
   const handleAddConcept = async (cat: any) => {
-    // Direkt ekleme yerine onay modalı göster
     setPendingConcept(cat);
     setShowApprovalModal(true);
   };
@@ -98,7 +87,6 @@ export default function ChildProfilePage() {
     const newPlan = [...roadmap, pendingConcept];
     setRoadmap(newPlan);
     
-    // DB'ye yaz - concept name'lerini kaydet
     await supabase.from('concept_roadmap').upsert([
       {
         child_id: id,
@@ -106,7 +94,6 @@ export default function ChildProfilePage() {
       }
     ], { onConflict: 'child_id' });
     
-    // Backend'e istek at
     try {
       await fetch('https://vertex-ai-backend-1003061737705.us-central1.run.app/generate-full-content', {
         method: 'POST',
@@ -126,7 +113,6 @@ export default function ChildProfilePage() {
     setPendingConcept(null);
   };
 
-
   const handleRemoveConcept = async (cat: any) => {
     const newPlan = roadmap.filter((c: any) => c.id !== cat.id);
     setRoadmap(newPlan);
@@ -138,24 +124,14 @@ export default function ChildProfilePage() {
     ], { onConflict: 'child_id' });
   };
 
-  // Çocuk yaşını hesapla (doğum yılı yoksa "-" göster)
   const childAge = child?.birth_year ? (new Date().getFullYear() - child.birth_year) : '-';
-  // Avatar gösterimi
+  
   const avatar = child?.avatar?.startsWith('<svg') ? (
     <span style={{display:'block',width:96,height:96}} dangerouslySetInnerHTML={{__html:child.avatar}} />
   ) : child?.avatar ? (
     <img src={child.avatar} alt="Avatar" style={{display:'block',width:96,height:96,borderRadius:'50%'}} />
   ) : null;
-  const GenderSVG = child?.gender === 'female' ? (
-    <svg width="22" height="22" viewBox="0 0 28 28"><circle cx="14" cy="14" r="13" fill="#f8c9d3" stroke="#e67e22" strokeWidth="2"/><ellipse cx="14" cy="16" rx="7" ry="8" fill="#fff"/><ellipse cx="14" cy="15" rx="5" ry="6" fill="#f8c9d3"/><ellipse cx="11" cy="13" rx="1.2" ry="1.5" fill="#fff"/><ellipse cx="17" cy="13" rx="1.2" ry="1.5" fill="#fff"/><ellipse cx="11" cy="13" rx="0.5" ry="0.7" fill="#7b8fa1"/><ellipse cx="17" cy="13" rx="0.5" ry="0.7" fill="#7b8fa1"/><ellipse cx="14" cy="17.5" rx="2" ry="1" fill="#e67e22"/></svg>
-  ) : (
-    <svg width="22" height="22" viewBox="0 0 28 28"><circle cx="14" cy="14" r="13" fill="#bde6f7" stroke="#2c3e50" strokeWidth="2"/><ellipse cx="14" cy="16" rx="7" ry="8" fill="#fff"/><ellipse cx="14" cy="15" rx="5" ry="6" fill="#bde6f7"/><ellipse cx="11" cy="13" rx="1.2" ry="1.5" fill="#fff"/><ellipse cx="17" cy="13" rx="1.2" ry="1.5" fill="#fff"/><ellipse cx="11" cy="13" rx="0.5" ry="0.7" fill="#2c3e50"/><ellipse cx="17" cy="13" rx="0.5" ry="0.7" fill="#2c3e50"/><ellipse cx="14" cy="17.5" rx="2" ry="1" fill="#7b8fa1"/><rect x="8" y="7" width="12" height="4" rx="2" fill="#7b8fa1"/></svg>
-  );
-  const AgeSVG = (
-    <svg width="22" height="22" viewBox="0 0 28 28"><circle cx="14" cy="14" r="13" fill="#ffe6b3" stroke="#e0b97d" strokeWidth="2"/><ellipse cx="14" cy="18" rx="7" ry="4" fill="#fff"/><ellipse cx="14" cy="18" rx="4" ry="2.2" fill="#f9d7a0"/><ellipse cx="11.5" cy="15" rx="2.2" ry="2.8" fill="#fff"/><ellipse cx="17.5" cy="15" rx="2.2" ry="2.8" fill="#fff"/><ellipse cx="11.5" cy="15.7" rx="1.1" ry="1.4" fill="#5a6a78"/><ellipse cx="17.5" cy="15.7" rx="1.1" ry="1.4" fill="#5a6a78"/><ellipse cx="14" cy="21.5" rx="2.2" ry="1.1" fill="#e0b97d"/></svg>
-  );
 
-  // Avatar güncelleme fonksiyonu
   const handleAvatarUpdate = async (newData: { avatar: string; is_literate: boolean; wants_tts: boolean }) => {
     if (!child?.id) return;
     await supabase.from('children').update({ avatar: newData.avatar, is_literate: newData.is_literate, wants_tts: newData.wants_tts }).eq('id', child.id);
@@ -164,7 +140,7 @@ export default function ChildProfilePage() {
     setWantsTTS(newData.wants_tts);
     setShowAvatarModal(false);
   };
-  // Silme fonksiyonu
+
   const handleDelete = async () => {
     if (!child?.id) return;
     await supabase.from('children').delete().eq('id', child.id);
@@ -173,12 +149,10 @@ export default function ChildProfilePage() {
 
   const handleCreatePIN = async () => {
     try {
-      // State'leri temizle
       setPinError('');
       setPinSuccess('');
       setNewPIN('');
       
-      // Mevcut PIN'i kontrol et
       const { data: existingPin } = await supabase
         .from('children')
         .select('pin_hash')
@@ -225,7 +199,6 @@ export default function ChildProfilePage() {
       setPinSuccess(`PIN güncellendi: ${newPIN}`);
       setNewPIN('');
       
-      // 2 saniye sonra modal'ı kapat
       setTimeout(() => {
         setShowPINModal(false);
         setPinSuccess('');
@@ -241,214 +214,853 @@ export default function ChildProfilePage() {
   }
   if (!child) return <div style={{padding:40}}>Çocuk bulunamadı.</div>;
 
-  // Mobilde alt alta, masaüstünde yan yana panel
   return (
-    <div style={{display:'flex',minHeight:'100vh',background:'#f7f4ed'}}>
+    <div style={{
+      display: 'flex',
+      minHeight: '100vh',
+      background: 'linear-gradient(135deg, #eff6ff 0%, #ffffff 50%, #faf5ff 100%)',
+      fontFamily: '"Comic Sans MS", "Chalkboard SE", "Arial Rounded MT Bold", cursive'
+    }}>
       <PortalSidebar open={sidebarOpen} setOpen={setSidebarOpen} />
+      
       {!sidebarOpen && (
         <button
           className="sidebar-expand-btn"
           onClick={() => setSidebarOpen(true)}
           aria-label="Menüyü Aç"
+          style={{
+            position: 'fixed',
+            top: '1rem',
+            left: '1rem',
+            zIndex: 1000,
+            background: 'rgba(255, 255, 255, 0.9)',
+            backdropFilter: 'blur(10px)',
+            border: '1px solid rgba(59, 130, 246, 0.2)',
+            borderRadius: '0.5rem',
+            padding: '0.5rem',
+            cursor: 'pointer',
+            transition: 'all 0.3s ease',
+            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)'
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.transform = 'scale(1.05)';
+            e.currentTarget.style.boxShadow = '0 8px 20px rgba(0, 0, 0, 0.15)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.transform = 'scale(1)';
+            e.currentTarget.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.1)';
+          }}
         >
           <ExpandSidebarIcon />
         </button>
       )}
-      <main style={{flex:1,display:'flex',flexDirection:'column',minHeight:'100vh',padding:'0'}}>
-        <div style={{width:'100%',background:'#fff',boxShadow:'0 2px 8px #f0f0f0',padding:'18px 0 8px 0',position:'sticky',top:0,zIndex:20,display:'flex',alignItems:'center',justifyContent:'space-between',gap:16}}>
-          <h2 style={{fontWeight:800, color:'#2c3e50',fontSize:'1.5rem',textAlign:'center',flex:1}}>{child.name} Profili & Ayarları</h2>
-          <div style={{width:120}} />
-        </div>
-        {/* Mobilde alt alta, masaüstünde yan yana panel */}
-        <div style={{display:'flex',flex:1,gap:isMobile?20:40,alignItems:'flex-start',justifyContent:'center',padding:isMobile?'18px':'40px',flexWrap:'wrap',transition:'all 0.3s'}}>
-          {/* Sol panel: Profil kartı + Kavramlar */}
-          <section style={{flex:'1 1 360px',maxWidth:520,minWidth:320,background:'linear-gradient(135deg, #f8c9d3, #fdebe2)',borderRadius:32,padding:isMobile?'24px 18px':'40px 32px',boxShadow:'0 8px 32px rgba(248,201,211,0.2)',display:'flex',flexDirection:'column',gap:28,transition:'all 0.3s',alignSelf:'stretch'}}>
-            {/* Profil Kartı */}
-            <div style={{display:'flex',flexDirection:'row',alignItems:'center',gap:28,marginBottom:18,justifyContent:'flex-start'}}>
-              {/* Avatar: 120x120 boyutunda, SVG içeriği tam kaplayacak */}
-              <span className="avatar-container" style={{display:'flex',width:120,height:120,minWidth:120,minHeight:120,borderRadius:'50%',boxShadow:'0 4px 12px rgba(230,126,34,0.3)',background:'#fff',alignItems:'center',justifyContent:'center',padding:4,border:'3px solid #e67e22'}}>
-                {avatar}
-              </span>
-              <div style={{display:'flex',flexDirection:'column',justifyContent:'center',gap:12}}>
-                <div style={{fontWeight:900,fontSize:28,color:'#2c3e50',letterSpacing:0.2}}>{child.name}</div>
-                <div style={{display:'flex',flexDirection:'column',gap:8}}>
-                  {child.birth_year && (
-                    <span style={{color:'#7b8fa1',fontWeight:700,fontSize:18}}>Yaş: {childAge}</span>
-                  )}
-                  {child.theme && (
-                    <div style={{display:'flex',alignItems:'center',gap:8,color:'#7b8fa1',fontWeight:700,fontSize:18}}>
-                      <CustomThemeIcon /> Tema: {child.theme}
-                    </div>
+
+      <main style={{
+        flex: 1,
+        padding: '2rem',
+        minHeight: '100vh',
+        overflow: 'auto',
+        position: 'relative'
+      }}>
+        {/* Floating Animated Elements */}
+        <div style={{
+          position: 'absolute',
+          top: '8%',
+          left: '8%',
+          width: '50px',
+          height: '50px',
+          background: 'linear-gradient(45deg, #3b82f6, #7c3aed)',
+          borderRadius: '50%',
+          opacity: '0.1',
+          animation: 'float 6s ease-in-out infinite'
+        }}></div>
+        
+        <div style={{
+          position: 'absolute',
+          top: '15%',
+          right: '12%',
+          width: '35px',
+          height: '35px',
+          background: 'linear-gradient(45deg, #ec4899, #f59e0b)',
+          borderRadius: '50%',
+          opacity: '0.1',
+          animation: 'float 8s ease-in-out infinite reverse'
+        }}></div>
+
+        <div style={{
+          position: 'absolute',
+          bottom: '25%',
+          left: '15%',
+          width: '40px',
+          height: '40px',
+          background: 'linear-gradient(45deg, #10b981, #3b82f6)',
+          borderRadius: '50%',
+          opacity: '0.1',
+          animation: 'float 7s ease-in-out infinite'
+        }}></div>
+
+        <div style={{
+          maxWidth: '1200px',
+          margin: '0 auto',
+          position: 'relative',
+          zIndex: 1
+        }}>
+          {/* Header Section */}
+          <div style={{
+            textAlign: 'center',
+            marginBottom: '3rem'
+          }}>
+            <h1 style={{
+              fontSize: 'clamp(2rem, 4vw, 3rem)',
+              fontWeight: 'bold',
+              marginBottom: '1rem',
+              background: 'linear-gradient(to right, #2563eb, #7c3aed, #ec4899)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              backgroundClip: 'text'
+            }}>
+              {child.name} Profili & Ayarları 👶
+            </h1>
+            <p style={{
+              fontSize: 'clamp(1rem, 2vw, 1.25rem)',
+              color: '#6b7280',
+              maxWidth: '600px',
+              margin: '0 auto',
+              lineHeight: '1.6'
+            }}>
+              Çocuğunuzun profilini düzenleyin ve öğrenme planını yönetin
+            </p>
+          </div>
+
+          {/* Content Grid */}
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr',
+            gap: '2rem',
+            marginBottom: '2rem'
+          }}>
+            {/* Sol Panel: Profil Kartı */}
+            <div style={{
+              background: 'rgba(255, 255, 255, 0.9)',
+              backdropFilter: 'blur(10px)',
+              borderRadius: '1rem',
+              padding: '2rem',
+              boxShadow: '0 10px 25px rgba(0, 0, 0, 0.1)',
+              border: '1px solid rgba(59, 130, 246, 0.1)',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '1.5rem'
+            }}>
+              {/* Profil Bilgileri */}
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '1.5rem',
+                marginBottom: '1rem'
+              }}>
+                <div style={{
+                  width: '6rem',
+                  height: '6rem',
+                  background: 'linear-gradient(45deg, #3b82f6, #7c3aed)',
+                  borderRadius: '50%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  boxShadow: '0 8px 24px rgba(59, 130, 246, 0.3)',
+                  border: '3px solid #fff'
+                }}>
+                  {avatar}
+                </div>
+                <div>
+                  <h2 style={{
+                    fontSize: '1.75rem',
+                    fontWeight: 'bold',
+                    color: '#1f2937',
+                    marginBottom: '0.5rem'
+                  }}>{child.name}</h2>
+                  <div style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '0.5rem'
+                  }}>
+                    {child.birth_year && (
+                      <div style={{
+                        color: '#6b7280',
+                        fontWeight: '600',
+                        fontSize: '1rem'
+                      }}>Yaş: {childAge}</div>
+                    )}
+                    {child.theme && (
+                      <div style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.5rem',
+                        color: '#6b7280',
+                        fontWeight: '600',
+                        fontSize: '1rem'
+                      }}>
+                        <CustomThemeIcon /> Tema: {child.theme}
+                      </div>
+                    )}
+                  </div>
+                  {child.note && (
+                    <div style={{
+                      color: '#f59e0b',
+                      fontWeight: '600',
+                      fontSize: '0.875rem',
+                      marginTop: '0.5rem'
+                    }}>{child.note}</div>
                   )}
                 </div>
-                {child.note && <div style={{color:'#e67e22',fontWeight:700,fontSize:15,marginTop:4}}>{child.note}</div>}
+              </div>
+
+              {/* Butonlar */}
+              <div style={{
+                display: 'flex',
+                gap: '1rem',
+                flexWrap: 'wrap'
+              }}>
+                <button 
+                  onClick={() => setShowAvatarModal(true)}
+                  style={{
+                    background: 'linear-gradient(to right, #3b82f6, #2563eb)',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '0.5rem',
+                    padding: '0.75rem 1.5rem',
+                    fontWeight: '600',
+                    fontSize: '0.875rem',
+                    cursor: 'pointer',
+                    transition: 'all 0.3s ease',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.5rem',
+                    flex: 1
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = 'translateY(-2px)';
+                    e.currentTarget.style.boxShadow = '0 8px 20px rgba(59, 130, 246, 0.3)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = 'translateY(0)';
+                    e.currentTarget.style.boxShadow = 'none';
+                  }}
+                >
+                  <CustomEditIcon /> Profili Düzenle
+                </button>
+                <button 
+                  onClick={handleCreatePIN}
+                  style={{
+                    background: 'linear-gradient(to right, #10b981, #059669)',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '0.5rem',
+                    padding: '0.75rem 1.5rem',
+                    fontWeight: '600',
+                    fontSize: '0.875rem',
+                    cursor: 'pointer',
+                    transition: 'all 0.3s ease',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.5rem',
+                    flex: 1
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = 'translateY(-2px)';
+                    e.currentTarget.style.boxShadow = '0 8px 20px rgba(16, 185, 129, 0.3)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = 'translateY(0)';
+                    e.currentTarget.style.boxShadow = 'none';
+                  }}
+                >
+                  🔐 PIN Görüntüle
+                </button>
+              </div>
+              
+              <div style={{
+                display: 'flex',
+                gap: '1rem',
+                flexWrap: 'wrap'
+              }}>
+                <button 
+                  onClick={handleUpdatePIN}
+                  style={{
+                    background: 'linear-gradient(to right, #8b5cf6, #7c3aed)',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '0.5rem',
+                    padding: '0.75rem 1.5rem',
+                    fontWeight: '600',
+                    fontSize: '0.875rem',
+                    cursor: 'pointer',
+                    transition: 'all 0.3s ease',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.5rem',
+                    flex: 1
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = 'translateY(-2px)';
+                    e.currentTarget.style.boxShadow = '0 8px 20px rgba(139, 92, 246, 0.3)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = 'translateY(0)';
+                    e.currentTarget.style.boxShadow = 'none';
+                  }}
+                >
+                  🔄 PIN Güncelle
+                </button>
+                <button 
+                  onClick={handleDelete}
+                  style={{
+                    background: 'linear-gradient(to right, #ef4444, #dc2626)',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '0.5rem',
+                    padding: '0.75rem 1.5rem',
+                    fontWeight: '600',
+                    fontSize: '0.875rem',
+                    cursor: 'pointer',
+                    transition: 'all 0.3s ease',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.5rem',
+                    flex: 1
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = 'translateY(-2px)';
+                    e.currentTarget.style.boxShadow = '0 8px 20px rgba(239, 68, 68, 0.3)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = 'translateY(0)';
+                    e.currentTarget.style.boxShadow = 'none';
+                  }}
+                >
+                  <CustomTrashIcon /> Sil
+                </button>
+              </div>
+
+              {/* Kavramlar Listesi */}
+              <div>
+                <h3 style={{
+                  fontSize: '1.25rem',
+                  fontWeight: 'bold',
+                  color: '#1f2937',
+                  marginBottom: '1rem'
+                }}>📚 Tüm Kavramlar</h3>
+                <div style={{
+                  maxHeight: '300px',
+                  overflowY: 'auto',
+                  paddingRight: '0.5rem'
+                }}>
+                  <div style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '0.75rem'
+                  }}>
+                    {categories.length === 0 ? (
+                      <div style={{
+                        color: '#6b7280',
+                        fontWeight: '600',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.5rem',
+                        fontSize: '1rem'
+                      }}>
+                        <span style={{fontSize:'1.5rem'}}>🧩</span> Hiç kavram yok.
+                      </div>
+                    ) : categories.filter(cat => !roadmap.find((c:any)=>c.id===cat.id)).length === 0 ? (
+                      <div style={{
+                        color: '#6b7280',
+                        fontWeight: '600',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.5rem',
+                        fontSize: '1rem'
+                      }}>
+                        <span style={{fontSize:'1.5rem'}}>🎉</span> Tüm kavramlar plana eklendi.
+                      </div>
+                    ) : categories.filter(cat => !roadmap.find((c:any)=>c.id===cat.id)).map((cat, index) => (
+                      <div key={`category-${cat.id}-${index}`} style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        padding: '0.75rem',
+                        background: 'rgba(59, 130, 246, 0.05)',
+                        borderRadius: '0.5rem',
+                        border: '1px solid rgba(59, 130, 246, 0.1)'
+                      }}>
+                        <span style={{
+                          fontWeight: '600',
+                          fontSize: '0.875rem',
+                          color: '#1f2937'
+                        }}>{cat.name}</span>
+                        <button 
+                          onClick={() => handleAddConcept(cat)}
+                          style={{
+                            background: 'linear-gradient(to right, #10b981, #059669)',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: '0.375rem',
+                            padding: '0.5rem 1rem',
+                            fontSize: '0.75rem',
+                            fontWeight: '600',
+                            cursor: 'pointer',
+                            transition: 'all 0.3s ease'
+                          }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.transform = 'translateY(-1px)';
+                            e.currentTarget.style.boxShadow = '0 4px 12px rgba(16, 185, 129, 0.3)';
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.transform = 'translateY(0)';
+                            e.currentTarget.style.boxShadow = 'none';
+                          }}
+                        >
+                          Ekle
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
               </div>
             </div>
 
-            {/* Butonlar - responsive */}
-            <div style={{display:'flex',gap:16,flexWrap:'wrap',justifyContent:'center'}}>
-              <button aria-label="Profili Düzenle" style={{background:'#ffe6b3',color:'#e67e22',borderRadius:12,padding:'12px 24px',fontWeight:800,border:'none',cursor:'pointer',transition:'background 0.2s',fontSize:16,boxShadow:'0 2px 8px #ffe6b3',display:'flex',alignItems:'center',gap:8}} tabIndex={0} onClick={()=>setShowAvatarModal(true)}>
-                <CustomEditIcon /> Profili Düzenle
-              </button>
-              <button aria-label="PIN Görüntüle" style={{background:'#ffe6b3',color:'#3498db',borderRadius:12,padding:'12px 24px',fontWeight:800,border:'none',cursor:'pointer',transition:'background 0.2s',fontSize:16,boxShadow:'0 2px 8px #ffe6b3',display:'flex',alignItems:'center',gap:8}} tabIndex={0} onClick={handleCreatePIN}>
-                🔐 PIN Görüntüle
-              </button>
-              <button aria-label="PIN Güncelle" style={{background:'#ffe6b3',color:'#9b59b6',borderRadius:12,padding:'12px 24px',fontWeight:800,border:'none',cursor:'pointer',transition:'background 0.2s',fontSize:16,boxShadow:'0 2px 8px #ffe6b3',display:'flex',alignItems:'center',gap:8}} tabIndex={0} onClick={handleUpdatePIN}>
-                🔄 PIN Güncelle
-              </button>
-              <button aria-label="Çocuğu Sil" style={{background:'#ffe6b3',color:'#e74c3c',borderRadius:12,padding:'12px 24px',fontWeight:800,border:'none',cursor:'pointer',transition:'background 0.2s',fontSize:16,boxShadow:'0 2px 8px #ffe6b3',display:'flex',alignItems:'center',gap:8}} tabIndex={0} onClick={handleDelete}>
-                <CustomTrashIcon /> Sil
-              </button>
-            </div>
-            
-            {showAvatarModal && (
-              <AddChildModal
-                onAdd={handleAvatarUpdate}
-                onClose={()=>setShowAvatarModal(false)}
-                isEditMode={true}
-                childId={id as string}
-              />
-            )}
-            {/* Onay Modal */}
-            {showApprovalModal && (
-              <div style={{position:'fixed',top:0,left:0,width:'100vw',height:'100vh',background:'rgba(0,0,0,0.18)',zIndex:2000,display:'flex',alignItems:'center',justifyContent:'center'}}>
-                <div style={{background:'#fff',borderRadius:22,padding:32,maxWidth:400}}>
-                  <h3 style={{fontWeight:900,fontSize:22,marginBottom:16}}>Kavram Ekleme Onayı</h3>
-                  <p style={{marginBottom:12}}>
-                    <strong>{pendingConcept?.name}</strong> kavramını öğrenme planına eklemek istiyor musunuz?
-                  </p>
-                  <p style={{marginBottom:24,color:'#7b8fa1',fontSize:14}}>
-                    Bu kavram için AI tarafından özel içerik üretilecek ve oyunlarda kullanılacak.
-                  </p>
-                  <button style={{width:'100%',fontWeight:900,fontSize:18,padding:'14px 0',borderRadius:12,marginBottom:8,background:'#4CAF50',color:'#fff',border:'none',cursor:'pointer'}} onClick={handleConfirmAddConcept}>
-                    Onayla
-                  </button>
-                  <button style={{width:'100%',background:'#eee',color:'#333',borderRadius:12,padding:12,fontWeight:800,border:'none',cursor:'pointer'}} onClick={handleCancelAddConcept}>
-                    Vazgeç
-                  </button>
+            {/* Sağ Panel: Öğrenme Planı */}
+            <div style={{
+              background: 'rgba(255, 255, 255, 0.9)',
+              backdropFilter: 'blur(10px)',
+              borderRadius: '1rem',
+              padding: '2rem',
+              boxShadow: '0 10px 25px rgba(0, 0, 0, 0.1)',
+              border: '1px solid rgba(16, 185, 129, 0.1)',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '1.5rem'
+            }}>
+              <h3 style={{
+                fontSize: '1.25rem',
+                fontWeight: 'bold',
+                color: '#1f2937',
+                marginBottom: '1rem'
+              }}>📝 Öğrenme Planı</h3>
+              
+              {planLoading ? (
+                <div style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  gap: '1rem',
+                  padding: '2rem'
+                }}>
+                  <div style={{
+                    width: '2rem',
+                    height: '2rem',
+                    border: '3px solid #10b981',
+                    borderTop: '3px solid transparent',
+                    borderRadius: '50%',
+                    animation: 'spin 1s linear infinite'
+                  }}></div>
+                  <span style={{
+                    color: '#6b7280',
+                    fontWeight: '600',
+                    fontSize: '1rem'
+                  }}>Yükleniyor...</span>
                 </div>
-              </div>
-            )}
-            
-            {/* PIN Modal */}
-            {showPINModal && (
-              <div style={{position:'fixed',top:0,left:0,width:'100vw',height:'100vh',background:'rgba(0,0,0,0.18)',zIndex:2000,display:'flex',alignItems:'center',justifyContent:'center'}}>
-                <div style={{background:'#fff',borderRadius:22,padding:32,maxWidth:400}}>
-                  <h3 style={{fontWeight:900,fontSize:22,marginBottom:16}}>PIN Yönetimi</h3>
-                  
-                  {pinMessage ? (
-                    // PIN Görüntüleme modu
-                    <p style={{marginBottom:24,color:'#7b8fa1',fontSize:14}}>{pinMessage}</p>
-                  ) : (
-                    // PIN Güncelleme modu
-                    <div style={{marginBottom:24}}>
-                      <label style={{fontSize:14,fontWeight:600,marginBottom:8,display:'block'}}>
-                        Yeni PIN (4 haneli):
-                      </label>
-                      <input
-                        type="password"
-                        value={newPIN}
-                        onChange={(e) => setNewPIN(e.target.value)}
-                        style={{
-                          width:'100%',
-                          padding:'12px',
-                          borderRadius:8,
-                          border:'1.5px solid #ddd',
-                          fontSize:16,
-                          marginBottom:12
-                        }}
-                        placeholder="0000"
-                        maxLength={4}
-                      />
-                      <button 
-                        onClick={handleSubmitPIN}
-                        style={{
-                          width:'100%',
-                          padding:'12px',
-                          borderRadius:8,
-                          background:'#9b59b6',
-                          color:'#fff',
-                          border:'none',
-                          fontWeight:700,
-                          cursor:'pointer',
-                          fontSize:16,
-                          marginBottom:8
-                        }}
-                      >
-                        PIN Güncelle
-                      </button>
-                    </div>
-                  )}
-                  
-                  {pinError && (
-                    <div style={{color:'#e74c3c',fontSize:13,marginBottom:12,fontWeight:600}}>{pinError}</div>
-                  )}
-                  {pinSuccess && (
-                    <div style={{color:'#27ae60',fontSize:13,marginBottom:12,fontWeight:600}}>{pinSuccess}</div>
-                  )}
-                  
-                  <button style={{width:'100%',background:'#eee',color:'#333',borderRadius:12,padding:12,fontWeight:800,border:'none',cursor:'pointer'}} onClick={() => {
-                    setShowPINModal(false);
-                    setPinMessage('');
-                    setPinError('');
-                    setPinSuccess('');
-                    setNewPIN('');
-                  }}>
-                    Tamam
-                  </button>
+              ) : roadmap.length === 0 ? (
+                <div style={{
+                  color: '#6b7280',
+                  fontWeight: '600',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.5rem',
+                  fontSize: '1rem',
+                  textAlign: 'center',
+                  padding: '2rem'
+                }}>
+                  <span style={{fontSize:'1.5rem'}}>📝</span> Henüz kavram eklenmedi. Soldan ekleyin.
                 </div>
-              </div>
-            )}
-            
-            {/* Kavramlar başlığı ve liste */}
-            <h3 style={{ margin: 0, fontWeight: 900, color: '#2c3e50',fontSize:'1.18rem',marginBottom:14,letterSpacing:0.1 }}>Tüm Kavramlar</h3>
-            <div style={{flex:1,overflowY:'auto',minHeight:120,maxHeight:isMobile?260:260,paddingRight:4}}>
-              <ul style={{ listStyle: 'none', padding: 0, margin: 0,display:'flex',flexDirection:'column',gap:12 }}>
-                {categories.length === 0 ? (
-                  <li style={{color:'#7b8fa1',fontWeight:700,display:'flex',alignItems:'center',gap:10,fontSize:16}}><span style={{fontSize:24}}>🧩</span> Hiç kavram yok.</li>
-                ) : categories.filter(cat => !roadmap.find((c:any)=>c.id===cat.id)).length === 0 ? (
-                  <li style={{color:'#7b8fa1',fontWeight:700,display:'flex',alignItems:'center',gap:10,fontSize:16}}><span style={{fontSize:24}}>🎉</span> Tüm kavramlar plana eklendi.</li>
-                ) : categories.filter(cat => !roadmap.find((c:any)=>c.id===cat.id)).map((cat, index) => (
-                  <li key={`category-${cat.id}-${index}`} style={{ display: 'flex', alignItems: 'center', gap: 12,justifyContent:'space-between' }}>
-                    <span style={{ fontWeight: 700, fontSize:15 }}>{cat.name}</span>
-                    <button aria-label="Kavramı Öğrenme Planına Ekle" style={{ background: '#4CAF50', color: '#fff', padding: '7px 18px', fontSize: 15, borderRadius: 12, border:'none',cursor:'pointer',transition:'background 0.2s',fontWeight:800,boxShadow:'0 2px 8px #bde6d3' }} onClick={() => handleAddConcept(cat)} tabIndex={0}>Ekle</button>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </section>
-          {/* Sağ panel: Roadmap */}
-          <section style={{flex:'2 1 520px',maxWidth:900,minWidth:280,background:'#bde6d3',borderRadius:32,padding:isMobile?'24px 12px':'40px 40px',boxShadow:'0 4px 24px rgba(189,230,211,0.13)',display:'flex',flexDirection:'column',gap:28,transition:'all 0.3s'}}>
-            <h3 style={{ margin: 0, fontWeight: 900, color: '#2c3e50',fontSize:'1.18rem',marginBottom:14,letterSpacing:0.1 }}>Öğrenme Planı</h3>
-            {planLoading ? (
-              <div style={{display:'flex',flexDirection:'column',alignItems:'center',gap:10,padding:32}}>
-                <span className="loader" aria-label="Yükleniyor" />
-                <span style={{color:'#7b8fa1',fontWeight:700,fontSize:16}}>Yükleniyor...</span>
-              </div>
-            ) : (
-              roadmap.length === 0 ? (
-                <div style={{color:'#7b8fa1',fontWeight:700,display:'flex',alignItems:'center',gap:10,fontSize:16}}><span style={{fontSize:24}}>📝</span> Henüz kavram eklenmedi. Soldan ekleyin.</div>
               ) : (
-                <div style={{display:'flex',flexDirection:'column',gap:22}}>
+                <div style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '1.5rem'
+                }}>
                   {/* Kronolojik çizgi */}
-                  <div style={{display:'flex',alignItems:'center',gap:0,margin:'12px 0',overflowX:'auto',paddingBottom:8}}>
+                  <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0',
+                    margin: '1rem 0',
+                    overflowX: 'auto',
+                    paddingBottom: '1rem'
+                  }}>
                     {roadmap.map((cat, idx) => (
                       <Fragment key={`roadmap-${cat.id}-${idx}`}>
-                        <div style={{display:'flex',flexDirection:'column',alignItems:'center',gap:6}}>
-                          <div style={{width:52,height:52,borderRadius:'50%',background:'#fff',display:'flex',alignItems:'center',justifyContent:'center',fontWeight:900,fontSize:20,color:'#4CAF50',boxShadow:'0 2px 8px #bde6d3',border:'2.5px solid #4CAF50',transition:'box-shadow 0.2s'}}>{idx+1}</div>
-                          <span style={{fontSize:15,fontWeight:800,color:'#2c3e50',marginTop:2}}>{cat.name}</span>
-                          <button aria-label="Kavramı Öğrenme Planından Çıkar" style={{ background: '#E57373', color: '#fff', padding: '5px 14px', fontSize: 14, borderRadius: 10, border:'none',cursor:'pointer',transition:'background 0.2s',fontWeight:800,marginTop:4,boxShadow:'0 2px 8px #f8c9d3' }} onClick={() => handleRemoveConcept(cat)} tabIndex={0}>Çıkar</button>
+                        <div style={{
+                          display: 'flex',
+                          flexDirection: 'column',
+                          alignItems: 'center',
+                          gap: '0.5rem',
+                          minWidth: '120px'
+                        }}>
+                          <div style={{
+                            width: '3rem',
+                            height: '3rem',
+                            borderRadius: '50%',
+                            background: 'linear-gradient(45deg, #10b981, #059669)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            fontWeight: 'bold',
+                            fontSize: '1.25rem',
+                            color: 'white',
+                            boxShadow: '0 4px 12px rgba(16, 185, 129, 0.3)',
+                            border: '2px solid #fff'
+                          }}>
+                            {idx+1}
+                          </div>
+                          <span style={{
+                            fontSize: '0.875rem',
+                            fontWeight: '600',
+                            color: '#1f2937',
+                            textAlign: 'center'
+                          }}>{cat.name}</span>
+                          <button 
+                            onClick={() => handleRemoveConcept(cat)}
+                            style={{
+                              background: 'linear-gradient(to right, #ef4444, #dc2626)',
+                              color: 'white',
+                              border: 'none',
+                              borderRadius: '0.375rem',
+                              padding: '0.5rem 1rem',
+                              fontSize: '0.75rem',
+                              fontWeight: '600',
+                              cursor: 'pointer',
+                              transition: 'all 0.3s ease'
+                            }}
+                            onMouseEnter={(e) => {
+                              e.currentTarget.style.transform = 'translateY(-1px)';
+                              e.currentTarget.style.boxShadow = '0 4px 12px rgba(239, 68, 68, 0.3)';
+                            }}
+                            onMouseLeave={(e) => {
+                              e.currentTarget.style.transform = 'translateY(0)';
+                              e.currentTarget.style.boxShadow = 'none';
+                            }}
+                          >
+                            Çıkar
+                          </button>
                         </div>
-                        {idx < roadmap.length-1 && <div style={{width:36,height:4,background:'#4CAF50',borderRadius:2,margin:'0 2px'}}></div>}
+                        {idx < roadmap.length-1 && (
+                          <div style={{
+                            width: '2rem',
+                            height: '0.25rem',
+                            background: 'linear-gradient(to right, #10b981, #059669)',
+                            borderRadius: '0.125rem',
+                            margin: '0 0.5rem'
+                          }}></div>
+                        )}
                       </Fragment>
                     ))}
                   </div>
                 </div>
-              )
-            )}
-          </section>
+              )}
+            </div>
+          </div>
         </div>
       </main>
+
+      {/* Modals */}
+      {showAvatarModal && (
+        <AddChildModal
+          onAdd={handleAvatarUpdate}
+          onClose={() => setShowAvatarModal(false)}
+          isEditMode={true}
+          childId={id as string}
+        />
+      )}
+
+      {showApprovalModal && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100vw',
+          height: '100vh',
+          background: 'rgba(0, 0, 0, 0.5)',
+          backdropFilter: 'blur(4px)',
+          zIndex: 2000,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: '1rem'
+        }}>
+          <div style={{
+            background: 'rgba(255, 255, 255, 0.95)',
+            backdropFilter: 'blur(10px)',
+            borderRadius: '1rem',
+            padding: '2rem',
+            maxWidth: '400px',
+            width: '100%',
+            boxShadow: '0 20px 40px rgba(0, 0, 0, 0.2)',
+            border: '1px solid rgba(59, 130, 246, 0.1)'
+          }}>
+            <h3 style={{
+              fontWeight: 'bold',
+              fontSize: '1.5rem',
+              marginBottom: '1rem',
+              color: '#1f2937'
+            }}>Kavram Ekleme Onayı</h3>
+            <p style={{
+              marginBottom: '0.75rem',
+              color: '#1f2937',
+              lineHeight: '1.5'
+            }}>
+              <strong>{pendingConcept?.name}</strong> kavramını öğrenme planına eklemek istiyor musunuz?
+            </p>
+            <p style={{
+              marginBottom: '1.5rem',
+              color: '#6b7280',
+              fontSize: '0.875rem',
+              lineHeight: '1.5'
+            }}>
+              Bu kavram için AI tarafından özel içerik üretilecek ve oyunlarda kullanılacak.
+            </p>
+            <div style={{
+              display: 'flex',
+              gap: '1rem'
+            }}>
+              <button 
+                onClick={handleConfirmAddConcept}
+                style={{
+                  flex: 1,
+                  background: 'linear-gradient(to right, #10b981, #059669)',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '0.5rem',
+                  padding: '0.75rem 1rem',
+                  fontWeight: '600',
+                  fontSize: '0.875rem',
+                  cursor: 'pointer',
+                  transition: 'all 0.3s ease'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = 'translateY(-2px)';
+                  e.currentTarget.style.boxShadow = '0 8px 20px rgba(16, 185, 129, 0.3)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'translateY(0)';
+                  e.currentTarget.style.boxShadow = 'none';
+                }}
+              >
+                Onayla
+              </button>
+              <button 
+                onClick={handleCancelAddConcept}
+                style={{
+                  flex: 1,
+                  background: 'linear-gradient(to right, #6b7280, #4b5563)',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '0.5rem',
+                  padding: '0.75rem 1rem',
+                  fontWeight: '600',
+                  fontSize: '0.875rem',
+                  cursor: 'pointer',
+                  transition: 'all 0.3s ease'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = 'translateY(-2px)';
+                  e.currentTarget.style.boxShadow = '0 8px 20px rgba(107, 114, 128, 0.3)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'translateY(0)';
+                  e.currentTarget.style.boxShadow = 'none';
+                }}
+              >
+                Vazgeç
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showPINModal && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100vw',
+          height: '100vh',
+          background: 'rgba(0, 0, 0, 0.5)',
+          backdropFilter: 'blur(4px)',
+          zIndex: 2000,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: '1rem'
+        }}>
+          <div style={{
+            background: 'rgba(255, 255, 255, 0.95)',
+            backdropFilter: 'blur(10px)',
+            borderRadius: '1rem',
+            padding: '2rem',
+            maxWidth: '400px',
+            width: '100%',
+            boxShadow: '0 20px 40px rgba(0, 0, 0, 0.2)',
+            border: '1px solid rgba(59, 130, 246, 0.1)'
+          }}>
+            <h3 style={{
+              fontWeight: 'bold',
+              fontSize: '1.5rem',
+              marginBottom: '1rem',
+              color: '#1f2937'
+            }}>PIN Yönetimi</h3>
+            
+            {pinMessage ? (
+              <p style={{
+                marginBottom: '1.5rem',
+                color: '#6b7280',
+                fontSize: '0.875rem',
+                lineHeight: '1.5'
+              }}>{pinMessage}</p>
+            ) : (
+              <div style={{marginBottom: '1.5rem'}}>
+                <label style={{
+                  fontSize: '0.875rem',
+                  fontWeight: '600',
+                  marginBottom: '0.5rem',
+                  display: 'block',
+                  color: '#374151'
+                }}>
+                  Yeni PIN (4 haneli):
+                </label>
+                <input
+                  type="password"
+                  value={newPIN}
+                  onChange={(e) => setNewPIN(e.target.value)}
+                  style={{
+                    width: '100%',
+                    padding: '0.75rem',
+                    borderRadius: '0.5rem',
+                    border: '1px solid rgba(59, 130, 246, 0.2)',
+                    fontSize: '1rem',
+                    marginBottom: '1rem',
+                    background: 'rgba(255, 255, 255, 0.8)',
+                    transition: 'all 0.3s ease'
+                  }}
+                  placeholder="0000"
+                  maxLength={4}
+                  onFocus={(e) => {
+                    e.target.style.borderColor = '#3b82f6';
+                    e.target.style.boxShadow = '0 0 0 3px rgba(59, 130, 246, 0.1)';
+                  }}
+                  onBlur={(e) => {
+                    e.target.style.borderColor = 'rgba(59, 130, 246, 0.2)';
+                    e.target.style.boxShadow = 'none';
+                  }}
+                />
+                <button 
+                  onClick={handleSubmitPIN}
+                  style={{
+                    width: '100%',
+                    background: 'linear-gradient(to right, #8b5cf6, #7c3aed)',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '0.5rem',
+                    padding: '0.75rem 1rem',
+                    fontWeight: '600',
+                    fontSize: '0.875rem',
+                    cursor: 'pointer',
+                    transition: 'all 0.3s ease',
+                    marginBottom: '1rem'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = 'translateY(-2px)';
+                    e.currentTarget.style.boxShadow = '0 8px 20px rgba(139, 92, 246, 0.3)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = 'translateY(0)';
+                    e.currentTarget.style.boxShadow = 'none';
+                  }}
+                >
+                  PIN Güncelle
+                </button>
+              </div>
+            )}
+            
+            {pinError && (
+              <div style={{
+                color: '#dc2626',
+                fontSize: '0.875rem',
+                marginBottom: '1rem',
+                fontWeight: '600',
+                padding: '0.75rem',
+                background: 'rgba(239, 68, 68, 0.1)',
+                borderRadius: '0.5rem',
+                border: '1px solid rgba(239, 68, 68, 0.2)'
+              }}>{pinError}</div>
+            )}
+            {pinSuccess && (
+              <div style={{
+                color: '#059669',
+                fontSize: '0.875rem',
+                marginBottom: '1rem',
+                fontWeight: '600',
+                padding: '0.75rem',
+                background: 'rgba(16, 185, 129, 0.1)',
+                borderRadius: '0.5rem',
+                border: '1px solid rgba(16, 185, 129, 0.2)'
+              }}>{pinSuccess}</div>
+            )}
+            
+            <button 
+              onClick={() => {
+                setShowPINModal(false);
+                setPinMessage('');
+                setPinError('');
+                setPinSuccess('');
+                setNewPIN('');
+              }}
+              style={{
+                width: '100%',
+                background: 'linear-gradient(to right, #6b7280, #4b5563)',
+                color: 'white',
+                border: 'none',
+                borderRadius: '0.5rem',
+                padding: '0.75rem 1rem',
+                fontWeight: '600',
+                fontSize: '0.875rem',
+                cursor: 'pointer',
+                transition: 'all 0.3s ease'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'translateY(-2px)';
+                e.currentTarget.style.boxShadow = '0 8px 20px rgba(107, 114, 128, 0.3)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'translateY(0)';
+                e.currentTarget.style.boxShadow = 'none';
+              }}
+            >
+              Tamam
+            </button>
+          </div>
+        </div>
+      )}
+
+      <style jsx>{`
+        @keyframes float {
+          0%, 100% { transform: translateY(0px); }
+          50% { transform: translateY(-15px); }
+        }
+        
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+      `}</style>
     </div>
   );
 } 

@@ -1,12 +1,11 @@
 "use client";
-import React, { useEffect, useState } from "react";
-import { PortalSidebar } from "@/components/PortalSidebar";
+import React, { useEffect, useState, Fragment } from "react";
+import { PortalLayout } from "../../components/layout/PortalLayout";
 import { useRouter } from "next/navigation";
-import { GameIcon } from "@/components/icons/GameIcon";
-import { SettingsIcon } from "@/components/icons/SettingsIcon";
-import { ExpandSidebarIcon } from '@/components/icons/ExpandSidebarIcon';
+import { GameIcon, SettingsIcon } from '../../components/icons/CustomIcons';
 import { useAuth } from '../../utils/AuthContext';
 import { supabase } from '../../utils/supabaseClient';
+import { gameCache } from '../../utils/gameCache';
 
 export default function GamesPage() {
   const router = useRouter();
@@ -16,24 +15,22 @@ export default function GamesPage() {
   const [selectedChildId, setSelectedChildId] = useState<string | null>(null);
   const [selectedChild, setSelectedChild] = useState<any>(null);
   const [showChildSelector, setShowChildSelector] = useState(false);
+  const [isLoadingContent, setIsLoadingContent] = useState(false);
 
   useEffect(() => {
     if (!user?.id) return;
     
-    // Çocukları yükle
     supabase.from('children')
       .select('id, name, avatar, birth_year, theme')
       .eq('user_id', user.id)
       .then(({ data }) => {
         setChildren(data || []);
         
-        // localStorage'dan seçili çocuğu al
         const localSelectedId = localStorage.getItem('selected_child_id');
         if (localSelectedId && data?.find(c => c.id === localSelectedId)) {
           setSelectedChildId(localSelectedId);
           setSelectedChild(data.find(c => c.id === localSelectedId));
         } else if (data && data.length > 0) {
-          // İlk çocuğu otomatik seç
           setSelectedChildId(data[0].id);
           setSelectedChild(data[0]);
           localStorage.setItem('selected_child_id', data[0].id);
@@ -43,10 +40,48 @@ export default function GamesPage() {
 
   const handleSelectChild = (childId: string) => {
     const child = children.find(c => c.id === childId);
+    
+    // Cache'de yoksa içerik yükle
+    if (!gameCache.has(childId)) {
+      loadChildContent(childId, child?.name || '');
+    }
+    
     setSelectedChildId(childId);
     setSelectedChild(child);
     localStorage.setItem('selected_child_id', childId);
     setShowChildSelector(false);
+  };
+
+  const loadChildContent = async (childId: string, childName: string) => {
+    try {
+      setIsLoadingContent(true);
+      
+      // Backend'den içerik çek
+      const response = await fetch('/api/generate-content', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ child_id: childId })
+      });
+
+      if (!response.ok) {
+        throw new Error('Backend isteği başarısız');
+      }
+
+      const data = await response.json();
+      
+      if (data.all_concepts && data.all_concepts.length > 0) {
+        const filteredContent = data.all_concepts.filter((c: any) => !c.error);
+        gameCache.set(childId, filteredContent, childName);
+      } else {
+        console.error('❌ Geçerli içerik alınamadı');
+      }
+    } catch (error) {
+      console.error('❌ İçerik yükleme hatası:', error);
+    } finally {
+      setIsLoadingContent(false);
+    }
   };
 
   const handleStartGame = (gamePath: string) => {
@@ -54,129 +89,623 @@ export default function GamesPage() {
       setShowChildSelector(true);
       return;
     }
+    
     router.push(gamePath);
   };
+
   return (
-    <div style={{display:'flex',minHeight:'100vh',background:'var(--light-blue-bg)'}}>
-      <PortalSidebar open={sidebarOpen} setOpen={setSidebarOpen} />
-      {!sidebarOpen && (
-        <button
-          className="sidebar-expand-btn"
-          onClick={() => setSidebarOpen(true)}
-          aria-label="Menüyü Aç"
-        >
-          <ExpandSidebarIcon />
-        </button>
-      )}
-      <main style={{flex:1,padding:'40px 0 0 0',minHeight:'100vh',background:'var(--light-blue-bg)',overflow:'auto'}}>
-        <div style={{maxWidth:1200,margin:'0 auto',padding:'0 24px'}}>
-          <h1 style={{fontWeight:900,fontSize:'2.2rem',color:'var(--dark-text)',marginBottom:32}}>Oyunlar</h1>
-          
+    <Fragment>
+      <PortalLayout sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen}>
+        {/* Floating Animated Elements */}
+        <div style={{
+          position: 'absolute',
+          top: '8%',
+          left: '8%',
+          width: '50px',
+          height: '50px',
+          background: 'linear-gradient(45deg, #3b82f6, #7c3aed)',
+          borderRadius: '50%',
+          opacity: '0.1',
+          animation: 'float 6s ease-in-out infinite'
+        }}></div>
+        
+        <div style={{
+          position: 'absolute',
+          top: '15%',
+          right: '12%',
+          width: '35px',
+          height: '35px',
+          background: 'linear-gradient(45deg, #ec4899, #f59e0b)',
+          borderRadius: '50%',
+          opacity: '0.1',
+          animation: 'float 8s ease-in-out infinite reverse'
+        }}></div>
+
+        <div style={{
+          position: 'absolute',
+          bottom: '25%',
+          left: '15%',
+          width: '40px',
+          height: '40px',
+          background: 'linear-gradient(45deg, #10b981, #3b82f6)',
+          borderRadius: '50%',
+          opacity: '0.1',
+          animation: 'float 7s ease-in-out infinite'
+        }}></div>
+
+        <div style={{
+          maxWidth: '1200px',
+          margin: '0 auto',
+          position: 'relative',
+          zIndex: 1
+        }}>
+          {/* Header Section */}
+          <div style={{
+            textAlign: 'center',
+            marginBottom: '3rem'
+          }}>
+            <h1 style={{
+              fontSize: 'clamp(2rem, 4vw, 3rem)',
+              fontWeight: 'bold',
+              marginBottom: '1rem',
+              background: 'linear-gradient(to right, #2563eb, #7c3aed, #ec4899)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              backgroundClip: 'text'
+            }}>
+              Eğitici Oyunlar 🎮
+            </h1>
+            <p style={{
+              fontSize: 'clamp(1rem, 2vw, 1.25rem)',
+              color: '#6b7280',
+              maxWidth: '600px',
+              margin: '0 auto',
+              lineHeight: '1.6'
+            }}>
+              Çocuğunuzun öğrenme yolculuğunu eğlenceli oyunlarla destekleyin
+            </p>
+          </div>
+
           {/* Seçili çocuk bilgisi */}
           {selectedChild && (
-            <div style={{background:'#eaffea',borderRadius:16,padding:20,marginBottom:24,border:'2px solid #4CAF50',display:'flex',alignItems:'center',gap:16}}>
-              <div style={{display:'flex',alignItems:'center',gap:12}}>
-                {selectedChild.avatar?.startsWith('<svg') ? (
-                  <span style={{display:'block',width:40,height:40}} dangerouslySetInnerHTML={{__html:selectedChild.avatar}} />
-                ) : (
-                  selectedChild.avatar ? <img src={selectedChild.avatar} alt="Avatar" style={{display:'block',width:40,height:40,borderRadius:'50%'}} /> : null
-                )}
+            <div style={{
+              background: 'rgba(255, 255, 255, 0.9)',
+              backdropFilter: 'blur(10px)',
+              borderRadius: '1rem',
+              padding: '1.5rem',
+              marginBottom: '2rem',
+              boxShadow: '0 10px 25px rgba(0, 0, 0, 0.1)',
+              border: '1px solid rgba(59, 130, 246, 0.1)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              flexWrap: 'wrap',
+              gap: '1rem'
+            }}>
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '1rem'
+              }}>
+                <div style={{
+                  width: '3rem',
+                  height: '3rem',
+                  background: 'linear-gradient(45deg, #3b82f6, #7c3aed)',
+                  borderRadius: '50%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  boxShadow: '0 4px 12px rgba(59, 130, 246, 0.3)'
+                }}>
+                  {selectedChild.avatar?.startsWith('<svg') ? (
+                    <span style={{display:'block',width:32,height:32}} dangerouslySetInnerHTML={{__html:selectedChild.avatar}} />
+                  ) : (
+                    selectedChild.avatar ? (
+                      <img src={selectedChild.avatar} alt="Avatar" style={{width:32,height:32,borderRadius:'50%'}} />
+                    ) : (
+                      <span style={{color:'white',fontWeight:'bold',fontSize:'1.25rem'}}>
+                        {selectedChild.name.charAt(0).toUpperCase()}
+                      </span>
+                    )
+                  )}
+                </div>
                 <div>
-                  <div style={{fontWeight:900,fontSize:18,color:'#2c3e50'}}>
+                  <h3 style={{
+                    fontSize: '1.25rem',
+                    fontWeight: 'bold',
+                    color: '#1f2937',
+                    margin: 0
+                  }}>
                     {selectedChild.name} ✓ Seçili
-                  </div>
-                  <div style={{fontSize:14,color:'#7b8fa1'}}>
+                  </h3>
+                  <p style={{
+                    fontSize: '0.875rem',
+                    color: '#6b7280',
+                    margin: 0
+                  }}>
                     Tema: {selectedChild.theme} | Yaş: {new Date().getFullYear() - selectedChild.birth_year}
-                  </div>
+                  </p>
                 </div>
               </div>
               <button 
                 onClick={() => setShowChildSelector(true)}
-                style={{background:'#4CAF50',color:'#fff',border:'none',borderRadius:8,padding:'8px 16px',fontWeight:700,fontSize:14,cursor:'pointer'}}
+                style={{
+                  background: 'linear-gradient(to right, #3b82f6, #7c3aed)',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '0.5rem',
+                  padding: '0.75rem 1.5rem',
+                  fontWeight: '600',
+                  fontSize: '0.875rem',
+                  cursor: 'pointer',
+                  transition: 'all 0.3s ease',
+                  boxShadow: '0 4px 12px rgba(59, 130, 246, 0.3)'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = 'translateY(-2px)';
+                  e.currentTarget.style.boxShadow = '0 8px 20px rgba(59, 130, 246, 0.4)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'translateY(0)';
+                  e.currentTarget.style.boxShadow = '0 4px 12px rgba(59, 130, 246, 0.3)';
+                }}
               >
                 Çocuk Değiştir
               </button>
             </div>
           )}
           
-          <div style={{display:'flex',gap:32,flexWrap:'wrap'}}>
+          {/* Games Grid */}
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
+            gap: '1.5rem',
+            marginBottom: '2rem'
+          }}>
             {/* Oyun 1: Kavram Oyunu */}
-            <div style={{background:'var(--sidebar-bg)',borderRadius:22,padding:32,minWidth:320,maxWidth:380,boxShadow:'0 4px 24px #e0e0e0',display:'flex',flexDirection:'column',alignItems:'flex-start',gap:18}}>
-              <div style={{display:'flex',alignItems:'center',gap:14}}>
-                <GameIcon />
-                <span style={{fontWeight:800,fontSize:'1.3rem',color:'var(--dark-text)'}}>Kavram Oyunu</span>
+            <div style={{
+              background: 'rgba(255, 255, 255, 0.9)',
+              backdropFilter: 'blur(10px)',
+              borderRadius: '1rem',
+              padding: '1.5rem',
+              boxShadow: '0 10px 25px rgba(0, 0, 0, 0.1)',
+              border: '1px solid rgba(59, 130, 246, 0.1)',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '1rem',
+              transition: 'all 0.3s ease',
+              position: 'relative',
+              overflow: 'hidden'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = 'translateY(-4px)';
+              e.currentTarget.style.boxShadow = '0 20px 40px rgba(0, 0, 0, 0.15)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = 'translateY(0)';
+              e.currentTarget.style.boxShadow = '0 10px 25px rgba(0, 0, 0, 0.1)';
+            }}>
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '1rem'
+              }}>
+                <div style={{
+                  width: '3rem',
+                  height: '3rem',
+                  background: 'linear-gradient(45deg, #3b82f6, #2563eb)',
+                  borderRadius: '0.75rem',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  boxShadow: '0 4px 12px rgba(59, 130, 246, 0.3)'
+                }}>
+                  <GameIcon />
+                </div>
+                <h3 style={{
+                  fontWeight: 'bold',
+                  fontSize: '1.25rem',
+                  color: '#1f2937',
+                  margin: 0
+                }}>Kavram Oyunu</h3>
               </div>
-              <div style={{color:'var(--light-text)',fontSize:16,margin:'8px 0 18px 0'}}>Çocuğunuzun kavramları temalara göre eğlenceli şekilde öğrenmesini sağlayan oyun.</div>
-              <div style={{display:'flex',gap:14}}>
-                <button onClick={()=>handleStartGame('/portal/games/oyun1')} style={{background:'var(--primary-yellow)',color:'#2c3e50',border:'none',borderRadius:12,padding:'12px 32px',fontWeight:900,fontSize:17,cursor:'pointer',boxShadow:'0 2px 8px #ffd600'}}>Başlat</button>
-                <button onClick={()=>router.push('/portal/roadmap')} style={{background:'var(--white)',color:'var(--dark-text)',border:'1.5px solid #e0b97d',borderRadius:12,padding:'12px 24px',fontWeight:800,fontSize:16,cursor:'pointer',display:'flex',alignItems:'center',gap:8}}><SettingsIcon /> Ayarlar</button>
+              <p style={{
+                color: '#6b7280',
+                fontSize: '1rem',
+                lineHeight: '1.5',
+                margin: 0
+              }}>Çocuğunuzun kavramları temalara göre eğlenceli şekilde öğrenmesini sağlayan oyun.</p>
+              <div style={{
+                display: 'flex',
+                gap: '0.75rem',
+                marginTop: 'auto'
+              }}>
+                              <button 
+                onClick={() => handleStartGame('/portal/games/oyun1')} 
+                disabled={isLoadingContent}
+                style={{
+                  background: isLoadingContent 
+                    ? 'linear-gradient(to right, #9ca3af, #6b7280)' 
+                    : 'linear-gradient(to right, #f59e0b, #d97706)',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '0.5rem',
+                  padding: '0.75rem 1.5rem',
+                  fontWeight: '600',
+                  fontSize: '0.875rem',
+                  cursor: isLoadingContent ? 'not-allowed' : 'pointer',
+                  transition: 'all 0.3s ease',
+                  boxShadow: '0 4px 12px rgba(245, 158, 11, 0.3)',
+                  flex: 1
+                }}
+                  onMouseEnter={(e) => {
+                    if (!isLoadingContent) {
+                      e.currentTarget.style.transform = 'translateY(-2px)';
+                      e.currentTarget.style.boxShadow = '0 8px 20px rgba(245, 158, 11, 0.4)';
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = 'translateY(0)';
+                    e.currentTarget.style.boxShadow = '0 4px 12px rgba(245, 158, 11, 0.3)';
+                  }}
+                >
+                  {isLoadingContent ? 'Yükleniyor...' : 'Başlat'}
+                </button>
+                <button 
+                  onClick={() => router.push('/portal/roadmap')} 
+                  style={{
+                    background: 'rgba(255, 255, 255, 0.9)',
+                    color: '#1f2937',
+                    border: '1px solid rgba(59, 130, 246, 0.2)',
+                    borderRadius: '0.5rem',
+                    padding: '0.75rem 1rem',
+                    fontWeight: '600',
+                    fontSize: '0.875rem',
+                    cursor: 'pointer',
+                    transition: 'all 0.3s ease',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.5rem'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = 'translateY(-2px)';
+                    e.currentTarget.style.background = 'rgba(255, 255, 255, 1)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = 'translateY(0)';
+                    e.currentTarget.style.background = 'rgba(255, 255, 255, 0.9)';
+                  }}
+                >
+                  <SettingsIcon /> Ayarlar
+                </button>
               </div>
             </div>
+
             {/* Oyun 2: Gelecekte eklenecek oyunlar için boş kart */}
-            <div style={{background:'var(--sidebar-bg)',borderRadius:22,padding:32,minWidth:320,maxWidth:380,boxShadow:'0 4px 24px #e0e0e0',display:'flex',flexDirection:'column',alignItems:'flex-start',gap:18,opacity:0.5,filter:'grayscale(0.3)'}}>
-              <div style={{display:'flex',alignItems:'center',gap:14}}>
-                <GameIcon />
-                <span style={{fontWeight:800,fontSize:'1.3rem',color:'var(--dark-text)'}}>Oyun 2 (Yakında)</span>
+            <div style={{
+              background: 'rgba(255, 255, 255, 0.6)',
+              backdropFilter: 'blur(10px)',
+              borderRadius: '1rem',
+              padding: '1.5rem',
+              boxShadow: '0 10px 25px rgba(0, 0, 0, 0.05)',
+              border: '1px solid rgba(156, 163, 175, 0.1)',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '1rem',
+              opacity: 0.6,
+              filter: 'grayscale(0.3)'
+            }}>
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '1rem'
+              }}>
+                <div style={{
+                  width: '3rem',
+                  height: '3rem',
+                  background: 'linear-gradient(45deg, #9ca3af, #6b7280)',
+                  borderRadius: '0.75rem',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  opacity: 0.7
+                }}>
+                  <GameIcon />
+                </div>
+                <h3 style={{
+                  fontWeight: 'bold',
+                  fontSize: '1.25rem',
+                  color: '#9ca3af',
+                  margin: 0
+                }}>Oyun 2 (Yakında)</h3>
               </div>
-              <div style={{color:'var(--light-text)',fontSize:16,margin:'8px 0 18px 0'}}>Yeni oyunlar çok yakında burada olacak!</div>
-              <div style={{display:'flex',gap:14}}>
-                <button disabled style={{background:'#eee',color:'#aaa',border:'none',borderRadius:12,padding:'12px 32px',fontWeight:900,fontSize:17,cursor:'not-allowed'}}>Başlat</button>
-                <button disabled style={{background:'#fff',color:'#aaa',border:'1.5px solid #e0b97d',borderRadius:12,padding:'12px 24px',fontWeight:800,fontSize:16,cursor:'not-allowed',display:'flex',alignItems:'center',gap:8}}><SettingsIcon /> Ayarlar</button>
+              <p style={{
+                color: '#9ca3af',
+                fontSize: '1rem',
+                lineHeight: '1.5',
+                margin: 0
+              }}>Yeni oyunlar çok yakında burada olacak!</p>
+              <div style={{
+                display: 'flex',
+                gap: '0.75rem',
+                marginTop: 'auto'
+              }}>
+                <button 
+                  disabled 
+                  style={{
+                    background: '#f3f4f6',
+                    color: '#9ca3af',
+                    border: 'none',
+                    borderRadius: '0.5rem',
+                    padding: '0.75rem 1.5rem',
+                    fontWeight: '600',
+                    fontSize: '0.875rem',
+                    cursor: 'not-allowed',
+                    flex: 1
+                  }}
+                >
+                  Başlat
+                </button>
+                <button 
+                  disabled 
+                  style={{
+                    background: '#f3f4f6',
+                    color: '#9ca3af',
+                    border: '1px solid #e5e7eb',
+                    borderRadius: '0.5rem',
+                    padding: '0.75rem 1rem',
+                    fontWeight: '600',
+                    fontSize: '0.875rem',
+                    cursor: 'not-allowed',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.5rem'
+                  }}
+                >
+                  <SettingsIcon /> Ayarlar
+                </button>
               </div>
             </div>
+
             {/* Oyun 3: Yeni aktif oyun kartı */}
-            <div style={{background:'var(--sidebar-bg)',borderRadius:22,padding:32,minWidth:320,maxWidth:380,boxShadow:'0 4px 24px #e0e0e0',display:'flex',flexDirection:'column',alignItems:'flex-start',gap:18}}>
-              <div style={{display:'flex',alignItems:'center',gap:14}}>
-                <GameIcon />
-                <span style={{fontWeight:800,fontSize:'1.3rem',color:'var(--dark-text)'}}>Oyun 3</span>
+            <div style={{
+              background: 'rgba(255, 255, 255, 0.9)',
+              backdropFilter: 'blur(10px)',
+              borderRadius: '1rem',
+              padding: '1.5rem',
+              boxShadow: '0 10px 25px rgba(0, 0, 0, 0.1)',
+              border: '1px solid rgba(236, 72, 153, 0.1)',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '1rem',
+              transition: 'all 0.3s ease',
+              position: 'relative',
+              overflow: 'hidden'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = 'translateY(-4px)';
+              e.currentTarget.style.boxShadow = '0 20px 40px rgba(0, 0, 0, 0.15)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = 'translateY(0)';
+              e.currentTarget.style.boxShadow = '0 10px 25px rgba(0, 0, 0, 0.1)';
+            }}>
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '1rem'
+              }}>
+                <div style={{
+                  width: '3rem',
+                  height: '3rem',
+                  background: 'linear-gradient(45deg, #ec4899, #db2777)',
+                  borderRadius: '0.75rem',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  boxShadow: '0 4px 12px rgba(236, 72, 153, 0.3)'
+                }}>
+                  <GameIcon />
+                </div>
+                <h3 style={{
+                  fontWeight: 'bold',
+                  fontSize: '1.25rem',
+                  color: '#1f2937',
+                  margin: 0
+                }}>Oyun 3</h3>
               </div>
-              <div style={{color:'var(--light-text)',fontSize:16,margin:'8px 0 18px 0'}}>Yeni bir oyun! Eğlenceli ve öğretici içerikler çok yakında burada.</div>
-              <div style={{display:'flex',gap:14}}>
-                <button onClick={()=>handleStartGame('/portal/games/oyun3')} style={{background:'var(--primary-yellow)',color:'#2c3e50',border:'none',borderRadius:12,padding:'12px 32px',fontWeight:900,fontSize:17,cursor:'pointer',boxShadow:'0 2px 8px #ffd600'}}>Başlat</button>
-                <button onClick={()=>router.push('/portal/games/oyun3/settings')} style={{background:'var(--white)',color:'var(--dark-text)',border:'1.5px solid #e0b97d',borderRadius:12,padding:'12px 24px',fontWeight:800,fontSize:16,cursor:'pointer',display:'flex',alignItems:'center',gap:8}}><SettingsIcon /> Ayarlar</button>
+              <p style={{
+                color: '#6b7280',
+                fontSize: '1rem',
+                lineHeight: '1.5',
+                margin: 0
+              }}>Yeni bir oyun! Eğlenceli ve öğretici içerikler çok yakında burada.</p>
+              <div style={{
+                display: 'flex',
+                gap: '0.75rem',
+                marginTop: 'auto'
+              }}>
+                <button 
+                  onClick={() => handleStartGame('/portal/games/oyun3')} 
+                  style={{
+                    background: 'linear-gradient(to right, #ec4899, #db2777)',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '0.5rem',
+                    padding: '0.75rem 1.5rem',
+                    fontWeight: '600',
+                    fontSize: '0.875rem',
+                    cursor: 'pointer',
+                    transition: 'all 0.3s ease',
+                    boxShadow: '0 4px 12px rgba(236, 72, 153, 0.3)',
+                    flex: 1
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = 'translateY(-2px)';
+                    e.currentTarget.style.boxShadow = '0 8px 20px rgba(236, 72, 153, 0.4)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = 'translateY(0)';
+                    e.currentTarget.style.boxShadow = '0 4px 12px rgba(236, 72, 153, 0.3)';
+                  }}
+                >
+                  Başlat
+                </button>
+                <button 
+                  onClick={() => router.push('/portal/games/oyun3/settings')} 
+                  style={{
+                    background: 'rgba(255, 255, 255, 0.9)',
+                    color: '#1f2937',
+                    border: '1px solid rgba(236, 72, 153, 0.2)',
+                    borderRadius: '0.5rem',
+                    padding: '0.75rem 1rem',
+                    fontWeight: '600',
+                    fontSize: '0.875rem',
+                    cursor: 'pointer',
+                    transition: 'all 0.3s ease',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.5rem'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = 'translateY(-2px)';
+                    e.currentTarget.style.background = 'rgba(255, 255, 255, 1)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = 'translateY(0)';
+                    e.currentTarget.style.background = 'rgba(255, 255, 255, 0.9)';
+                  }}
+                >
+                  <SettingsIcon /> Ayarlar
+                </button>
               </div>
             </div>
           </div>
         </div>
-      </main>
+      </PortalLayout>
 
       {/* Çocuk Seçici Modal */}
       {showChildSelector && (
-        <div style={{position:'fixed',top:0,left:0,width:'100vw',height:'100vh',background:'rgba(0,0,0,0.18)',zIndex:2000,display:'flex',alignItems:'center',justifyContent:'center'}}>
-          <div style={{background:'#fff',borderRadius:22,padding:32,maxWidth:400}}>
-            <h3 style={{fontWeight:900,fontSize:22,marginBottom:16}}>Çocuk Seç</h3>
-            <p style={{marginBottom:24}}>Oynamak için bir çocuk profili seçmelisin.</p>
-            {children.length === 0 && <div>Hiç çocuk profili yok. Önce çocuk ekleyin.</div>}
-            <div style={{display:'flex',flexDirection:'column',gap:12}}>
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100vw',
+          height: '100vh',
+          background: 'rgba(0, 0, 0, 0.5)',
+          backdropFilter: 'blur(4px)',
+          zIndex: 2000,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: '1rem'
+        }}>
+          <div style={{
+            background: 'rgba(255, 255, 255, 0.95)',
+            backdropFilter: 'blur(10px)',
+            borderRadius: '1rem',
+            padding: '2rem',
+            maxWidth: '400px',
+            width: '100%',
+            boxShadow: '0 20px 40px rgba(0, 0, 0, 0.2)',
+            border: '1px solid rgba(59, 130, 246, 0.1)'
+          }}>
+            <h3 style={{
+              fontWeight: 'bold',
+              fontSize: '1.5rem',
+              marginBottom: '1rem',
+              color: '#1f2937'
+            }}>Çocuk Seç</h3>
+            <p style={{
+              marginBottom: '1.5rem',
+              color: '#6b7280',
+              lineHeight: '1.5'
+            }}>Oynamak için bir çocuk profili seçmelisin.</p>
+            
+            {children.length === 0 && (
+              <div style={{
+                color: '#6b7280',
+                textAlign: 'center',
+                padding: '1rem',
+                background: 'rgba(156, 163, 175, 0.1)',
+                borderRadius: '0.5rem',
+                marginBottom: '1rem'
+              }}>
+                Hiç çocuk profili yok. Önce çocuk ekleyin.
+              </div>
+            )}
+            
+            <div style={{
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '0.75rem',
+              marginBottom: '1.5rem'
+            }}>
               {children.map(child => (
                 <button 
                   key={child.id} 
                   style={{
-                    padding:'12px 0',
-                    borderRadius:10,
-                    fontWeight:800,
-                    fontSize:18,
-                    background: selectedChildId === child.id ? '#eaffea' : '#f8f9fa',
-                    border: selectedChildId === child.id ? '2px solid #4CAF50' : '1px solid #ddd',
-                    color:'#2c3e50',
-                    marginBottom:8,
-                    cursor:'pointer'
+                    padding: '1rem',
+                    borderRadius: '0.75rem',
+                    fontWeight: '600',
+                    fontSize: '1rem',
+                    background: selectedChildId === child.id ? 'rgba(16, 185, 129, 0.1)' : 'rgba(59, 130, 246, 0.05)',
+                    border: selectedChildId === child.id ? '2px solid #10b981' : '1px solid rgba(59, 130, 246, 0.1)',
+                    color: '#1f2937',
+                    cursor: 'pointer',
+                    transition: 'all 0.3s ease',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between'
                   }} 
                   onClick={() => handleSelectChild(child.id)}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = 'translateY(-2px)';
+                    e.currentTarget.style.boxShadow = '0 8px 20px rgba(0, 0, 0, 0.1)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = 'translateY(0)';
+                    e.currentTarget.style.boxShadow = 'none';
+                  }}
                 >
-                  {child.name} ({child.birth_year}) {selectedChildId === child.id && '✓'}
+                  <span>{child.name} ({child.birth_year})</span>
+                  {selectedChildId === child.id && (
+                    <span style={{
+                      color: '#10b981',
+                      fontWeight: 'bold'
+                    }}>✓</span>
+                  )}
                 </button>
               ))}
             </div>
+            
             <button 
               onClick={() => setShowChildSelector(false)}
-              style={{width:'100%',background:'#eee',color:'#333',borderRadius:12,padding:12,fontWeight:800,marginTop:16,border:'none',cursor:'pointer'}}
+              style={{
+                width: '100%',
+                background: 'linear-gradient(to right, #6b7280, #4b5563)',
+                color: 'white',
+                borderRadius: '0.75rem',
+                padding: '1rem',
+                fontWeight: '600',
+                border: 'none',
+                cursor: 'pointer',
+                transition: 'all 0.3s ease'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'translateY(-2px)';
+                e.currentTarget.style.boxShadow = '0 8px 20px rgba(107, 114, 128, 0.3)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'translateY(0)';
+                e.currentTarget.style.boxShadow = 'none';
+              }}
             >
               Kapat
             </button>
           </div>
         </div>
       )}
-    </div>
+    </Fragment>
   );
 } 

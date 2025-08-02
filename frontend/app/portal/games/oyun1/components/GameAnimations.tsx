@@ -88,9 +88,11 @@ interface CompletionModalProps {
   onRestart: () => void;
   isGameOver?: boolean;
   gameCompleted?: boolean;
+  score?: number;
+  totalQuestions?: number;
 }
 
-export const CompletionModal: React.FC<CompletionModalProps> = ({ onRestart, isGameOver = false, gameCompleted = false }) => {
+export const CompletionModal: React.FC<CompletionModalProps> = ({ onRestart, isGameOver = false, gameCompleted = false, score = 0, totalQuestions = 0 }) => {
   return (
     <div style={{
       position: 'fixed',
@@ -155,7 +157,7 @@ export const CompletionModal: React.FC<CompletionModalProps> = ({ onRestart, isG
         
         <div style={{
           fontSize: 18,
-          marginBottom: 30,
+          marginBottom: 20,
           opacity: 0.9,
           lineHeight: 1.4
         }}>
@@ -163,6 +165,17 @@ export const CompletionModal: React.FC<CompletionModalProps> = ({ onRestart, isG
             ? 'Canların bitti! Tekrar denemek ister misin?' 
             : 'Tüm soruları başarıyla tamamladın!'
           }
+        </div>
+        
+        {/* Skor göstergesi */}
+        <div style={{
+          fontSize: 20,
+          fontWeight: 700,
+          marginBottom: 30,
+          color: '#fff',
+          textShadow: '2px 2px 4px rgba(0,0,0,0.3)'
+        }}>
+          🏆 Skor: {score} / {totalQuestions}
         </div>
         
         {!isGameOver && (

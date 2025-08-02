@@ -42,3 +42,6 @@ coverage/
 .vite/
 .vite/deps/ 
 ui-ux/ 
+
+DONE.md
+guideline.txt
