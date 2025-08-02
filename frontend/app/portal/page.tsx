@@ -42,14 +42,14 @@ export default function PortalPage() {
         .from('children')
         .select('id, name, gender, theme, avatar, birth_year, is_literate, wants_tts')
         .eq('user_id', user.id)
-        .then(({ data }) => {
+        .then(({ data }: { data: any }) => {
           setChildren(data || []);
           setChildrenLoading(false);
           if ((!data || data.length === 0) && !localStorage.getItem('child_added_once')) {
             setShowAddChild(true);
           } else {
             setShowAddChild(false);
-            if ((!selectedChildId || !(data || []).find(c=>c.id===selectedChildId)) && data && data.length > 0) {
+            if ((!selectedChildId || !(data || []).find((c: any)=>c.id===selectedChildId)) && data && data.length > 0) {
               setSelectedChildId(data[0].id);
               localStorage.setItem('selected_child_id', data[0].id);
             }

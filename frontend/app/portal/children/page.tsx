@@ -25,12 +25,12 @@ export default function ChildrenPage() {
     supabase.from('children')
       .select('id, name, gender, theme, avatar, birth_year, is_literate, wants_tts')
       .eq('user_id', user.id)
-      .then(async ({ data }) => {
+      .then(async ({ data }: { data: any }) => {
         setChildren(data || []);
         setLoading(false);
         
         const localSelectedId = localStorage.getItem('selected_child_id');
-        if (localSelectedId && data?.find(c => c.id === localSelectedId)) {
+        if (localSelectedId && data?.find((c: any) => c.id === localSelectedId)) {
           setSelectedChildId(localSelectedId);
         }
         
@@ -77,15 +77,15 @@ export default function ChildrenPage() {
       
       // Her çocuk için istatistikleri hesapla
       for (const child of children) {
-        const childLogs = allLogs?.filter(log => log.child_id === child.id) || [];
-        const childContent = allContent?.filter(content => content.child_id === child.id) || [];
+        const childLogs = allLogs?.filter((log: any) => log.child_id === child.id) || [];
+        const childContent = allContent?.filter((content: any) => content.child_id === child.id) || [];
         
         stats[child.id] = {
           totalInteractions: childLogs.length,
-          correctAnswers: childLogs.filter(l => l.details?.is_correct).length,
+          correctAnswers: childLogs.filter((l: any) => l.details?.is_correct).length,
           conceptsLearned: childContent.length,
           lastPlayed: childLogs.length > 0 
-            ? new Date(Math.max(...childLogs.map(l => new Date(l.created_at).getTime()))).toLocaleDateString('tr-TR') 
+            ? new Date(Math.max(...childLogs.map((l: any) => new Date(l.created_at).getTime()))).toLocaleDateString('tr-TR') 
             : 'Hiç oynamamış'
         };
       }

@@ -65,7 +65,7 @@ export const AddChildModal: React.FC<AddChildModalProps> = ({ onAdd, onClose, is
     }
 
     // Cache'de yoksa DB'den çek
-    supabase.from('themes').select('name').then(({ data }) => {
+    supabase.from('themes').select('name').then(({ data }: { data: any }) => {
       setThemes(data || []);
       setCached('public_themes_', data || []); // Cache'e kaydet
     });
@@ -84,7 +84,7 @@ export const AddChildModal: React.FC<AddChildModalProps> = ({ onAdd, onClose, is
     }
 
     // Cache'de yoksa DB'den çek
-    supabase.from('avatars').select('name, image_url').then(({ data }) => {
+    supabase.from('avatars').select('name, image_url').then(({ data }: { data: any }) => {
       setAvatars(data || []);
       setCached('public_avatars_', data || []); // Cache'e kaydet
     });
@@ -102,7 +102,7 @@ export const AddChildModal: React.FC<AddChildModalProps> = ({ onAdd, onClose, is
     }
 
     // Cache'de yoksa DB'den çek
-    supabase.from('categories').select('id, name').then(({ data }) => {
+    supabase.from('categories').select('id, name').then(({ data }: { data: any }) => {
       setConcepts(data || []);
       setCached('public_categories_', data || []); // Cache'e kaydet
     });

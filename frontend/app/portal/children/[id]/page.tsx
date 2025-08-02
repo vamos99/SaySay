@@ -48,7 +48,7 @@ export default function ChildProfilePage() {
       .eq('id', id)
       .eq('user_id', user.id)
       .single()
-      .then(({ data }) => {
+      .then(({ data }: { data: any }) => {
         setChild(data);
         setIsLiterate(data?.is_literate ?? false);
         setWantsTTS(data?.wants_tts ?? false);

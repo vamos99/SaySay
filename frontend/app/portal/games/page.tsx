@@ -23,13 +23,13 @@ export default function GamesPage() {
     supabase.from('children')
       .select('id, name, avatar, birth_year, theme')
       .eq('user_id', user.id)
-      .then(({ data }) => {
+      .then(({ data }: { data: any }) => {
         setChildren(data || []);
         
         const localSelectedId = localStorage.getItem('selected_child_id');
-        if (localSelectedId && data?.find(c => c.id === localSelectedId)) {
+        if (localSelectedId && data?.find((c: any) => c.id === localSelectedId)) {
           setSelectedChildId(localSelectedId);
-          setSelectedChild(data.find(c => c.id === localSelectedId));
+          setSelectedChild(data.find((c: any) => c.id === localSelectedId));
         } else if (data && data.length > 0) {
           setSelectedChildId(data[0].id);
           setSelectedChild(data[0]);
