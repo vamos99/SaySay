@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
 import { useAuth } from './AuthContext';
 import { supabase } from './supabaseClient';
 
@@ -98,12 +98,12 @@ export const UserTypeProvider: React.FC<UserTypeProviderProps> = ({ children }) 
     }
   };
 
-  const refreshUserType = async () => {
+  const refreshUserType = useCallback(async () => {
     setIsLoading(true);
     const type = await determineUserType();
     setUserType(type);
     setIsLoading(false);
-  };
+  }, []);
 
   useEffect(() => {
     if (user) {
@@ -121,7 +121,7 @@ export const UserTypeProvider: React.FC<UserTypeProviderProps> = ({ children }) 
         setSelectedChildId(storedChildId);
       }
     }
-  }, [user, selectedChildId]);
+  }, [user]); // Removed selectedChildId from dependencies to prevent infinite loop
 
   // localStorage'daki user_type değişikliklerini dinle
   useEffect(() => {

@@ -103,12 +103,7 @@ export default function ChildDashboard() {
   const { user } = useAuth();
   const [showPINModal, setShowPINModal] = useState(false);
 
-  // Eğer parent ise portal'a yönlendir
-  React.useEffect(() => {
-    if (!isLoading && userType === 'parent') {
-      router.push('/portal');
-    }
-  }, [userType, isLoading, router]);
+
 
   // Loading durumu
   if (isLoading) {
@@ -128,11 +123,7 @@ export default function ChildDashboard() {
     return null;
   }
 
-  // Çocuk değilse portal'a yönlendir
-  if (userType !== 'child') {
-    router.push('/portal');
-    return null;
-  }
+
 
   const handleGameClick = (gamePath: string) => {
     console.log('Oyun tıklandı:', gamePath);
@@ -301,6 +292,7 @@ export default function ChildDashboard() {
             .game-card:nth-child(1) { animation-delay: 0.1s; }
             .game-card:nth-child(2) { animation-delay: 0.2s; }
             .game-card:nth-child(3) { animation-delay: 0.3s; }
+            .game-card:nth-child(4) { animation-delay: 0.4s; }
             
             .floating-icon {
               animation: float 3s ease-in-out infinite;
@@ -543,6 +535,90 @@ export default function ChildDashboard() {
               <h3 style={{fontWeight:900,fontSize:20,color:'#fff',marginBottom:8}}>İletişim Panosu</h3>
               <p style={{color:'#fff',fontSize:13,opacity:0.9,lineHeight:1.3}}>
                 Kendini ifade et!
+              </p>
+            </div>
+
+            {/* Oyun2 Kartı */}
+            <div 
+              className="game-card"
+              onClick={() => handleGameClick('/games/oyun2')}
+              role="button"
+              tabIndex={0}
+              aria-label="Oyun2'yi başlat"
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  handleGameClick('/games/oyun2');
+                }
+              }}
+              style={{
+                background:'linear-gradient(135deg, #9C27B0 0%, #7B1FA2 100%)',
+                borderRadius:18,
+                padding:28,
+                cursor:'pointer',
+                transition:'all 0.3s ease',
+                transform:'scale(1)',
+                boxShadow:'0 8px 32px rgba(156,39,176,0.3)',
+                border:'3px solid rgba(255,255,255,0.2)',
+                textAlign:'center',
+                width:220,
+                height:180,
+                display:'flex',
+                flexDirection:'column',
+                justifyContent:'center',
+                alignItems:'center',
+                position:'relative',
+                overflow:'hidden'
+              }}
+              onMouseOver={(e) => {
+                e.currentTarget.style.transform = 'scale(1.05) rotate(2deg)';
+                e.currentTarget.style.boxShadow = '0 12px 40px rgba(156,39,176,0.4)';
+              }}
+              onMouseOut={(e) => {
+                e.currentTarget.style.transform = 'scale(1) rotate(0deg)';
+                e.currentTarget.style.boxShadow = '0 8px 32px rgba(156,39,176,0.3)';
+              }}
+            >
+              {/* Custom Oyun2 İkonu */}
+              <div className="floating-icon" style={{
+                width:48,
+                height:48,
+                background:'rgba(255,255,255,0.2)',
+                borderRadius:'50%',
+                display:'flex',
+                alignItems:'center',
+                justifyContent:'center',
+                marginBottom:12,
+                position:'relative'
+              }}>
+                <div style={{
+                  width:24,
+                  height:24,
+                  background:'#fff',
+                  borderRadius:12,
+                  position:'relative',
+                  display:'flex',
+                  alignItems:'center',
+                  justifyContent:'center'
+                }}>
+                  <div style={{
+                    width:8,
+                    height:8,
+                    background:'#9C27B0',
+                    borderRadius:'50%',
+                    marginRight:4
+                  }}></div>
+                  <div style={{
+                    width:8,
+                    height:8,
+                    background:'#9C27B0',
+                    borderRadius:'50%',
+                    marginLeft:4
+                  }}></div>
+                </div>
+              </div>
+              <h3 style={{fontWeight:900,fontSize:20,color:'#fff',marginBottom:8}}>Nesne ve Eylem</h3>
+              <p style={{color:'#fff',fontSize:13,opacity:0.9,lineHeight:1.3}}>
+                Nesne ve eylem seç, cümle oluştur!
               </p>
             </div>
 

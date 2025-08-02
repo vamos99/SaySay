@@ -1,6 +1,46 @@
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey); 
+// Check if environment variables are set
+if (!supabaseUrl || !supabaseAnonKey) {
+  console.error('❌ Supabase environment variables are not set!');
+  console.error('Please create a .env.local file in the frontend directory with:');
+  console.error('NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url');
+  console.error('NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key');
+  console.error('NEXT_PUBLIC_BACKEND_URL=http://localhost:8000');
+}
+
+// Only create client if environment variables are properly set
+let supabase: any = null;
+
+if (supabaseUrl && supabaseAnonKey) {
+  supabase = createClient(supabaseUrl, supabaseAnonKey);
+} else {
+  // Create a mock client that throws helpful errors
+  supabase = {
+    auth: {
+      signInWithPassword: () => {
+        throw new Error('Supabase not configured. Please set up your .env.local file with Supabase credentials.');
+      },
+      signUp: () => {
+        throw new Error('Supabase not configured. Please set up your .env.local file with Supabase credentials.');
+      },
+      signOut: () => {
+        throw new Error('Supabase not configured. Please set up your .env.local file with Supabase credentials.');
+      },
+      getSession: () => {
+        throw new Error('Supabase not configured. Please set up your .env.local file with Supabase credentials.');
+      },
+      onAuthStateChange: () => {
+        throw new Error('Supabase not configured. Please set up your .env.local file with Supabase credentials.');
+      }
+    },
+    from: () => {
+      throw new Error('Supabase not configured. Please set up your .env.local file with Supabase credentials.');
+    }
+  };
+}
+
+export { supabase }; 

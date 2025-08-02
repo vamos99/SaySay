@@ -7,6 +7,10 @@ from google.genai import types
 import io
 import random
 
+# Load environment variables from config.env
+from dotenv import load_dotenv
+load_dotenv('config.env')
+
 def wave_file(filename, pcm, channels=1, rate=24000, sample_width=2):
     """PCM verisini WAV dosyası olarak kaydeder (tts_local_test.py'den kopya)"""
     if isinstance(filename, str):
@@ -80,7 +84,13 @@ def generate_tts_audio(text: str, voice_name: str = 'Sulafat', file_name: str = 
         raise Exception(f"TTS audio üretilemedi: {e}")
 
 def _get_api_key():
-    """API key'i Secret Manager'dan alır (pool sistemi)"""
+    """API key'i environment variable'dan alır, yoksa Secret Manager'dan"""
+    # First try environment variable
+    api_key = os.environ.get("GOOGLE_AI_API_KEY")
+    if api_key:
+        return api_key
+    
+    # Fallback to Secret Manager
     try:
         import google.cloud.secretmanager as secretmanager
         client = secretmanager.SecretManagerServiceClient()

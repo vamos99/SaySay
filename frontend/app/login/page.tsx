@@ -14,7 +14,8 @@ export default function LoginPage() {
     if (error) {
       alert('Giriş başarısız: ' + error.message);
     } else {
-      window.location.href = '/portal';
+      // Giriş başarılı olduğunda child-dashboard'a yönlendir
+      window.location.href = '/child-dashboard';
     }
   };
 

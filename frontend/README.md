@@ -42,11 +42,28 @@ frontend/
 - Production-ready, gereksiz dosya ve kod yok
 
 ## Kurulum & Çalıştırma
+
+### Frontend
 ```bash
 cd frontend
 npm install
 npm run dev
 # .env.local dosyanı oluşturmayı unutma!
+```
+
+### Backend (Oyun2 için gerekli)
+```bash
+cd backend/generator
+pip install -r requirements.txt
+python -m uvicorn api:app --reload --host 0.0.0.0 --port 8000
+```
+
+### Ortam Değişkenleri
+Backend için `backend/generator/config.env` dosyasını oluşturun:
+```env
+GOOGLE_AI_API_KEY=your_google_ai_api_key
+SUPABASE_URL=your_supabase_url
+SUPABASE_KEY=your_supabase_anon_key
 ```
 
 ## Build & Deploy
