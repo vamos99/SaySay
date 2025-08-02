@@ -1,47 +1,26 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-import { PortalSidebar } from "@/components/PortalSidebar";
+import React, { useEffect, useState, Fragment } from "react";
+import { PortalLayout } from "@/components/layout/PortalLayout";
 import { useRouter } from "next/navigation";
 import { supabase } from "../../../utils/supabaseClient";
-import LoadingScreen from "@/components/LoadingScreen";
-
-import { useSecureCache } from "../../../utils/cacheManager";
-import { GameButton } from './components/GameButton';
-import { FeedbackAnimation } from './components/GameAnimations';
-import { CompletionModal } from './components/GameAnimations';
-import { GameStyles } from './components/GameStyles';
-import { useGameLogic } from './hooks/useGameLogic';
+import { Oyun1Game } from "../../../shared/components/games/Oyun1Game";
+import LoadingScreen from "../../../components/layout/LoadingScreen";
 
 export default function Oyun1Page() {
   const router = useRouter();
-  const { getCached, setCached, clearCache } = useSecureCache();
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [child, setChild] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
   const [childList, setChildList] = useState<any[]>([]);
   const [selectedChildId, setSelectedChildId] = useState<string | null>(null);
   const [showChildModal, setShowChildModal] = useState(false);
+  const [loading, setLoading] = useState(true);
 
-  const {
-    aiContent,
-    currentConceptIndex,
-    feedback,
-    optionOrder,
-    loading,
-    isPreloading,
-    isGameCompleted,
-    lives,
-    gameCompleted,
-    gameOver,
-    handleAnswer,
-    randomizeOptions
-  } = useGameLogic(selectedChildId);
-
-  // Çocuk listesini yükle
   useEffect(() => {
     async function fetchChildren() {
       try {
+        setLoading(true);
         const { data } = await supabase.auth.getSession();
         const user = data.session?.user;
         if (!user) {
@@ -62,14 +41,22 @@ export default function Oyun1Page() {
 
         setChildList(children || []);
         
-        // Eğer çocuk varsa ilkini seç
         if (children && children.length > 0) {
-          setSelectedChildId(children[0].id);
-          setChild(children[0]);
+          // Oyun ayarlarından seçilen çocuğu kontrol et
+          const localSelectedId = localStorage.getItem('selected_child_id');
+                         if (localSelectedId && children.find(c => c.id === localSelectedId)) {
+                 setSelectedChildId(localSelectedId);
+                 setChild(children.find(c => c.id === localSelectedId));
+               } else {
+                 setSelectedChildId(children[0].id);
+                 setChild(children[0]);
+               }
         }
       } catch (error) {
         console.error('Children fetch error:', error);
         setError('Çocuk bilgileri yüklenemedi');
+      } finally {
+        setLoading(false);
       }
     }
 
@@ -83,23 +70,8 @@ export default function Oyun1Page() {
     setShowChildModal(false);
   };
 
-  if (loading || isPreloading) {
-    return (
-      <div style={{
-        display: 'flex',
-        minHeight: '100vh',
-        background: 'var(--light-blue-bg)',
-        alignItems: 'center',
-        justifyContent: 'center'
-      }}>
-        <div style={{ textAlign: 'center', color: '#2c3e50' }}>
-          <div style={{ fontSize: 24, fontWeight: 700, marginBottom: 16 }}>
-            {isPreloading ? 'Görseller Hazırlanıyor...' : 'Oyun Yükleniyor...'}
-          </div>
-          <div style={{ fontSize: 16, color: '#7b8fa1' }}>Lütfen bekleyin</div>
-        </div>
-      </div>
-    );
+  if (loading) {
+    return <LoadingScreen text="Yükleniyor..." />;
   }
 
   if (error) {
@@ -107,13 +79,29 @@ export default function Oyun1Page() {
       <div style={{
         display: 'flex',
         minHeight: '100vh',
-        background: 'var(--light-blue-bg)',
+        background: 'linear-gradient(135deg, #eff6ff 0%, #ffffff 50%, #faf5ff 100%)',
         alignItems: 'center',
-        justifyContent: 'center'
+        justifyContent: 'center',
+        fontFamily: '"Comic Sans MS", "Chalkboard SE", "Arial Rounded MT Bold", cursive'
       }}>
-        <div style={{ textAlign: 'center', color: '#e74c3c' }}>
-          <div style={{ fontSize: 24, fontWeight: 700, marginBottom: 16 }}>Hata!</div>
-          <div style={{ fontSize: 16 }}>{error}</div>
+        <div style={{
+          background: 'rgba(255, 255, 255, 0.9)',
+          backdropFilter: 'blur(10px)',
+          borderRadius: '1rem',
+          padding: '2rem',
+          boxShadow: '0 10px 25px rgba(0, 0, 0, 0.1)',
+          border: '1px solid rgba(239, 68, 68, 0.1)',
+          textAlign: 'center',
+          color: '#dc2626'
+        }}>
+          <div style={{
+            fontSize: '1.5rem',
+            fontWeight: '600',
+            marginBottom: '1rem'
+          }}>❌ Hata!</div>
+          <div style={{
+            fontSize: '1rem'
+          }}>{error}</div>
         </div>
       </div>
     );
@@ -124,23 +112,50 @@ export default function Oyun1Page() {
       <div style={{
         display: 'flex',
         minHeight: '100vh',
-        background: 'var(--light-blue-bg)',
+        background: 'linear-gradient(135deg, #eff6ff 0%, #ffffff 50%, #faf5ff 100%)',
         alignItems: 'center',
-        justifyContent: 'center'
+        justifyContent: 'center',
+        fontFamily: '"Comic Sans MS", "Chalkboard SE", "Arial Rounded MT Bold", cursive'
       }}>
-        <div style={{ textAlign: 'center', color: '#2c3e50' }}>
-          <div style={{ fontSize: 24, fontWeight: 700, marginBottom: 16 }}>Çocuk Seçin</div>
+        <div style={{
+          background: 'rgba(255, 255, 255, 0.9)',
+          backdropFilter: 'blur(10px)',
+          borderRadius: '1rem',
+          padding: '2rem',
+          boxShadow: '0 10px 25px rgba(0, 0, 0, 0.1)',
+          border: '1px solid rgba(59, 130, 246, 0.1)',
+          textAlign: 'center',
+          color: '#2c3e50'
+        }}>
+          <div style={{
+            fontSize: '1.5rem',
+            fontWeight: '600',
+            marginBottom: '1rem'
+          }}>👶 Çocuk Seçin</div>
+          <div style={{
+            fontSize: '1rem',
+            marginBottom: '1.5rem'
+          }}>Oyun oynamak için bir çocuk seçmelisiniz.</div>
           <button
             onClick={() => setShowChildModal(true)}
             style={{
-              background: '#e0b97d',
-              color: '#2c3e50',
+              background: 'linear-gradient(to right, #3b82f6, #2563eb)',
+              color: 'white',
               border: 'none',
-              padding: '12px 24px',
-              borderRadius: '12px',
-              fontSize: 16,
-              fontWeight: 700,
-              cursor: 'pointer'
+              borderRadius: '0.5rem',
+              padding: '0.75rem 1.5rem',
+              fontWeight: '600',
+              fontSize: '1rem',
+              cursor: 'pointer',
+              transition: 'all 0.3s ease'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = 'translateY(-2px)';
+              e.currentTarget.style.boxShadow = '0 8px 20px rgba(59, 130, 246, 0.3)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = 'translateY(0)';
+              e.currentTarget.style.boxShadow = 'none';
             }}
           >
             Çocuk Seç
@@ -150,230 +165,139 @@ export default function Oyun1Page() {
     );
   }
 
-  const currentContent = aiContent[currentConceptIndex];
-
-  if (!currentContent) {
-    return (
-      <div style={{
-        display: 'flex',
-        minHeight: '100vh',
-        background: 'var(--light-blue-bg)',
-        alignItems: 'center',
-        justifyContent: 'center'
-      }}>
-        <div style={{ textAlign: 'center', color: '#2c3e50' }}>
-          <div style={{ fontSize: 24, fontWeight: 700, marginBottom: 16 }}>İçerik Bulunamadı</div>
-          <div style={{ fontSize: 16 }}>Bu çocuk için oyun içeriği henüz hazırlanmamış.</div>
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div style={{ display: 'flex', minHeight: '100vh', background: 'var(--light-blue-bg)' }}>
-      <GameStyles />
-      
-      <PortalSidebar open={sidebarOpen} setOpen={setSidebarOpen} />
-      
-      <main style={{
-        flex: 1,
-        padding: '24px',
-        marginLeft: sidebarOpen ? '280px' : '80px',
-        transition: 'margin-left 0.3s ease',
-        overflow: 'auto'
-      }}>
+    <Fragment>
+      <PortalLayout sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen}>
+        <Oyun1Game 
+          key={selectedChildId} // childId değişince component yeniden render edilir
+          childId={selectedChildId!}
+          onBackToMenu={() => router.push('/portal/games')}
+          isChildPortal={false}
+        />
+      </PortalLayout>
+
+      {/* Child Selection Modal */}
+      {showChildModal && (
         <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100vw',
+          height: '100vh',
+          background: 'rgba(0, 0, 0, 0.5)',
+          backdropFilter: 'blur(4px)',
+          zIndex: 2000,
           display: 'flex',
-          justifyContent: 'space-between',
           alignItems: 'center',
-          marginBottom: '32px'
+          justifyContent: 'center',
+          padding: '1rem'
         }}>
           <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '16px'
+            background: 'rgba(255, 255, 255, 0.95)',
+            backdropFilter: 'blur(10px)',
+            borderRadius: '1rem',
+            padding: '2rem',
+            maxWidth: '400px',
+            width: '100%',
+            boxShadow: '0 20px 40px rgba(0, 0, 0, 0.2)',
+            border: '1px solid rgba(59, 130, 246, 0.1)'
           }}>
-            <div>
-              <div style={{ fontSize: 16, color: '#7b8fa1' }}>
-                Kavram: {currentContent.concept} | {currentConceptIndex + 1} / {aiContent.length}
+            <h3 style={{
+              fontWeight: 'bold',
+              fontSize: '1.5rem',
+              marginBottom: '1rem',
+              color: '#1f2937'
+            }}>Çocuk Seç</h3>
+            <p style={{
+              marginBottom: '1.5rem',
+              color: '#6b7280',
+              lineHeight: '1.5'
+            }}>Oynamak için bir çocuk profili seçmelisin.</p>
+            
+            {childList.length === 0 && (
+              <div style={{
+                color: '#6b7280',
+                textAlign: 'center',
+                padding: '1rem',
+                background: 'rgba(156, 163, 175, 0.1)',
+                borderRadius: '0.5rem',
+                marginBottom: '1rem'
+              }}>
+                Hiç çocuk profili yok. Önce çocuk ekleyin.
               </div>
-            </div>
-          </div>
-          
-          {/* Can göstergesi */}
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px'
-          }}>
-            <span style={{ fontSize: 16, color: '#7b8fa1', marginRight: '8px' }}>
-              Canlar:
-            </span>
-            {[...Array(3)].map((_, index) => (
-              <div
-                key={index}
-                style={{
-                  width: '20px',
-                  height: '20px',
-                  borderRadius: '50%',
-                  background: index < lives ? '#e74c3c' : '#ecf0f1',
-                  border: '2px solid #e74c3c',
-                  transition: 'all 0.3s ease',
-                  animation: index >= lives ? 'pulse 1s ease-in-out infinite' : 'none'
-                }}
-              />
-            ))}
-          </div>
-
-          <button
-            onClick={() => setShowChildModal(true)}
-            style={{
-              background: '#e0b97d',
-              color: '#2c3e50',
-              border: 'none',
-              padding: '12px 24px',
-              borderRadius: '12px',
-              fontSize: 16,
-              fontWeight: 700,
-              cursor: 'pointer',
-              transition: 'all 0.3s ease'
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.background = '#d4af37';
-              e.currentTarget.style.transform = 'scale(1.05)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.background = '#e0b97d';
-              e.currentTarget.style.transform = 'scale(1)';
-            }}
-          >
-            Çocuk Değiştir
-          </button>
-        </div>
-
-        <div style={{ textAlign: 'center' }}>
-          <div className="question-text" style={{
-            fontSize: '24px',
-            fontWeight: 700,
-            color: '#2c3e50',
-            textAlign: 'center',
-            marginBottom: '32px',
-            padding: '20px',
-            background: '#fff',
-            borderRadius: '16px',
-            boxShadow: '0 2px 12px #f0f0f0',
-            border: '2px solid #e0b97d',
-            transition: 'all 0.3s ease',
-            cursor: 'pointer',
-          }} onMouseEnter={(e) => {
-            e.currentTarget.style.transform = 'scale(1.02)';
-            e.currentTarget.style.boxShadow = '0 4px 20px #d0d0d0';
-          }} onMouseLeave={(e) => {
-            e.currentTarget.style.transform = 'scale(1)';
-            e.currentTarget.style.boxShadow = '0 2px 12px #f0f0f0';
-          }}>
-            {currentContent.question}
-          </div>
-
-          <div style={{
-            display: 'flex',
-            justifyContent: 'center',
-            gap: '32px',
-            flexWrap: 'wrap'
-          }}>
-            <GameButton
-              imageUrl={optionOrder[0] === 0 ? currentContent.correct_image_url : currentContent.wrong_image_url}
-              altText={optionOrder[0] === 0 ? "Doğru cevap" : "Yanlış cevap"}
-              isCorrect={optionOrder[0] === 0}
-              onClick={() => handleAnswer(optionOrder[0] === 0)}
-              feedback={feedback}
-              optionOrder={optionOrder}
-              index={0}
-            />
-
-            <GameButton
-              imageUrl={optionOrder[1] === 0 ? currentContent.correct_image_url : currentContent.wrong_image_url}
-              altText={optionOrder[1] === 0 ? "Doğru cevap" : "Yanlış cevap"}
-              isCorrect={optionOrder[1] === 0}
-              onClick={() => handleAnswer(optionOrder[1] === 0)}
-              feedback={feedback}
-              optionOrder={optionOrder}
-              index={1}
-            />
-          </div>
-
-          {feedback && <FeedbackAnimation type={feedback as 'dogru' | 'yanlis'} questionIndex={currentConceptIndex} />}
-        </div>
-
-        {/* Çocuk seçim modalı */}
-        {showChildModal && (
-          <div style={{
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            width: '100vw',
-            height: '100vh',
-            background: 'rgba(0,0,0,0.5)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            zIndex: 1000
-          }} onClick={() => setShowChildModal(false)}>
+            )}
+            
             <div style={{
-              background: '#fff',
-              padding: '32px',
-              borderRadius: '16px',
-              maxWidth: '400px',
-              width: '90%',
-              maxHeight: '80vh',
-              overflow: 'auto'
-            }} onClick={(e) => e.stopPropagation()}>
-              <div style={{
-                fontSize: 24,
-                fontWeight: 700,
-                marginBottom: 24,
-                color: '#2c3e50'
-              }}>
-                Çocuk Seçin
-              </div>
-              <div style={{
-                display: 'flex',
-                flexDirection: 'column',
-                gap: 12
-              }}>
-                {childList.map((childItem) => (
-                  <button
-                    key={childItem.id}
-                    onClick={() => handleSelectChild(childItem.id)}
-                    style={{
-                      background: selectedChildId === childItem.id ? '#e0b97d' : '#f8f9fa',
-                      color: '#2c3e50',
-                      border: '2px solid #e0b97d',
-                      padding: '16px',
-                      borderRadius: '12px',
-                      fontSize: 16,
-                      fontWeight: 600,
-                      cursor: 'pointer',
-                      transition: 'all 0.3s ease'
-                    }}
-                  >
-                    {childItem.name}
-                  </button>
-                ))}
-              </div>
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '0.75rem',
+              marginBottom: '1.5rem'
+            }}>
+              {childList.map(child => (
+                <button 
+                  key={child.id} 
+                  style={{
+                    padding: '1rem',
+                    borderRadius: '0.75rem',
+                    fontWeight: '600',
+                    fontSize: '1rem',
+                    background: selectedChildId === child.id ? 'rgba(16, 185, 129, 0.1)' : 'rgba(59, 130, 246, 0.05)',
+                    border: selectedChildId === child.id ? '2px solid #10b981' : '1px solid rgba(59, 130, 246, 0.1)',
+                    color: '#1f2937',
+                    cursor: 'pointer',
+                    transition: 'all 0.3s ease',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between'
+                  }} 
+                  onClick={() => handleSelectChild(child.id)}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = 'translateY(-2px)';
+                    e.currentTarget.style.boxShadow = '0 8px 20px rgba(0, 0, 0, 0.1)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = 'translateY(0)';
+                    e.currentTarget.style.boxShadow = 'none';
+                  }}
+                >
+                  <span>{child.name} ({child.birth_year})</span>
+                  {selectedChildId === child.id && (
+                    <span style={{
+                      color: '#10b981',
+                      fontWeight: 'bold'
+                    }}>✓</span>
+                  )}
+                </button>
+              ))}
             </div>
+            
+            <button 
+              onClick={() => setShowChildModal(false)}
+              style={{
+                width: '100%',
+                background: 'linear-gradient(to right, #6b7280, #4b5563)',
+                color: 'white',
+                borderRadius: '0.75rem',
+                padding: '1rem',
+                fontWeight: '600',
+                border: 'none',
+                cursor: 'pointer',
+                transition: 'all 0.3s ease'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'translateY(-2px)';
+                e.currentTarget.style.boxShadow = '0 8px 20px rgba(107, 114, 128, 0.3)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'translateY(0)';
+                e.currentTarget.style.boxShadow = 'none';
+              }}
+            >
+              Kapat
+            </button>
           </div>
-        )}
-
-        {/* Oyun tamamlama modalı */}
-        {isGameCompleted && (
-          <CompletionModal 
-            onRestart={() => window.location.reload()} 
-            isGameOver={gameOver}
-            gameCompleted={gameCompleted}
-          />
-        )}
-      </main>
-    </div>
+        </div>
+      )}
+    </Fragment>
   );
 } 

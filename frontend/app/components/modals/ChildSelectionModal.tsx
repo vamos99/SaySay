@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { supabase } from '../utils/supabaseClient';
-import { useAuth } from '../utils/AuthContext';
+import { supabase } from '../../utils/supabaseClient';
+import { useAuth } from '../../utils/AuthContext';
 
 interface Child {
   id: string;

@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useUserType } from '../utils/UserTypeContext';
 import { useAuth } from '../utils/AuthContext';
 import { verifyChildPIN } from '../utils/pinUtils';
-import LoadingScreen from '../components/LoadingScreen';
+import LoadingScreen from '../components/layout/LoadingScreen';
 
 // PIN Modal bileşeni
 const PINModal: React.FC<{
