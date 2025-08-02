@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useUserType } from '../utils/UserTypeContext';
 import { useAuth } from '../utils/AuthContext';
 import { verifyChildPIN } from '../utils/pinUtils';
+import LoadingScreen from '../components/LoadingScreen';
 
 // PIN Modal bileşeni
 const PINModal: React.FC<{
@@ -103,30 +104,29 @@ export default function ChildDashboard() {
   const { user } = useAuth();
   const [showPINModal, setShowPINModal] = useState(false);
 
-
+  // Yönlendirmeler için useEffect
+  React.useEffect(() => {
+    if (!isLoading) {
+      if (!user) {
+        router.push('/login');
+      } else if (userType === 'parent') {
+        router.push('/portal');
+      }
+    }
+  }, [user, userType, isLoading, router]);
 
   // Loading durumu
   if (isLoading) {
-    return (
-      <div style={{display:'flex',minHeight:'100vh',alignItems:'center',justifyContent:'center',background:'var(--light-blue-bg)'}}>
-        <div style={{textAlign:'center',color:'#2c3e50'}}>
-          <div style={{fontSize:24,fontWeight:700,marginBottom:16}}>Yükleniyor...</div>
-          <div style={{fontSize:16,color:'#7b8fa1'}}>Lütfen bekleyin</div>
-        </div>
-      </div>
-    );
+    return <LoadingScreen text="Yükleniyor..." />;
   }
 
-  // Kullanıcı giriş yapmamışsa login'e yönlendir
-  if (!user) {
-    router.push('/login');
-    return null;
+  // Kullanıcı giriş yapmamışsa veya çocuk değilse loading göster
+  if (!user || userType !== 'child') {
+    return <LoadingScreen text="Yönlendiriliyor..." />;
   }
-
-
 
   const handleGameClick = (gamePath: string) => {
-    console.log('Oyun tıklandı:', gamePath);
+
     // Direkt window.location kullan
     window.location.href = gamePath;
   };
