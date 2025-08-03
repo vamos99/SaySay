@@ -409,6 +409,34 @@ Bu sprint'te AI entegrasyonu ve kavram oyunları geliştirmeleri üzerine odakla
 - **Hafta 2:** Kavram oyunları geliştirme ve UI iyileştirmeleri
 - **Hafta 3:** Test, optimizasyon ve deployment
 
+<div style="display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; margin: 20px 0;">
+
+<div style="border: 2px solid #e0b97d; border-radius: 12px; padding: 15px; background: #fff; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+
+**Toplantı 1:** AI entegrasyonu ve kavram oyunları planlaması
+
+![Daily Scrum Meeting 1](./assets/sprint3/s3toplantı.jpeg)
+
+</div>
+
+<div style="border: 2px solid #e0b97d; border-radius: 12px; padding: 15px; background: #fff; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+
+**Toplantı 2:** Teknik implementasyon detayları ve API entegrasyonu
+
+![Daily Scrum Meeting 2](./assets/sprint3/s3toplantı2.jpeg)
+
+</div>
+
+<div style="border: 2px solid #e0b97d; border-radius: 12px; padding: 15px; background: #fff; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+
+**Toplantı 3:** Sprint progress review ve gelecek hedefler
+
+![Daily Scrum Meeting 3](./assets/sprint3/s3toplantı3.jpeg)
+
+</div>
+
+</div>
+
 </details>
 
 <details>
@@ -427,6 +455,26 @@ Sprint 3 board'u Notion'da yönetilmektedir. Ekip üyeleri, görev takibi ve ile
 - Sprint Velocity: 37 puan hedef
 - Burndown Chart: Günlük ilerleme takibi
 - Team Capacity: Haftalık kapasite planlaması
+
+<div style="display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; margin: 20px 0;">
+
+<div style="border: 2px solid #e0b97d; border-radius: 12px; padding: 15px; background: #fff; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+
+**Sprint Board 1:** Sprint 3 görev planlaması ve sprint board yapısı
+
+![Sprint Board 1](./assets/sprint3/spring%20board.jpeg)
+
+</div>
+
+<div style="border: 2px solid #e0b97d; border-radius: 12px; padding: 15px; background: #fff; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+
+**Sprint Board 2:** Sprint 3 detaylı görev dağılımı ve progress tracking
+
+![Sprint Board 2](./assets/sprint3/spring%20board2.jpeg)
+
+</div>
+
+</div>
 
 </details>
 
