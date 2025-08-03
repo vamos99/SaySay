@@ -481,12 +481,105 @@ Sprint 3 board'u Notion'da yönetilmektedir. Ekip üyeleri, görev takibi ve ile
 <details>
 <summary><h4>Uygulama Ekran Görüntüleri</h4></summary>
 
+<div style="display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; margin: 20px 0;">
 
-**Planlanan Ekran Görüntüleri:**
-- AI destekli kavram oyunları arayüzleri
-- Gelişmiş portal dashboard'u
-- Oyun sonuçları ve istatistik sayfaları
-- Yeni oyun türleri ve kategoriler
+<div style="border: 2px solid #e0b97d; border-radius: 12px; padding: 15px; background: #fff; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+
+**Portal Ana Sayfa:** Gelişmiş portal dashboard'u ve çocuk seçimi
+
+![Portal Ana Sayfa](./assets/sprint3/Screenshot%202025-08-03%20at%2020.31.19.png)
+
+</div>
+
+<div style="border: 2px solid #e0b97d; border-radius: 12px; padding: 15px; background: #fff; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+
+**Çocuk Profili:** Çocuk detay sayfası ve profil yönetimi
+
+![Çocuk Profili](./assets/sprint3/Screenshot%202025-08-03%20at%2020.31.30.png)
+
+</div>
+
+<div style="border: 2px solid #e0b97d; border-radius: 12px; padding: 15px; background: #fff; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+
+**Oyun Seçimi:** Kavram oyunları menüsü ve oyun kategorileri
+
+![Oyun Seçimi](./assets/sprint3/Screenshot%202025-08-03%20at%2020.31.46.png)
+
+</div>
+
+<div style="border: 2px solid #e0b97d; border-radius: 12px; padding: 15px; background: #fff; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+
+**Oyun 1:** İlk kavram oyunu arayüzü ve oyun mekanikleri
+
+![Oyun 1](./assets/sprint3/Screenshot%202025-08-03%20at%2020.31.51.png)
+
+</div>
+
+<div style="border: 2px solid #e0b97d; border-radius: 12px; padding: 15px; background: #fff; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+
+**Oyun 2:** İkinci kavram oyunu ve gelişmiş oyun arayüzü
+
+![Oyun 2](./assets/sprint3/Screenshot%202025-08-03%20at%2020.32.00.png)
+
+</div>
+
+<div style="border: 2px solid #e0b97d; border-radius: 12px; padding: 15px; background: #fff; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+
+**Oyun 3:** Üçüncü kavram oyunu ve AI destekli içerik
+
+![Oyun 3](./assets/sprint3/Screenshot%202025-08-03%20at%2020.32.04.png)
+
+</div>
+
+<div style="border: 2px solid #e0b97d; border-radius: 12px; padding: 15px; background: #fff; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+
+**Oyun Ayarları:** Oyun konfigürasyonu ve zorluk seviyeleri
+
+![Oyun Ayarları](./assets/sprint3/Screenshot%202025-08-03%20at%2020.32.10.png)
+
+</div>
+
+<div style="border: 2px solid #e0b97d; border-radius: 12px; padding: 15px; background: #fff; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+
+**Oyun Sonucu:** Oyun tamamlama ve başarı ekranı
+
+![Oyun Sonucu](./assets/sprint3/Screenshot%202025-08-03%20at%2020.32.22.png)
+
+</div>
+
+<div style="border: 2px solid #e0b97d; border-radius: 12px; padding: 15px; background: #fff; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+
+**İlerleme Takibi:** Çocuk gelişim raporu ve istatistikler
+
+![İlerleme Takibi](./assets/sprint3/Screenshot%202025-08-03%20at%2020.32.31.png)
+
+</div>
+
+<div style="border: 2px solid #e0b97d; border-radius: 12px; padding: 15px; background: #fff; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+
+**Raporlar:** Detaylı gelişim raporları ve grafikler
+
+![Raporlar](./assets/sprint3/Screenshot%202025-08-03%20at%2020.32.57.png)
+
+</div>
+
+<div style="border: 2px solid #e0b97d; border-radius: 12px; padding: 15px; background: #fff; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+
+**Ayarlar:** Portal ayarları ve kullanıcı tercihleri
+
+![Ayarlar](./assets/sprint3/Screenshot%202025-08-03%20at%2020.33.09.png)
+
+</div>
+
+<div style="border: 2px solid #e0b97d; border-radius: 12px; padding: 15px; background: #fff; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+
+**Roadmap:** Çocuk gelişim yol haritası ve kavram takibi
+
+![Roadmap](./assets/sprint3/Screenshot%202025-08-03%20at%2020.33.16.png)
+
+</div>
+
+</div>
 
 </details>
 
