@@ -485,97 +485,97 @@ Sprint 3 board'u Notion'da yönetilmektedir. Ekip üyeleri, görev takibi ve ile
 
 <div style="border: 2px solid #e0b97d; border-radius: 12px; padding: 15px; background: #fff; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
 
-**Portal Ana Sayfa:** Gelişmiş portal dashboard'u ve çocuk seçimi
+**Ana Sayfa:** SaySay platform ana sayfası
 
-![Portal Ana Sayfa](./assets/sprint3/Screenshot%202025-08-03%20at%2020.31.19.png)
-
-</div>
-
-<div style="border: 2px solid #e0b97d; border-radius: 12px; padding: 15px; background: #fff; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
-
-**Çocuk Profili:** Çocuk detay sayfası ve profil yönetimi
-
-![Çocuk Profili](./assets/sprint3/Screenshot%202025-08-03%20at%2020.31.30.png)
+![Ana Sayfa](./assets/sprint3/Screenshot%202025-08-03%20at%2020.31.19.png)
 
 </div>
 
 <div style="border: 2px solid #e0b97d; border-radius: 12px; padding: 15px; background: #fff; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
 
-**Oyun Seçimi:** Kavram oyunları menüsü ve oyun kategorileri
+**Giriş Sayfası:** Kullanıcı giriş ekranı
 
-![Oyun Seçimi](./assets/sprint3/Screenshot%202025-08-03%20at%2020.31.46.png)
-
-</div>
-
-<div style="border: 2px solid #e0b97d; border-radius: 12px; padding: 15px; background: #fff; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
-
-**Oyun 1:** İlk kavram oyunu arayüzü ve oyun mekanikleri
-
-![Oyun 1](./assets/sprint3/Screenshot%202025-08-03%20at%2020.31.51.png)
+![Giriş Sayfası](./assets/sprint3/Screenshot%202025-08-03%20at%2020.31.30.png)
 
 </div>
 
 <div style="border: 2px solid #e0b97d; border-radius: 12px; padding: 15px; background: #fff; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
 
-**Oyun 2:** İkinci kavram oyunu ve gelişmiş oyun arayüzü
+**Çocuk Portalı:** Çocuk kullanıcı arayüzü
 
-![Oyun 2](./assets/sprint3/Screenshot%202025-08-03%20at%2020.32.00.png)
-
-</div>
-
-<div style="border: 2px solid #e0b97d; border-radius: 12px; padding: 15px; background: #fff; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
-
-**Oyun 3:** Üçüncü kavram oyunu ve AI destekli içerik
-
-![Oyun 3](./assets/sprint3/Screenshot%202025-08-03%20at%2020.32.04.png)
+![Çocuk Portalı](./assets/sprint3/Screenshot%202025-08-03%20at%2020.31.46.png)
 
 </div>
 
 <div style="border: 2px solid #e0b97d; border-radius: 12px; padding: 15px; background: #fff; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
 
-**Oyun Ayarları:** Oyun konfigürasyonu ve zorluk seviyeleri
+**Ebeveyn Paneline Geçiş:** PIN ekranı
 
-![Oyun Ayarları](./assets/sprint3/Screenshot%202025-08-03%20at%2020.32.10.png)
-
-</div>
-
-<div style="border: 2px solid #e0b97d; border-radius: 12px; padding: 15px; background: #fff; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
-
-**Oyun Sonucu:** Oyun tamamlama ve başarı ekranı
-
-![Oyun Sonucu](./assets/sprint3/Screenshot%202025-08-03%20at%2020.32.22.png)
+![Ebeveyn Paneline Geçiş](./assets/sprint3/Screenshot%202025-08-03%20at%2020.31.51.png)
 
 </div>
 
 <div style="border: 2px solid #e0b97d; border-radius: 12px; padding: 15px; background: #fff; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
 
-**İlerleme Takibi:** Çocuk gelişim raporu ve istatistikler
+**Ebeveyn Portalı Ana Sayfa:** Ebeveyn dashboard'u
 
-![İlerleme Takibi](./assets/sprint3/Screenshot%202025-08-03%20at%2020.32.31.png)
-
-</div>
-
-<div style="border: 2px solid #e0b97d; border-radius: 12px; padding: 15px; background: #fff; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
-
-**Raporlar:** Detaylı gelişim raporları ve grafikler
-
-![Raporlar](./assets/sprint3/Screenshot%202025-08-03%20at%2020.32.57.png)
+![Ebeveyn Portalı Ana Sayfa](./assets/sprint3/Screenshot%202025-08-03%20at%2020.32.00.png)
 
 </div>
 
 <div style="border: 2px solid #e0b97d; border-radius: 12px; padding: 15px; background: #fff; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
 
-**Ayarlar:** Portal ayarları ve kullanıcı tercihleri
+**Çocuklarım:** Çocuk listesi ve yönetimi
 
-![Ayarlar](./assets/sprint3/Screenshot%202025-08-03%20at%2020.33.09.png)
+![Çocuklarım](./assets/sprint3/Screenshot%202025-08-03%20at%2020.32.04.png)
 
 </div>
 
 <div style="border: 2px solid #e0b97d; border-radius: 12px; padding: 15px; background: #fff; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
 
-**Roadmap:** Çocuk gelişim yol haritası ve kavram takibi
+**Çocuk Ekleme:** Yeni çocuk profili oluşturma
 
-![Roadmap](./assets/sprint3/Screenshot%202025-08-03%20at%2020.33.16.png)
+![Çocuk Ekleme](./assets/sprint3/Screenshot%202025-08-03%20at%2020.32.10.png)
+
+</div>
+
+<div style="border: 2px solid #e0b97d; border-radius: 12px; padding: 15px; background: #fff; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+
+**Oyunlar (Ebeveyn):** Ebeveyn panelindeki oyun yönetimi
+
+![Oyunlar (Ebeveyn)](./assets/sprint3/Screenshot%202025-08-03%20at%2020.32.22.png)
+
+</div>
+
+<div style="border: 2px solid #e0b97d; border-radius: 12px; padding: 15px; background: #fff; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+
+**Raporlar:** Çocuk gelişim raporları
+
+![Raporlar](./assets/sprint3/Screenshot%202025-08-03%20at%2020.32.31.png)
+
+</div>
+
+<div style="border: 2px solid #e0b97d; border-radius: 12px; padding: 15px; background: #fff; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+
+**Kavram Oyunu (Ebeveyn):** Ebeveyn panelinden oyun yönetimi
+
+![Kavram Oyunu (Ebeveyn)](./assets/sprint3/Screenshot%202025-08-03%20at%2020.32.57.png)
+
+</div>
+
+<div style="border: 2px solid #e0b97d; border-radius: 12px; padding: 15px; background: #fff; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+
+**Oyun 2 - Nesne Eylem:** İkinci kavram oyunu
+
+![Oyun 2 - Nesne Eylem](./assets/sprint3/Screenshot%202025-08-03%20at%2020.33.09.png)
+
+</div>
+
+<div style="border: 2px solid #e0b97d; border-radius: 12px; padding: 15px; background: #fff; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+
+**Oyun 3 - İletişim Panosu:** Üçüncü kavram oyunu
+
+![Oyun 3 - İletişim Panosu](./assets/sprint3/Screenshot%202025-08-03%20at%2020.33.16.png)
 
 </div>
 
