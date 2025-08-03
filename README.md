@@ -374,13 +374,13 @@ Bu sprint'in ana hedefi, AI entegrasyonu ve kavram oyunlarının geliştirilmesi
 ---
 
 ### Sprint İçinde Tamamlanması Tahmin Edilen Puan
-**Hedeflenen Puan:** 37 Puan  
-**Tamamlanan Puan:** 0 Puan
+**Hedeflenen Puan:** 164 Puan  
+**Tamamlanan Puan:** 150 Puan
 
 ---
 
 ### Puan Tamamlama Mantığı
-Sprint 3 için toplam 37 puan hedeflenmiştir. Bu sprint'te AI entegrasyonu, kavram oyunları geliştirmeleri ve backend iyileştirmeleri odak noktası olacaktır. Puanlama, görevlerin karmaşıklığı, gerektirdiği efor ve barındırdığı belirsizliklere göre Fibonacci serisi (1, 2, 3, 5, 8, ...) kullanılarak belirlenmektedir.
+Sprint 3 için toplam 164 puan hedeflenmiştir. Bu sprint'te AI entegrasyonu, kavram oyunları geliştirmeleri ve backend iyileştirmeleri odak noktası olacaktır. Puanlama, görevlerin karmaşıklığı, gerektirdiği efor ve barındırdığı belirsizliklere göre Fibonacci serisi (1, 2, 3, 5, 8, ...) kullanılarak belirlenmektedir.
 
 **Öncelikli Görevler:**
 - AI API entegrasyonu (8 puan)
@@ -400,7 +400,7 @@ Daily Scrum toplantılarında ekip, önceki gün yapılanlar, o günün planı v
 Bu sprint'te AI entegrasyonu ve kavram oyunları geliştirmeleri üzerine odaklanılacaktır. Ekip üyeleri, Gemini API entegrasyonu ve oyun algoritmaları konularında işbirliği yapacaktır.
 
 **Ekip Dağılımı:**
-- **AI Entegrasyonu:** Muhammed Yuşa Güler, Eray İnan
+- **AI Entegrasyonu:** Muhammed Yuşa Güler, Halil Kıyak
 - **Kavram Oyunları:** Sevde Altunköse, Muhammet Yusuf Aydın
 - **Backend & DevOps:** Halil Kıyak
 
@@ -433,7 +433,6 @@ Sprint 3 board'u Notion'da yönetilmektedir. Ekip üyeleri, görev takibi ve ile
 <details>
 <summary><h4>Uygulama Ekran Görüntüleri</h4></summary>
 
-Sprint 3 henüz başlamıştır. Ekran görüntüleri sprint ilerledikçe eklenecektir.
 
 **Planlanan Ekran Görüntüleri:**
 - AI destekli kavram oyunları arayüzleri
