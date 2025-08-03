@@ -50,6 +50,15 @@ export const Game2Styles: React.FC = () => {
         }
       }
 
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+
       .game2-container {
         animation: fadeIn 0.5s ease-out;
       }

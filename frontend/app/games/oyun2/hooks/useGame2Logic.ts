@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 
 interface Game2Object {
-  id: number;
+  id: string;
   name: string;
   image_url: string;
 }
@@ -17,6 +17,9 @@ interface Game2Data {
   actions: Game2Action[];
 }
 
+// Cloud Run API URL
+const API_BASE_URL = 'https://vertex-ai-backend-1003061737705.us-central1.run.app';
+
 export const useGame2Logic = (childId: string | null) => {
   const [gameData, setGameData] = useState<Game2Data | null>(null);
   const [selectedObject, setSelectedObject] = useState<Game2Object | null>(null);
@@ -26,8 +29,11 @@ export const useGame2Logic = (childId: string | null) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [sentenceLoading, setSentenceLoading] = useState(false);
+  const [ttsLoading, setTtsLoading] = useState(false);
+  const [isCompleted, setIsCompleted] = useState(false); // Yeni state: cümle tamamlandı mı?
 
-  // Oyun verilerini yükle
+  // Game2 verilerini yükle
   const loadGameData = useCallback(async () => {
     if (!childId) return;
 
@@ -35,7 +41,7 @@ export const useGame2Logic = (childId: string | null) => {
     setError(null);
 
     try {
-      const response = await fetch('/api/game2/data', {
+      const response = await fetch(`${API_BASE_URL}/game2/data`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -49,10 +55,6 @@ export const useGame2Logic = (childId: string | null) => {
         throw new Error(data.error);
       }
 
-      if (data.objects.length === 0 && data.actions.length === 0) {
-        throw new Error('Veritabanında nesne veya eylem bulunamadı. Lütfen Supabase veritabanınızı kontrol edin.');
-      }
-
       setGameData(data);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Veri yüklenirken hata oluştu');
@@ -61,13 +63,15 @@ export const useGame2Logic = (childId: string | null) => {
     }
   }, [childId]);
 
-  // Cümle oluştur
+  // Game2 cümle oluştur
   const generateSentence = useCallback(async (objectName: string, actionName: string) => {
-    setLoading(true);
+    setSentenceLoading(true);
     setError(null);
+    setGeneratedSentence(''); // Önceki cümleyi temizle
+    setAudioUrl(''); // Önceki sesi temizle
 
     try {
-      const response = await fetch('/api/game2/generate-sentence', {
+      const response = await fetch(`${API_BASE_URL}/game2/generate-sentence`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -84,23 +88,28 @@ export const useGame2Logic = (childId: string | null) => {
         throw new Error(data.error);
       }
 
+      // Cümleyi session storage'a kaydet
+      sessionStorage.setItem('game2_sentence', data.sentence);
+      sessionStorage.setItem('game2_object', objectName);
+      sessionStorage.setItem('game2_action', actionName);
+      
       setGeneratedSentence(data.sentence);
       return data.sentence;
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Cümle oluşturulurken hata oluştu');
       return null;
     } finally {
-      setLoading(false);
+      setSentenceLoading(false);
     }
   }, []);
 
-  // TTS audio oluştur
+  // Game2 TTS audio oluştur
   const generateTTS = useCallback(async (sentence: string) => {
-    setLoading(true);
+    setTtsLoading(true);
     setError(null);
 
     try {
-      const response = await fetch('/api/game2/generate-tts', {
+      const response = await fetch(`${API_BASE_URL}/game2/generate-tts`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -114,13 +123,16 @@ export const useGame2Logic = (childId: string | null) => {
         throw new Error(data.error);
       }
 
+      // Ses URL'ini session storage'a kaydet
+      sessionStorage.setItem('game2_audio_url', data.audio_url);
+      
       setAudioUrl(data.audio_url);
       return data.audio_url;
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Ses oluşturulurken hata oluştu');
       return null;
     } finally {
-      setLoading(false);
+      setTtsLoading(false);
     }
   }, []);
 
@@ -144,14 +156,12 @@ export const useGame2Logic = (childId: string | null) => {
     try {
       const audio = new Audio(audioUrl);
       
-      // Audio yükleme hatalarını yakala
       audio.onerror = (e) => {
         console.error('Audio error:', e);
         setError('Ses dosyası yüklenirken hata oluştu');
         setIsPlaying(false);
       };
       
-      // Audio yüklendiğinde çal
       audio.oncanplaythrough = async () => {
         try {
           await audio.play();
@@ -166,7 +176,6 @@ export const useGame2Logic = (childId: string | null) => {
         setIsPlaying(false);
       };
       
-      // Audio'yu yükle
       audio.load();
       
     } catch (err) {
@@ -176,18 +185,58 @@ export const useGame2Logic = (childId: string | null) => {
     }
   }, [audioUrl]);
 
+  // TTS tamamlandığında seçimleri temizle
+  useEffect(() => {
+    if (audioUrl && !ttsLoading && !sentenceLoading) {
+      setIsCompleted(true);
+      // 3 saniye sonra sadece seçimleri temizle
+      const timer = setTimeout(() => {
+        setSelectedObject(null);
+        setSelectedAction(null);
+        setIsCompleted(false);
+        // Session storage'dan sadece seçimleri temizle
+        sessionStorage.removeItem('game2_object');
+        sessionStorage.removeItem('game2_action');
+      }, 3000);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [audioUrl, ttsLoading, sentenceLoading]);
+
   // Seçimleri temizle
   const clearSelections = useCallback(() => {
     setSelectedObject(null);
     setSelectedAction(null);
     setGeneratedSentence('');
     setAudioUrl('');
+    setIsCompleted(false);
+    // Session storage'ı temizle
+    sessionStorage.removeItem('game2_sentence');
+    sessionStorage.removeItem('game2_audio_url');
+    sessionStorage.removeItem('game2_object');
+    sessionStorage.removeItem('game2_action');
+  }, []);
+
+  // Session'dan veri yükle
+  const loadFromSession = useCallback(() => {
+    const savedSentence = sessionStorage.getItem('game2_sentence');
+    const savedAudioUrl = sessionStorage.getItem('game2_audio_url');
+    const savedObject = sessionStorage.getItem('game2_object');
+    const savedAction = sessionStorage.getItem('game2_action');
+
+    if (savedSentence) {
+      setGeneratedSentence(savedSentence);
+    }
+    if (savedAudioUrl) {
+      setAudioUrl(savedAudioUrl);
+    }
   }, []);
 
   // İlk yükleme
   useEffect(() => {
     loadGameData();
-  }, [loadGameData]);
+    loadFromSession(); // Session'dan veri yükle
+  }, [loadGameData, loadFromSession]);
 
   // Hem nesne hem eylem seçiliyse cümle oluştur
   useEffect(() => {
@@ -198,10 +247,10 @@ export const useGame2Logic = (childId: string | null) => {
 
   // Cümle oluşturulduğunda TTS oluştur
   useEffect(() => {
-    if (generatedSentence) {
+    if (generatedSentence && !audioUrl) {
       generateTTS(generatedSentence);
     }
-  }, [generatedSentence, generateTTS]);
+  }, [generatedSentence, audioUrl, generateTTS]);
 
   return {
     gameData,
@@ -212,6 +261,9 @@ export const useGame2Logic = (childId: string | null) => {
     loading,
     error,
     isPlaying,
+    sentenceLoading,
+    ttsLoading,
+    isCompleted,
     selectObject,
     selectAction,
     playAudio,

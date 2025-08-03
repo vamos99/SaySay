@@ -1,7 +1,7 @@
 import React from 'react';
 
 interface Game2CardProps {
-  id: number;
+  id: string;
   name: string;
   imageUrl: string;
   isSelected: boolean;
