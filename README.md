@@ -19,6 +19,23 @@ SaySay, çocukların kavram öğrenimini destekleyen interaktif bir platformdur.
 
 ---
 
+## **Portfolio ve Mühendislik Notu**
+
+Bu repo bir bootcamp takım projesi olarak geliştirilmiştir. Portfolio açısından öne çıkan kısımlar:
+
+- Next.js App Router ile ebeveyn portalı, çocuk profili ve oyun akışları
+- Supabase Auth/DB kullanımı ve çocuk bazlı içerik yönetimi
+- Gemini destekli içerik üretimi için server-side API route yaklaşımı
+- Python/FastAPI generator servisi ile AI içerik, TTS ve Supabase işlemleri
+- CI ile frontend typecheck ve backend Python compile kontrolü
+
+Gizli değerler repoya eklenmez. Lokal kurulum için `frontend/.env.example` ve
+`backend/generator/config.env.example` dosyalarını örnek alarak kendi ortam
+değişkenlerinizi oluşturun. GitHub Actions veya Vercel deployment için aynı
+değerler GitHub/Vercel secret veya environment variable olarak tanımlanmalıdır.
+
+---
+
 ## **🏆 Takım Bilgileri**
 
 <div align="center">

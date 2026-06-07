@@ -23,7 +23,8 @@ frontend/
 │   ├── utils/            # AuthContext, Supabase client vb.
 │   └── constants.ts      # Sabitler
 ├── public/               # Statik dosyalar ve görseller
-├── .env.local            # Supabase anahtarları (örnek: .env.local.example)
+├── .env.example          # Lokal env şablonu
+├── .env.local            # Lokal gizli değerler (commit edilmez)
 ├── package.json
 ├── tsconfig.json
 ├── next.config.mjs
@@ -37,9 +38,8 @@ frontend/
 - Tüm ikonlar ve loading ekranı custom SVG, emoji yok
 - Portal/Sidebar yapısı, açılır/kapanır, animasyonlu
 - Çocuk ekleme, modal ve localStorage ile ilk giriş kontrolü
-- Tüm kodlar clean code ve guideline.txt'ye tam uyumlu
 - .env.local ile güvenli anahtar yönetimi
-- Production-ready, gereksiz dosya ve kod yok
+- Server-only Gemini key kullanımı için `/api/oyun3/generate` route'u
 
 ## Kurulum & Çalıştırma
 
@@ -47,9 +47,11 @@ frontend/
 ```bash
 cd frontend
 npm install
+npm run typecheck
 npm run dev
-# .env.local dosyanı oluşturmayı unutma!
 ```
+
+`.env.local` dosyasını `frontend/.env.example` üzerinden oluşturun.
 
 ### Backend (Oyun2 için gerekli)
 ```bash
@@ -59,11 +61,22 @@ python -m uvicorn api:app --reload --host 0.0.0.0 --port 8000
 ```
 
 ### Ortam Değişkenleri
-Backend için `backend/generator/config.env` dosyasını oluşturun:
+Frontend için `frontend/.env.local` dosyasını oluşturun:
+```env
+NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+BACKEND_URL=http://localhost:8000
+NEXT_PUBLIC_BACKEND_URL=http://localhost:8000
+GEMINI_API_KEY=your_gemini_api_key
+```
+
+Backend için `backend/generator/config.env` dosyasını `config.env.example`
+üzerinden oluşturun:
 ```env
 GOOGLE_AI_API_KEY=your_google_ai_api_key
 SUPABASE_URL=your_supabase_url
 SUPABASE_KEY=your_supabase_anon_key
+GCP_PROJECT_ID=your_gcp_project_id
 ```
 
 ## Build & Deploy
@@ -76,7 +89,7 @@ npm run build
 - Tüm gereksiz dosya ve eski Vite/React yapısı kaldırıldı.
 - Klasörler ve componentler modern Next.js mimarisine göre ayrıldı.
 - .env.local, .next, node_modules, guideline.txt vb. .gitignore'a eklendi.
-- Kodlar guideline ve kullanıcı taleplerine %100 uyumlu, test edildi ve onaylandı.
+- Servis anahtarları lokal env veya deployment secret olarak yönetilmelidir.
 
 ---
 Her türlü katkı, öneri ve geri bildirim için PR veya issue açabilirsin. 
