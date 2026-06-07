@@ -10,157 +10,74 @@ export interface Oyun3Question {
 }
 
 export class GeminiService {
-  private apiKey = process.env.NEXT_PUBLIC_GEMINI_API_KEY;
-  private baseUrl = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent';
-
   async generateOyun3Content(childTheme: string, difficulty: 'short' | 'medium' | 'long'): Promise<Oyun3Question[]> {
     try {
-      if (!this.apiKey) {
-        console.warn('API key bulunamadı, fallback kullanılıyor');
-        return this.getFallbackQuestion();
-      }
-
-      const prompt = this.buildPrompt(childTheme, difficulty);
-      console.log('Gemini prompt:', prompt);
-      
-      const requestBody = {
-        contents: [{
-          parts: [{ text: prompt }]
-        }]
-      };
-      
-      const response = await fetch(this.baseUrl, {
+      const response = await fetch('/api/oyun3/generate', {
         method: 'POST',
         headers: {
-          'x-goog-api-key': this.apiKey,
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify(requestBody)
+        body: JSON.stringify({ theme: childTheme, difficulty })
       });
-
-      console.log('Response status:', response.status);
       
       if (!response.ok) {
         const errorText = await response.text();
-        console.error('Response error text:', errorText);
-        throw new Error(`Gemini API error: ${response.status} - ${errorText}`);
+        throw new Error(`Oyun3 içerik API hatası: ${response.status} - ${errorText}`);
       }
 
       const data = await response.json();
-      console.log('Response data:', data);
-      return this.parseGeminiResponse(data);
+      return this.validateQuestions(data.questions, childTheme, difficulty);
     } catch (error) {
-      console.error('Gemini API hatası:', error);
-      console.log('Fallback soru kullanılıyor...');
+      console.error('Oyun3 içerik üretim hatası:', error);
       return this.getFallbackQuestion();
     }
   }
 
-  private buildPrompt(theme: string, difficulty: string): string {
-    const difficultySettings = {
-      short: { minWords: 5, maxWords: 10, minBlanks: 2, maxBlanks: 3 },
-      medium: { minWords: 12, maxWords: 16, minBlanks: 3, maxBlanks: 4 },
-      long: { minWords: 18, maxWords: 22, minBlanks: 4, maxBlanks: 5 }
-    };
-
-    const settings = difficultySettings[difficulty as keyof typeof difficultySettings] || difficultySettings.medium;
-
-    return `Sen bir Türkçe öğretmenisin. ${theme} temasıyla ilgili boşluk doldurma soruları oluştur.
-
-KURALLAR:
-1. Sadece JSON formatında cevap ver
-2. Her soru için:
-   - text: Cümle parçaları dizisi (${settings.minWords}-${settings.maxWords} kelime)
-   - blanks: Doğru cevaplar dizisi (${settings.minBlanks}-${settings.maxBlanks} adet)
-   - options: Her boşluk için 4 seçenek (doğru + 3 yanlış)
-3. Cümleler ${theme} temasıyla ilgili olmalı
-4. Boşluklar mantıklı yerlerde olmalı
-5. Seçenekler aynı kelime türünde olmalı
-6. Yanlış seçenekler mantıklı ama yanlış olmalı
-
-ÖRNEK:
-\`\`\`json
-[
-  {
-    "text": ["Ayşe", "okuldan", "sonra", "evde", "ödevini", "yaptı", "ve", "annesi", "ona", "çikolata", "verdi"],
-    "blanks": ["yaptı", "verdi"],
-    "options": [
-      ["yaptı", "yapmadı", "yapıyor", "yapacak"],
-      ["verdi", "vermedi", "veriyor", "verecek"]
-    ]
-  }
-]
-\`\`\`
-
-Lütfen 2 adet soru oluştur.`;
-  }
-
-  private parseGeminiResponse(response: any): Oyun3Question[] {
+  private validateQuestions(
+    questions: unknown,
+    theme: string,
+    difficulty: 'short' | 'medium' | 'long'
+  ): Oyun3Question[] {
     try {
-      console.log('🔍 Raw response:', response);
-      
-      if (!response || !response.candidates || !response.candidates[0]) {
-        console.error('❌ Geçersiz response formatı');
-        return this.getFallbackQuestion();
-      }
-
-      const content = response.candidates[0].content.parts[0].text;
-      console.log('📝 Content:', content);
-
-      // JSON çıkar
-      let jsonMatch = content.match(/```json\s*([\s\S]*?)\s*```/);
-      if (!jsonMatch) {
-        jsonMatch = content.match(/\[[\s\S]*\]/);
-      }
-
-      if (!jsonMatch) {
-        console.error('❌ JSON bulunamadı');
-        return this.getFallbackQuestion();
-      }
-
-      const jsonStr = jsonMatch[1] || jsonMatch[0];
-      console.log('🔧 JSON string:', jsonStr);
-
-      const questions = JSON.parse(jsonStr);
-      console.log('✅ Parsed questions:', questions);
-
       if (!Array.isArray(questions)) {
-        console.error('❌ Questions array değil');
         return this.getFallbackQuestion();
       }
 
-      // Her soru için validasyon
       const validQuestions = questions.filter((q, index) => {
-        if (!q.text || !q.blanks || !q.options) {
+        if (!q || typeof q !== 'object') {
+          console.error(`❌ Soru ${index + 1}: Obje değil`);
+          return false;
+        }
+
+        const question = q as Partial<Oyun3Question>;
+        if (!question.text || !question.blanks || !question.options) {
           console.error(`❌ Soru ${index + 1}: Eksik alanlar`);
           return false;
         }
 
-        if (!Array.isArray(q.text) || !Array.isArray(q.blanks) || !Array.isArray(q.options)) {
+        if (!Array.isArray(question.text) || !Array.isArray(question.blanks) || !Array.isArray(question.options)) {
           console.error(`❌ Soru ${index + 1}: Array değil`);
           return false;
         }
 
-        if (q.blanks.length !== q.options.length) {
+        if (question.blanks.length !== question.options.length) {
           console.error(`❌ Soru ${index + 1}: Boşluk ve seçenek sayısı uyuşmuyor`);
           return false;
         }
 
-        // Uzunluk kontrolü
-        const totalWords = q.text.join(' ').split(' ').length;
+        const totalWords = question.text.join(' ').split(' ').length;
         if (totalWords < 8 || totalWords > 25) {
           console.error(`❌ Soru ${index + 1}: Uzunluk uygun değil (${totalWords} kelime)`);
           return false;
         }
 
-        if (q.blanks.length < 2 || q.blanks.length > 5) {
-          console.error(`❌ Soru ${index + 1}: Boşluk sayısı uygun değil (${q.blanks.length})`);
+        if (question.blanks.length < 2 || question.blanks.length > 5) {
+          console.error(`❌ Soru ${index + 1}: Boşluk sayısı uygun değil (${question.blanks.length})`);
           return false;
         }
 
-        // Her seçenek için kontrol
-        for (let i = 0; i < q.options.length; i++) {
-          if (!Array.isArray(q.options[i]) || q.options[i].length !== 4) {
+        for (let i = 0; i < question.options.length; i++) {
+          if (!Array.isArray(question.options[i]) || question.options[i].length !== 4) {
             console.error(`❌ Soru ${index + 1}: Seçenek ${i + 1} geçersiz`);
             return false;
           }
@@ -174,18 +91,17 @@ Lütfen 2 adet soru oluştur.`;
         return this.getFallbackQuestion();
       }
 
-      console.log(`✅ ${validQuestions.length} geçerli soru bulundu`);
       return validQuestions.map(q => ({
         id: crypto.randomUUID(),
         text: q.text,
         blanks: q.blanks,
         options: q.options,
-        difficulty: 'medium' as 'short' | 'medium' | 'long',
-        theme: 'genel'
+        difficulty,
+        theme
       }));
 
     } catch (error) {
-      console.error('❌ Parse hatası:', error);
+      console.error('❌ Oyun3 doğrulama hatası:', error);
       return this.getFallbackQuestion();
     }
   }

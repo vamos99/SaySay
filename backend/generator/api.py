@@ -576,7 +576,7 @@ def _get_api_key():
     try:
         import google.cloud.secretmanager as secretmanager
         client = secretmanager.SecretManagerServiceClient()
-        project_id = "plated-shelter-466317-a7"
+        project_id = os.environ.get("GCP_PROJECT_ID", "plated-shelter-466317-a7")
         name = f"projects/{project_id}/secrets/gemini-api-keys/versions/latest"
         response = client.access_secret_version(request={"name": name})
         api_keys = response.payload.data.decode("UTF-8")

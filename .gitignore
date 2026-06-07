@@ -9,15 +9,21 @@ guideline.txt
 node_modules/
 .next/
 .env*
+!.env.example
+!frontend/.env.example
 *.log
 dist/
 build/ 
 # Ortam değişkenleri (gizli anahtarlar)
 .env
 .env.*
+!.env.example
+!frontend/.env.example
 .env.local
 .env.development
 .env.production
+backend/generator/config.env
+!backend/generator/config.env.example
 
 # Test ve upload çıktıları
 coverage/

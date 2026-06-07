@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { getBackendBaseUrl } from '@/utils/env';
 
 export async function POST(request: NextRequest) {
   try {
@@ -9,7 +10,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'child_id zorunlu' }, { status: 400 });
     }
 
-    const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://vertex-ai-backend-1003061737705.us-central1.run.app';
+    const API_URL = getBackendBaseUrl();
     
     
 

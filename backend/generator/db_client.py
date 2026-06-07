@@ -12,7 +12,7 @@ def _get_supabase_client():
     try:
         import google.cloud.secretmanager as secretmanager
         client = secretmanager.SecretManagerServiceClient()
-        project_id = "plated-shelter-466317-a7"
+        project_id = os.environ.get("GCP_PROJECT_ID", "plated-shelter-466317-a7")
         
         # Supabase URL'i al
         name = f"projects/{project_id}/secrets/supabase-url/versions/latest"

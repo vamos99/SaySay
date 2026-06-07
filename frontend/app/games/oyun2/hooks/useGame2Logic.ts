@@ -17,9 +17,6 @@ interface Game2Data {
   actions: Game2Action[];
 }
 
-// Cloud Run API URL
-const API_BASE_URL = 'https://vertex-ai-backend-1003061737705.us-central1.run.app';
-
 export const useGame2Logic = (childId: string | null) => {
   const [gameData, setGameData] = useState<Game2Data | null>(null);
   const [selectedObject, setSelectedObject] = useState<Game2Object | null>(null);
@@ -41,7 +38,7 @@ export const useGame2Logic = (childId: string | null) => {
     setError(null);
 
     try {
-      const response = await fetch(`${API_BASE_URL}/game2/data`, {
+      const response = await fetch('/api/game2/data', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -71,7 +68,7 @@ export const useGame2Logic = (childId: string | null) => {
     setAudioUrl(''); // Önceki sesi temizle
 
     try {
-      const response = await fetch(`${API_BASE_URL}/game2/generate-sentence`, {
+      const response = await fetch('/api/game2/generate-sentence', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -109,7 +106,7 @@ export const useGame2Logic = (childId: string | null) => {
     setError(null);
 
     try {
-      const response = await fetch(`${API_BASE_URL}/game2/generate-tts`, {
+      const response = await fetch('/api/game2/generate-tts', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

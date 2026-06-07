@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { getBackendBaseUrl } from '@/utils/env';
 
-const BACKEND_URL = process.env.BACKEND_URL || 'https://say-say.vercel.app/';
+const BACKEND_URL = getBackendBaseUrl();
 
 export async function POST(request: NextRequest) {
   try {
