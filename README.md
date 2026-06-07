@@ -2,7 +2,7 @@
 
 # **SaySay**
 
-**🌐 Canlı Demo:** [https://say-say.vercel.app/](https://say-say.vercel.app/)
+**Public demo:** yeni hosting kararı verilene kadar kapalıdır.
 
 SaySay, çocukların kavram öğrenimini destekleyen interaktif bir platformdur. Ebeveynler çocuklarının gelişimini takip edebilir, çocuklar ise eğlenceli oyunlar ile öğrenir.
 
@@ -29,11 +29,12 @@ Bu repo bir bootcamp takım projesi olarak geliştirilmiştir. Portfolio açıs�
 - Python/FastAPI generator servisi ile AI içerik, TTS ve Supabase işlemleri
 - CI ile frontend typecheck ve backend Python compile kontrolü
 - GitHub Issues/Projects için hafif sprint ve backlog akışı: [`docs/project-management.md`](docs/project-management.md)
+- Vercel kapatma ve yeni hosting hazırlığı: [`docs/deployment-handoff.md`](docs/deployment-handoff.md)
 
 Gizli değerler repoya eklenmez. Lokal kurulum için `frontend/.env.example` ve
 `backend/generator/config.env.example` dosyalarını örnek alarak kendi ortam
-değişkenlerinizi oluşturun. GitHub Actions veya Vercel deployment için aynı
-değerler GitHub/Vercel secret veya environment variable olarak tanımlanmalıdır.
+değişkenlerinizi oluşturun. GitHub Actions veya seçilen deployment platformu
+için aynı değerler secret veya environment variable olarak tanımlanmalıdır.
 
 ---
 
@@ -87,9 +88,9 @@ Tüm oyun ve iletişim ayarlarını yönetebileceğiniz, çocuğunuzun gelişimi
 
 ## **🛠️ Teknoloji Stack**
 
-| Frontend | Backend | Veritabanı | AI | Deployment |
+| Frontend | Backend | Veritabanı | AI | Hosting |
 |----------|---------|------------|----|------------|
-| Next.js, React, TypeScript | FastAPI, Python | Supabase PostgreSQL | Gemini | Vercel |
+| Next.js, React, TypeScript | FastAPI, Python | Supabase PostgreSQL | Gemini | Platform bağımsız, public demo kapalı |
 
 ---
 
@@ -175,7 +176,7 @@ Bazı UI görevlerinin tahminimizden uzun sürdüğünü fark ettik. Bir sonraki
 <details open>
 <summary><h2>🏃‍♂️ Sprint 2</h2></summary>
 
-**🌐 Sprint 2 Canlı Demo:** [https://say-say.vercel.app/](https://say-say.vercel.app/)
+**Sprint 2 demo durumu:** eski public demo kapatılacaktır; ekran görüntüleri repo içinde korunur.
 
 ### Sprint Notları
 Bu sprint'in ana hedefi, Next.js 15'e geçiş yaparak modern folder structure oluşturmak ve temel portal özelliklerini geliştirmekti. Supabase entegrasyonu ile veritabanı bağlantısı kuruldu, çocuk ekleme modalı ve profil yönetimi tamamlandı. Kavram oyunları için temel altyapı hazırlandı ve kullanıcı deneyimi iyileştirmeleri yapıldı.
@@ -349,7 +350,7 @@ Aşağıdaki görsellerde Sprint 2 sürecinde yapılan toplantılardan kesitler 
 <details open>
 <summary><h2>🏃‍♂️ Sprint 3</h2></summary>
 
-**🌐 Sprint 3 Canlı Demo:** [https://say-say.vercel.app/](https://say-say.vercel.app/)
+**Sprint 3 demo durumu:** eski public demo kapatılacaktır; lokal kurulum ve ekran görüntüleri referans alınır.
 
 ### Sprint Notları
 Bu sprint, projenin final sprint'i olarak tüm hedeflenen özellikleri başarıyla tamamlamıştır. AI entegrasyonu ve kavram oyunlarının geliştirilmesi tam olarak hedeflendiği gibi gerçekleştirilmiştir. Gemini API entegrasyonu ile kişiselleştirilmiş öğrenme deneyimi sağlanmış ve kavram oyunları için gelişmiş algoritmalar implement edilmiştir. Backend altyapısının güçlendirilmesi ve performans optimizasyonları da bu sprint'te tamamlanmıştır.

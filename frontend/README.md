@@ -4,7 +4,7 @@
 - **Next.js 15 (App Router)**
 - **TypeScript**
 - **Supabase** (Auth & DB)
-- **Vercel** (deploy için önerilir)
+- **Next.js uyumlu hosting** (public demo şu an kapalı)
 - **Modern CSS (custom, responsive, animasyonlu)**
 
 ## Klasör Yapısı
@@ -82,8 +82,12 @@ GCP_PROJECT_ID=your_gcp_project_id
 ## Build & Deploy
 ```bash
 npm run build
-# Vercel veya dilediğin Next.js hosting ile kolayca deploy edebilirsin
+# Seçilen Next.js hosting platformunda env değişkenleri secret olarak tanımlanmalıdır
 ```
+
+Vercel deployment kaldırılıyorsa `docs/deployment-handoff.md` içindeki kontrol
+listesini izleyin. Yeni hosting seçilene kadar README'de public demo linki
+paylaşılmamalıdır.
 
 ## Notlar
 - Tüm gereksiz dosya ve eski Vite/React yapısı kaldırıldı.
