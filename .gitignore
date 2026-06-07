@@ -8,6 +8,7 @@ guideline.txt
 .DS_Store
 node_modules/
 .next/
+*.tsbuildinfo
 .env*
 !.env.example
 !frontend/.env.example
