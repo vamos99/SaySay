@@ -2,6 +2,10 @@
 
 This document keeps the product work visible in GitHub Issues and GitHub Projects without replacing the original sprint notes.
 
+## Live Board
+
+- GitHub Project: https://github.com/users/vamos99/projects/4
+
 ## Workflow
 
 Use a GitHub Projects board with these fields:
