@@ -95,7 +95,7 @@ export default function ChildProfilePage() {
     ], { onConflict: 'child_id' });
     
     try {
-      await fetch('https://vertex-ai-backend-1003061737705.us-central1.run.app/generate-full-content', {
+      await fetch('/api/generate-content', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ child_id: id })

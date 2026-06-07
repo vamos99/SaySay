@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../../../utils/supabaseClient';
+import { getBackendBaseUrl } from '../../../utils/env';
 
 export const useGameLogic = (childId: string | null) => {
   const [aiContent, setAiContent] = useState<any[]>([]);
@@ -57,7 +58,7 @@ export const useGameLogic = (childId: string | null) => {
 
   const fetchAIContent = async (childId: string) => {
     try {
-      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://vertex-ai-backend-1003061737705.us-central1.run.app';
+      const API_URL = getBackendBaseUrl();
 
       
       const response = await fetch(`${API_URL}/generate-full-content`, {

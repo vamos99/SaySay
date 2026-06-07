@@ -1,7 +1,8 @@
 import { createClient } from '@supabase/supabase-js';
+import { getPublicEnv } from './env';
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+const supabaseUrl = getPublicEnv('NEXT_PUBLIC_SUPABASE_URL');
+const supabaseAnonKey = getPublicEnv('NEXT_PUBLIC_SUPABASE_ANON_KEY');
 
 // Check if environment variables are set
 if (!supabaseUrl || !supabaseAnonKey) {
@@ -27,14 +28,20 @@ if (supabaseUrl && supabaseAnonKey) {
       signUp: () => {
         throw new Error('Supabase not configured. Please set up your .env.local file with Supabase credentials.');
       },
-      signOut: () => {
-        throw new Error('Supabase not configured. Please set up your .env.local file with Supabase credentials.');
+      signOut: async () => {
+        return { error: null };
       },
-      getSession: () => {
-        throw new Error('Supabase not configured. Please set up your .env.local file with Supabase credentials.');
+      getSession: async () => {
+        return { data: { session: null }, error: null };
       },
       onAuthStateChange: () => {
-        throw new Error('Supabase not configured. Please set up your .env.local file with Supabase credentials.');
+        return {
+          data: {
+            subscription: {
+              unsubscribe: () => undefined,
+            },
+          },
+        };
       }
     },
     from: () => {
