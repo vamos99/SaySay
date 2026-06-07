@@ -28,6 +28,7 @@ Bu repo bir bootcamp takım projesi olarak geliştirilmiştir. Portfolio açıs�
 - Gemini destekli içerik üretimi için server-side API route yaklaşımı
 - Python/FastAPI generator servisi ile AI içerik, TTS ve Supabase işlemleri
 - CI ile frontend typecheck ve backend Python compile kontrolü
+- GitHub Issues/Projects için hafif sprint ve backlog akışı: [`docs/project-management.md`](docs/project-management.md)
 
 Gizli değerler repoya eklenmez. Lokal kurulum için `frontend/.env.example` ve
 `backend/generator/config.env.example` dosyalarını örnek alarak kendi ortam

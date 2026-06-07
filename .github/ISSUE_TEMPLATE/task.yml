@@ -1,0 +1,43 @@
+name: Task
+description: Planned project work item
+title: "[Task]: "
+labels: ["type: task"]
+body:
+  - type: textarea
+    id: outcome
+    attributes:
+      label: Outcome
+      description: What should be true when this task is done?
+      placeholder: "Example: Parent report shows weekly game progress with fallback state."
+    validations:
+      required: true
+  - type: textarea
+    id: scope
+    attributes:
+      label: Scope
+      description: What is included and excluded?
+      placeholder: "Included: UI state and API route. Excluded: live Gemini test."
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance Criteria
+      description: List the checks that prove the task is complete.
+      placeholder: "- Typecheck passes\n- Env-free fallback still renders\n- README updated when needed"
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - product
+        - frontend
+        - backend
+        - ai-content
+        - analytics
+        - docs
+        - ci
+    validations:
+      required: true

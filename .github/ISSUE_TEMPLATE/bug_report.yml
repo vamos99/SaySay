@@ -1,0 +1,33 @@
+name: Bug Report
+description: Report a reproducible issue
+title: "[Bug]: "
+labels: ["type: bug"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What is broken or misleading?
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Reproduction Steps
+      description: Exact commands, page, user role, env state, or inputs.
+      placeholder: "1. Run ...\n2. Open ...\n3. Observe ..."
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected Result
+    validations:
+      required: true
+  - type: textarea
+    id: verification
+    attributes:
+      label: Verification Needed
+      placeholder: "Typecheck, route smoke check, browser check, or backend compile."
+    validations:
+      required: true
