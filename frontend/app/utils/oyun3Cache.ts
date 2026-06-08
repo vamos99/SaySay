@@ -1,4 +1,5 @@
 import { GeminiService, Oyun3Question } from './geminiService';
+import { logger } from './logger';
 import { TTSService } from './ttsService';
 import { supabase } from './supabaseClient';
 
@@ -28,7 +29,7 @@ export class Oyun3Cache {
     // Eğer 2'den az soru varsa yeni üret
     if (questions.length < 2) {
       try {
-        console.log(`🔄 Yeni soru üretiliyor... (${questions.length}/2)`);
+        logger.debug(`Yeni soru üretiliyor... (${questions.length}/2)`);
         const newQuestions = await this.geminiService.generateOyun3Content(theme, difficulty as any);
         
         // Database'e kaydet
@@ -38,9 +39,9 @@ export class Oyun3Cache {
         
         questions.push(newQuestions[0]); // Assuming the first generated question is the one to add
         this.cache.set(key, questions);
-        console.log(`✅ Yeni soru üretildi! (${questions.length}/2)`);
+        logger.debug(`Yeni soru üretildi! (${questions.length}/2)`);
       } catch (error) {
-        console.error('Yeni soru üretme hatası:', error);
+        logger.error('Yeni soru üretme hatası:', error);
       }
     }
 
@@ -58,20 +59,20 @@ export class Oyun3Cache {
         .limit(5);
 
       if (error) {
-        console.error('Database yükleme hatası:', error);
+        logger.error('Database yükleme hatası:', error);
         return [];
       }
 
       return data || [];
     } catch (error) {
-      console.error('Database yükleme hatası:', error);
+      logger.error('Database yükleme hatası:', error);
       return [];
     }
   }
 
   private async saveToDatabase(childId: string, question: Oyun3Question, difficulty: string, theme: string) {
     try {
-      console.log('💾 Database\'e kaydediliyor:', {
+      logger.debug('Database\'e kaydediliyor:', {
         childId,
         difficulty,
         theme,
@@ -90,12 +91,12 @@ export class Oyun3Cache {
         });
 
       if (error) {
-        console.error('❌ Database kaydetme hatası:', error);
+        logger.error('Database kaydetme hatası:', error);
       } else {
-        console.log('✅ Database\'e başarıyla kaydedildi');
+        logger.debug('Database\'e başarıyla kaydedildi');
       }
     } catch (error) {
-      console.error('❌ Database kaydetme exception:', error);
+      logger.error('Database kaydetme exception:', error);
     }
   }
 
@@ -142,10 +143,10 @@ export class Oyun3Cache {
         });
 
       if (error) {
-        console.error('Log kaydetme hatası:', error);
+        logger.error('Log kaydetme hatası:', error);
       }
     } catch (error) {
-      console.error('Log kaydetme hatası:', error);
+      logger.error('Log kaydetme hatası:', error);
     }
   }
-} 
+}

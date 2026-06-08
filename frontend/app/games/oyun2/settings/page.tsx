@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/utils/AuthContext';
+import { logger } from '@/utils/logger';
 
 interface Game2Object {
   id: string;  // UUID string olarak değiştirildi
@@ -47,7 +48,7 @@ export default function Game2SettingsPage() {
 
         const data = await response.json();
         
-        console.log('Game2 Settings Data:', data); // Debug log
+        logger.debug('Game2 Settings Data:', data);
         
         if (data.error) {
           setError(data.error);
@@ -137,11 +138,11 @@ export default function Game2SettingsPage() {
     action.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
   
-  // Debug logs
-  console.log('Search term:', searchTerm);
-  console.log('Settings:', settings);
-  console.log('Filtered objects:', filteredObjects);
-  console.log('Filtered actions:', filteredActions);
+  logger.debug('Game2 Settings Filter State:', {
+    searchTerm,
+    objectCount: filteredObjects.length,
+    actionCount: filteredActions.length,
+  });
 
   if (loading) {
     return (

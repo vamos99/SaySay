@@ -31,6 +31,11 @@ npm run typecheck
 python3 -m compileall -q backend/generator
 ```
 
+```bash
+curl http://localhost:8000/health
+curl http://localhost:8000/ready
+```
+
 ## Future Hosting Options
 
 - Static hosting alone is not enough because the frontend uses Next.js API routes.

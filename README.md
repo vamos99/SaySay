@@ -29,6 +29,7 @@ Bu repo bir bootcamp takım projesi olarak geliştirilmiştir. Portfolio açıs�
 - Python/FastAPI generator servisi ile AI içerik, TTS ve Supabase işlemleri
 - CI ile frontend typecheck ve backend Python compile kontrolü
 - Mimari ve servis akışı: [`docs/architecture.md`](docs/architecture.md)
+- Ürün analitiği event sözlüğü: [`docs/analytics-events.md`](docs/analytics-events.md)
 - GitHub Issues/Projects için hafif sprint ve backlog akışı: [Live Project Board](https://github.com/users/vamos99/projects/4) / [`docs/project-management.md`](docs/project-management.md)
 - Vercel kapatma ve yeni hosting hazırlığı: [`docs/deployment-handoff.md`](docs/deployment-handoff.md)
 
