@@ -10,10 +10,10 @@ SaySay, çocukların kavram öğrenimini destekleyen interaktif bir platformdur.
 
 *Çocuğunuzun sesini duyun, gelişimini destekleyin!*
 
-![Platform](https://img.shields.io/badge/Platform-Web-blue.svg)
-![Technology](https://img.shields.io/badge/Technology-React-green.svg)
-![Status](https://img.shields.io/badge/Status-Sprint2_Ongoing-orange.svg)
-![Status](https://img.shields.io/badge/Status-Sprint1_Completed-success.svg)
+![Scope](https://img.shields.io/badge/Scope-Bootcamp_Project-informational.svg)
+![Stack](https://img.shields.io/badge/Stack-Next.js_FastAPI-blue.svg)
+![Checks](https://img.shields.io/badge/Checks-Typecheck_Compile-green.svg)
+![Demo](https://img.shields.io/badge/Public_Demo-Disabled-lightgrey.svg)
 
 </div>
 
@@ -290,13 +290,13 @@ Aşağıdaki görsellerde Sprint 2 sürecinde yapılan toplantılardan kesitler 
 <strong>Review (Neler Başarıldı?):</strong>
 
 **✅ Teknik Başarılar:**
-- Next.js 15'e sorunsuz geçiş yapıldı ve App Router yapısı tam olarak benimsendi
-- Supabase PostgreSQL entegrasyonu başarıyla tamamlandı, authentication sistemi çalışır durumda
+- Next.js 15'e geçiş yapıldı ve App Router yapısı kullanılmaya başlandı
+- Supabase PostgreSQL entegrasyonu kuruldu; canlı doğrulama env yapılandırmasına bağlıdır
 - Component-based mimari ile LoadingScreen, Avatar, PortalSidebar gibi yeniden kullanılabilir bileşenler oluşturuldu
-- Responsive tasarım tüm ekran boyutlarında test edildi ve optimize edildi
+- Responsive tasarım için mobil ve masaüstü temel kontroller yapıldı
 
 **✅ Portal Özellikleri:**
-- Çocuk ekleme modalı ve profil yönetimi tamamen fonksiyonel hale getirildi
+- Çocuk ekleme modalı ve profil yönetimi demo akışı için hazırlandı
 - Portal ana sayfası ve sidebar navigasyonu kullanıcı dostu şekilde tasarlandı
 - Çocuk listesi ve detay sayfaları Supabase ile entegre edildi
 - Kavram oyunları için temel altyapı hazırlandı (oyun1 sayfası oluşturuldu)
@@ -321,10 +321,10 @@ Aşağıdaki görsellerde Sprint 2 sürecinde yapılan toplantılardan kesitler 
 <strong>Retrospective (Neler Öğrendik?):</strong>
 
 **🎯 Pozitif Deneyimler:**
-- Next.js 15'e geçiş süreci beklenenden daha sorunsuz oldu, modern development practices başarıyla benimsendi
-- Supabase entegrasyonu ile backend altyapısı güçlendirildi ve authentication sistemi güvenilir şekilde çalışıyor
+- Next.js 15'e geçiş sürecinde App Router pratikleri denendi
+- Supabase entegrasyonu ile auth ve veri erişimi için temel akışlar kuruldu
 - Component-based yaklaşım ile kod tekrarı azaldı ve geliştirme hızı arttı
-- Takım içi iletişim ve görev dağılımı daha etkili hale geldi, herkes kendi alanında uzmanlaştı
+- Takım içi iletişim ve görev dağılımı daha net hale geldi
 
 **⚠️ Gelişim Alanları:**
 - Bazı görevlerin tahminimizden uzun sürdüğünü fark ettik (özellikle UI/UX iyileştirmeleri)
@@ -356,14 +356,13 @@ Aşağıdaki görsellerde Sprint 2 sürecinde yapılan toplantılardan kesitler 
 **Sprint 3 demo durumu:** eski public demo kapatılacaktır; lokal kurulum ve ekran görüntüleri referans alınır.
 
 ### Sprint Notları
-Bu sprint, projenin final sprint'i olarak tüm hedeflenen özellikleri başarıyla tamamlamıştır. AI entegrasyonu ve kavram oyunlarının geliştirilmesi tam olarak hedeflendiği gibi gerçekleştirilmiştir. Gemini API entegrasyonu ile kişiselleştirilmiş öğrenme deneyimi sağlanmış ve kavram oyunları için gelişmiş algoritmalar implement edilmiştir. Backend altyapısının güçlendirilmesi ve performans optimizasyonları da bu sprint'te tamamlanmıştır.
+Bu sprint'te final demo için ana oyun akışları, Gemini destekli içerik üretimi denemeleri ve FastAPI generator servisi üzerine odaklanıldı. Canlı entegrasyonlar API key ve servis yapılandırmasına bağlıdır; repo şu an public demo yerine lokal kurulum ve dokümantasyon üzerinden değerlendirilir.
 
 **AI Entegrasyonu:**
-- Gemini API entegrasyonu ve kişiselleştirilmiş içerik üretimi
-- AI destekli soru-cevap sistemi ve öğrenme analizi
-- Akıllı içerik önerileri ve adaptif öğrenme algoritmaları
-- Text-to-Speech (TTS) entegrasyonu ile sesli öğrenme desteği
-- AI destekli görsel içerik üretimi ve kavram görselleri
+- Gemini API üzerinden kişiselleştirilmiş içerik üretimi prototipi
+- Soru-cevap ve kavram anlatımı için prompt tabanlı backend akışları
+- Text-to-Speech (TTS) ile sesli öğrenme desteği denemesi
+- Kavram oyunları için görsel içerik üretimi denemeleri
 
 **Kavram Oyunları Geliştirmeleri:**
 - Gelişmiş oyun algoritmaları ve zorluk seviyeleri
@@ -389,8 +388,8 @@ Bu sprint, projenin final sprint'i olarak tüm hedeflenen özellikleri başarıy
 **Performans ve Güvenlik:**
 - Frontend performans optimizasyonları
 - Backend API response time iyileştirmeleri
-- Güvenlik audit ve vulnerability scanning
-- Data encryption ve privacy compliance
+- Secret/env yönetimi ve güvenli deployment checklist'i
+- Veri gizliliği ve erişim kontrolü kontrolleri
 - Error handling ve logging sistemi
 
 ---
@@ -402,7 +401,7 @@ Bu sprint, projenin final sprint'i olarak tüm hedeflenen özellikleri başarıy
 ---
 
 ### Puan Tamamlama Mantığı
-Sprint 3, projenin final sprint'i olarak tüm hedeflenen 164 puanı başarıyla tamamlamıştır. Bu sprint'te AI entegrasyonu, kavram oyunları geliştirmeleri ve backend iyileştirmeleri tam olarak hedeflendiği gibi tamamlanmıştır. Puanlama, görevlerin karmaşıklığı, gerektirdiği efor ve barındırdığı belirsizliklere göre Fibonacci serisi (1, 2, 3, 5, 8, ...) kullanılarak belirlenmektedir.
+Sprint 3 puanları bootcamp teslim kapsamındaki görev takibine göre tutulmuştur. AI entegrasyonu, kavram oyunları ve backend iyileştirmeleri demo/prototip seviyesinde ele alınmıştır. Puanlama, görevlerin karmaşıklığı, gerektirdiği efor ve barındırdığı belirsizliklere göre Fibonacci serisi (1, 2, 3, 5, 8, ...) kullanılarak belirlenmektedir.
 
 **Tamamlanan Ana Görevler:**
 - AI API entegrasyonu (8 puan) ✅
@@ -610,42 +609,37 @@ Sprint 3 board'u Notion'da yönetilmektedir. Ekip üyeleri, görev takibi ve ile
 
 <strong>Review (Neler Başarıldı?):</strong>
 
-**✅ AI Entegrasyonu Başarıları:**
-- Gemini API entegrasyonu başarıyla tamamlandı ve kişiselleştirilmiş içerik üretimi aktif
-- AI destekli soru-cevap sistemi ve öğrenme analizi implementasyonu tamamlandı
-- Text-to-Speech (TTS) entegrasyonu ile sesli öğrenme desteği eklendi
-- AI destekli görsel içerik üretimi ve kavram görselleri sistemi kuruldu
+**✅ AI Entegrasyonu Çıktıları:**
+- Gemini API ile kişiselleştirilmiş içerik üretimi için prototip akış eklendi
+- Soru-cevap ve kavram anlatımı için backend endpointleri hazırlandı
+- Text-to-Speech (TTS) ile sesli öğrenme desteği denendi
+- Kavram oyunları için görsel içerik üretimi akışı hazırlandı
 
 **✅ Kavram Oyunları Geliştirmeleri:**
-- 3 farklı kavram oyunu (Oyun 1, 2, 3) tamamen fonksiyonel hale getirildi
-- Gelişmiş oyun algoritmaları ve zorluk seviyeleri implementasyonu tamamlandı
-- Çoklu kavram desteği ve kategorize edilmiş içerik sistemi kuruldu
-- Oyun istatistikleri ve ilerleme takibi sistemi aktif
+- 3 farklı kavram oyunu (Oyun 1, 2, 3) için demo akışları hazırlandı
+- Zorluk seviyesi ve çoklu kavram desteği için temel oyun mantığı eklendi
+- Oyun istatistikleri ve ilerleme takibi için portal ekranları hazırlandı
 - Çocuk dostu oyun arayüzleri ve animasyonlar eklendi
 
 **✅ Backend İyileştirmeleri:**
-- FastAPI backend geliştirmesi ve API optimizasyonu tamamlandı
-- Veritabanı performans iyileştirmeleri ve caching mekanizmaları eklendi
-- Güvenlik ve authentication güçlendirmeleri yapıldı
-- API rate limiting ve error handling sistemi kuruldu
+- FastAPI generator servisi oyun içerik üretimi için düzenlendi
+- Supabase veri erişimi ve fallback davranışları ayrıştırıldı
+- Error handling ve logging tarafında temel iyileştirmeler yapıldı
 
 **✅ UI/UX Geliştirmeleri:**
-- Portal dashboard'u tamamen yenilendi ve kullanıcı deneyimi iyileştirildi
-- Responsive tasarım tüm ekran boyutlarında optimize edildi
+- Portal dashboard'u ve oyun ekranları demo sunumu için düzenlendi
+- Responsive tasarım mobil ve masaüstü kullanım için iyileştirildi
 - Çocuk dostu renk paleti ve tipografi uygulandı
-- Erişilebilirlik (accessibility) iyileştirmeleri tamamlandı
 - Oyun arayüzlerinin modern tasarım ile yenilenmesi
 
-**✅ Performans ve Güvenlik:**
-- Frontend performans optimizasyonları ve lazy loading implementasyonu
-- Backend API response time iyileştirmeleri ve caching
-- Güvenlik audit ve vulnerability scanning tamamlandı
-- Data encryption ve privacy compliance sağlandı
-- Comprehensive error handling ve logging sistemi kuruldu
+**✅ Konfigürasyon ve Güvenlik Notları:**
+- Gizli değerler env dosyalarına ve deployment secret'larına bırakıldı
+- Public demo kapalı tutuldu; yeni hosting öncesi health/readiness kontrolü önerildi
+- Hata durumları ve eksik env senaryoları için kullanıcıya görünür uyarılar eklendi
 
 **✅ Portal Özellikleri:**
 - Çocuk profil yönetimi ve detay sayfaları geliştirildi
-- Roadmap sistemi ve kavram takibi tamamen fonksiyonel
+- Roadmap sistemi ve kavram takibi için temel ekranlar hazırlandı
 - Raporlar ve istatistik sayfaları detaylandırıldı
 - Ayarlar sayfası ve kullanıcı tercihleri sistemi eklendi
 - Oyun ayarları ve konfigürasyon sistemi kuruldu
@@ -658,11 +652,11 @@ Sprint 3 board'u Notion'da yönetilmektedir. Ekip üyeleri, görev takibi ve ile
 <strong>Retrospective (Neler Öğrendik?):</strong>
 
 **🎯 Pozitif Deneyimler:**
-- AI entegrasyonu süreci beklenenden daha verimli oldu, Gemini API ile hızlı prototipleme başarıyla gerçekleştirildi
-- Kavram oyunları geliştirme sürecinde component-based yaklaşım ile kod tekrarı minimize edildi
-- Backend optimizasyonları ile sistem performansı önemli ölçüde artırıldı
-- Takım içi iletişim ve görev dağılımı daha etkili hale geldi, herkes kendi uzmanlık alanında başarılı oldu
-- UI/UX iyileştirmeleri ile kullanıcı deneyimi önemli ölçüde geliştirildi
+- Gemini API ile hızlı prototipleme yapılabildi
+- Kavram oyunları geliştirme sürecinde component-based yaklaşımın faydası görüldü
+- Backend servislerini frontend'den ayırmanın bakım kolaylığı sağladığı görüldü
+- Takım içi görev dağılımı ve sprint takibi daha düzenli hale geldi
+- UI/UX iyileştirmeleri demo akışlarını daha anlaşılır yaptı
 
 **⚠️ Gelişim Alanları:**
 - AI API entegrasyonunda bazı edge case'lerde zaman kaybı yaşandı, daha detaylı test planlaması gerekli
@@ -671,20 +665,18 @@ Sprint 3 board'u Notion'da yönetilmektedir. Ekip üyeleri, görev takibi ve ile
 - Dokümantasyon süreçleri daha düzenli hale getirilmeli
 
 **📋 Proje Tamamlanma Süreci:**
-- Sprint 3 ile proje hedefleri başarıyla tamamlandı
-- Tüm temel özellikler implementasyonu tamamlandı
-- AI entegrasyonu ve kavram oyunları başarıyla geliştirildi
-- Kullanıcı deneyimi ve performans optimizasyonları tamamlandı
-- Proje production-ready duruma getirildi
+- Sprint 3 sonunda ana demo akışları ve temel portal ekranları hazırlandı
+- AI entegrasyonu ve kavram oyunları için prototip seviyesinde çalışma yapıldı
+- Public demo kapalıdır; canlı kullanım için env, secret ve hosting kontrolleri gerekir
+- Canlı kullanım iddiası yerine deployment handoff ve readiness notları tutulmaktadır
 
 **🚀 Teknik Öğrenilenler:**
-- Gemini API entegrasyonu ve AI content generation best practices
-- FastAPI ile high-performance backend development teknikleri
+- Gemini API entegrasyonu ve prompt yönetimi temel pratikleri
+- FastAPI ile ayrı backend servisi geliştirme
 - Component-based game development ve state management
-- Advanced CSS techniques ve responsive design optimization
-- Security best practices ve data encryption implementation
-- Performance monitoring ve optimization teknikleri
-- Error handling ve logging sistemi design patterns
+- Responsive tasarım ve oyun ekranı layout kararları
+- Env/secret yönetimi ve eksik konfigürasyon davranışları
+- Error handling ve logging için temel servis pratikleri
 
 **💡 Takım Gelişimi:**
 - Cross-functional collaboration ve knowledge sharing süreçleri güçlendi
