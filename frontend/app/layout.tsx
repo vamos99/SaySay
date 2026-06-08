@@ -5,6 +5,7 @@ import { ModernHeader } from "@/components/layout/ModernHeader";
 import { AuthProvider } from './utils/AuthContext';
 import { UserTypeProvider } from './utils/UserTypeContext';
 import { RouteGuard } from './components/RouteGuard';
+import { EnvStatusBanner } from './components/EnvStatusBanner';
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -20,6 +21,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <AuthProvider>
           <UserTypeProvider>
             <RouteGuard>
+              <EnvStatusBanner />
               <ModernHeader />
               {children}
             </RouteGuard>
