@@ -73,6 +73,4 @@ sequenceDiagram
 
 | Priority | Work | Why it matters |
 | --- | --- | --- |
-| P1 | Parent dashboard KPI definitions | Makes progress, weekly activity and completion metrics understandable for non-technical readers. |
-| P2 | Prompt version registry | Documents prompt purpose, model, owner and fallback behavior for AI content generation. |
 | P2 | Env-missing user states | Shows clear UI messages when local Supabase/Gemini config is absent instead of failing silently. |

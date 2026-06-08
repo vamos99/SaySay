@@ -45,8 +45,6 @@ Recommended board columns:
 
 | Priority | Area | Task | Acceptance Criteria |
 | --- | --- | --- | --- |
-| P1 | product | Define parent dashboard KPIs | Weekly game activity, completion, and child progress metrics are documented. |
-| P2 | ai-content | Add prompt version registry | Prompt name, model, purpose, fallback behavior, and owner are documented. |
 | P2 | frontend | Add env-missing empty states | Login and portal flows explain missing config without crashing. |
 | P2 | docs | Add product walkthrough screenshots | README shows parent portal, game flow, and reporting views. |
 
@@ -56,6 +54,8 @@ Recommended board columns:
 | --- | --- | --- |
 | analytics | Add game event schema | `docs/analytics-events.md` |
 | backend | Add health and readiness checks | `/health`, `/ready` in `backend/generator/api.py` |
+| product | Define parent dashboard KPIs | `docs/parent-dashboard-kpis.md` |
+| ai-content | Add prompt version registry | `docs/prompt-registry.md` |
 
 ## Sprint Plan
 
