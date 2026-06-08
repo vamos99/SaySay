@@ -105,6 +105,7 @@ class UpdateGame2SettingsResponse(BaseModel):
     error: Optional[str] = None
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s %(levelname)s %(message)s')
+logger = logging.getLogger(__name__)
 
 app = FastAPI()
 
@@ -118,12 +119,49 @@ app.add_middleware(
 
 @app.exception_handler(Exception)
 async def global_exception_handler(request: Request, exc: Exception):
-    logging.error(f"Hata: {exc}")
-    return JSONResponse(status_code=500, content={"error": str(exc)})
+    logger.exception("Unhandled request error path=%s", request.url.path)
+    return JSONResponse(status_code=500, content={"error": "Internal server error"})
 
 @app.get("/health")
 async def health_check():
-    return {"status": "healthy", "message": "Service is running"}
+    return {
+        "status": "healthy",
+        "service": "saysay-generator",
+        "message": "Service is running",
+    }
+
+@app.get("/ready")
+async def readiness_check():
+    """Report configuration readiness without calling external services."""
+    dependencies = _dependency_status()
+    required_ready = dependencies["supabase"]["configured"]
+
+    return {
+        "status": "ready" if required_ready else "degraded",
+        "service": "saysay-generator",
+        "dependencies": dependencies,
+        "external_checks": "not_performed",
+    }
+
+def _dependency_status() -> dict:
+    return {
+        "supabase": {
+            "configured": bool(os.environ.get("SUPABASE_URL") and os.environ.get("SUPABASE_KEY")),
+            "required": True,
+        },
+        "gemini": {
+            "configured": bool(os.environ.get("GOOGLE_AI_API_KEY") or os.environ.get("GEMINI_API_KEY")),
+            "required": False,
+        },
+        "gcp_project": {
+            "configured": bool(os.environ.get("GCP_PROJECT_ID")),
+            "required": False,
+        },
+        "secret_manager": {
+            "available": SECRET_MANAGER_AVAILABLE,
+            "required": False,
+        },
+    }
 
 @app.post("/generate", response_model=GenerateResponse)
 async def generate(request: GenerateRequest):
@@ -568,7 +606,7 @@ def _generate_fallback_sentence(object_name: str, action_name: str) -> str:
 def _get_api_key():
     """API key'i environment variable'dan alır, yoksa Secret Manager'dan"""
     # First try environment variable
-    api_key = os.environ.get("GOOGLE_AI_API_KEY")
+    api_key = os.environ.get("GOOGLE_AI_API_KEY") or os.environ.get("GEMINI_API_KEY")
     if api_key:
         return api_key
     

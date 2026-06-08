@@ -1,3 +1,5 @@
+import { logger } from './logger';
+
 export class TTSService {
   private currentSpeech: SpeechSynthesisUtterance | null = null;
   private isCurrentlySpeaking = false;
@@ -7,7 +9,7 @@ export class TTSService {
     this.stop();
     
     if (!text || typeof window === 'undefined' || !window.speechSynthesis) {
-      console.warn('TTS kullanılamıyor');
+      logger.warn('TTS kullanılamıyor');
       return;
     }
 
@@ -30,24 +32,24 @@ export class TTSService {
       this.isCurrentlySpeaking = true;
 
       utterance.onstart = () => {
-        console.log('🔊 TTS başladı');
+        logger.debug('TTS başladı');
         this.isCurrentlySpeaking = true;
       };
 
       utterance.onend = () => {
-        console.log('🔊 TTS bitti');
+        logger.debug('TTS bitti');
         this.isCurrentlySpeaking = false;
         this.currentSpeech = null;
       };
 
       utterance.onerror = (event) => {
-        console.warn('❌ TTS hatası:', event.error);
+        logger.warn('TTS hatası:', event.error);
         this.isCurrentlySpeaking = false;
         this.currentSpeech = null;
         
         // interrupted hatası için özel handling
         if (event.error === 'interrupted') {
-          console.log('🔄 TTS interrupted, yeniden deneniyor...');
+          logger.debug('TTS interrupted, yeniden deneniyor...');
           // Kısa bir bekleme sonrası yeniden dene
           setTimeout(() => {
             if (this.isCurrentlySpeaking) {
@@ -59,7 +61,7 @@ export class TTSService {
 
       window.speechSynthesis.speak(utterance);
     } catch (error) {
-      console.error('TTS başlatma hatası:', error);
+      logger.error('TTS başlatma hatası:', error);
       this.isCurrentlySpeaking = false;
     }
   }
@@ -71,7 +73,7 @@ export class TTSService {
       window.speechSynthesis.cancel();
       this.currentSpeech = null;
       this.isCurrentlySpeaking = false;
-      console.log('⏹️ TTS durduruldu');
+      logger.debug('TTS durduruldu');
     }
   }
 
@@ -92,4 +94,4 @@ export class TTSService {
   cleanTextForSpeech(text: string[]): string {
     return text.join(' ').replace(/____/g, '...');
   }
-} 
+}

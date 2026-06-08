@@ -46,11 +46,16 @@ Recommended board columns:
 | Priority | Area | Task | Acceptance Criteria |
 | --- | --- | --- | --- |
 | P1 | product | Define parent dashboard KPIs | Weekly game activity, completion, and child progress metrics are documented. |
-| P1 | analytics | Add game event schema | Game start, answer, completion, and response-time events have a consistent schema. |
-| P1 | backend | Add health and readiness checks | Backend exposes health checks that do not require Gemini or Supabase secrets. |
 | P2 | ai-content | Add prompt version registry | Prompt name, model, purpose, fallback behavior, and owner are documented. |
 | P2 | frontend | Add env-missing empty states | Login and portal flows explain missing config without crashing. |
 | P2 | docs | Add product walkthrough screenshots | README shows parent portal, game flow, and reporting views. |
+
+## Recently Done
+
+| Area | Task | Evidence |
+| --- | --- | --- |
+| analytics | Add game event schema | `docs/analytics-events.md` |
+| backend | Add health and readiness checks | `/health`, `/ready` in `backend/generator/api.py` |
 
 ## Sprint Plan
 
@@ -80,4 +85,5 @@ Recommended board columns:
 
 ## GitHub Projects Setup
 
-Create a repository project named `SaySay Product Board`, add the fields above, then use the issue templates in `.github/ISSUE_TEMPLATE/` for new work.
+The project board already exists. Keep future issues small and link PRs back to
+the board items when implementation starts.

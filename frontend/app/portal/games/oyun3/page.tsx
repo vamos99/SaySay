@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Oyun3Cache } from "@/utils/oyun3Cache";
 import { getChildTheme } from "@/utils/childThemeService";
 import { Oyun3Question } from "@/utils/geminiService";
+import { logger } from "@/utils/logger";
 
 const TIMER_OPTIONS = [30, 60, 90, 120];
 const LENGTH_OPTIONS = [
@@ -43,7 +44,7 @@ export default function Oyun3Page() {
   // Çocuk değişince cache'i temizle ve yeni sorular yükle
   useEffect(() => {
     if (selectedChild) {
-      console.log('👶 Çocuk değişti:', selectedChild.name);
+      logger.debug('Çocuk değişti:', selectedChild.name);
       // Çocuk değişince sesi durdur
       oyun3Cache.stopSpeaking();
       oyun3Cache.clearCache(selectedChild.id);
@@ -80,7 +81,7 @@ export default function Oyun3Page() {
   useEffect(() => {
     const currentQuestion = questions[currentQuestionIndex];
     if (currentQuestion && wantTTS && !isLoading) {
-      console.log('🔊 Soru seslendiriliyor...');
+      logger.debug('Soru seslendiriliyor...');
       oyun3Cache.speakQuestion(currentQuestion.text, wantTTS);
     }
   }, [currentQuestionIndex, questions, wantTTS, isLoading]);
@@ -629,4 +630,4 @@ export default function Oyun3Page() {
       </div>
     </PortalLayout>
   );
-} 
+}

@@ -73,8 +73,6 @@ sequenceDiagram
 
 | Priority | Work | Why it matters |
 | --- | --- | --- |
-| P1 | Product analytics event schema | Defines game start, answer, completion and response-time events before adding charts. |
 | P1 | Parent dashboard KPI definitions | Makes progress, weekly activity and completion metrics understandable for non-technical readers. |
-| P1 | Health and readiness checks | Allows hosting checks without requiring active Gemini or Supabase credentials. |
 | P2 | Prompt version registry | Documents prompt purpose, model, owner and fallback behavior for AI content generation. |
 | P2 | Env-missing user states | Shows clear UI messages when local Supabase/Gemini config is absent instead of failing silently. |
