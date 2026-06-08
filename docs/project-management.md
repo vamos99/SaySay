@@ -45,8 +45,9 @@ Recommended board columns:
 
 | Priority | Area | Task | Acceptance Criteria |
 | --- | --- | --- | --- |
-| P2 | frontend | Add env-missing empty states | Login and portal flows explain missing config without crashing. |
 | P2 | docs | Add product walkthrough screenshots | README shows parent portal, game flow, and reporting views. |
+| P2 | analytics | Add parent dashboard event wiring | Game events from `docs/analytics-events.md` are emitted from at least one game flow. |
+| P2 | backend | Add prompt fallback smoke tests | Prompt registry assumptions are covered by mock-safe tests without live Gemini calls. |
 
 ## Recently Done
 
@@ -54,6 +55,7 @@ Recommended board columns:
 | --- | --- | --- |
 | analytics | Add game event schema | `docs/analytics-events.md` |
 | backend | Add health and readiness checks | `/health`, `/ready` in `backend/generator/api.py` |
+| frontend | Add env-missing config banner | `frontend/app/components/EnvStatusBanner.tsx` |
 | product | Define parent dashboard KPIs | `docs/parent-dashboard-kpis.md` |
 | ai-content | Add prompt version registry | `docs/prompt-registry.md` |
 
