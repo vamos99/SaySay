@@ -1,6 +1,6 @@
 fastapi>=0.100
 uvicorn>=0.20
-google-cloud-aiplatform>=1.38
+google-cloud-aiplatform>=1.156.0
 google-generativeai>=0.3
 python-dotenv>=1.0
 pillow>=9.0.0
